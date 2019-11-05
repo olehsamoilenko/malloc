@@ -1,9 +1,9 @@
-#include <cstdlib>
-#include <cstdio>
+#include <stdlib.h>
+#include <stdio.h>
 
 #define NEXT(block) (   \
     (struct metadata *)((char *)block + 2 * sizeof(struct metadata) + block->size) \
-)
+) // TODO: check last_valid_addr here
 
 #define PREV(block) (   \
     (struct metadata *)((char *)block - sizeof(struct metadata)) \
@@ -25,15 +25,107 @@ struct metadata {
 void *memory_start = NULL;
 void *last_valid_address = NULL;
 
+void dump_visual(void)
+{
+    int i = 0;
+    struct metadata *block = (struct metadata *)memory_start;
+
+    while (1)
+    {
+        int meta;
+        
+        meta = sizeof(struct metadata);
+        while (meta--)
+        {
+            printf("       {{{ ");
+            if (++i % 10 == 0) {
+                printf("\n");
+            }
+        }
+        int data = block->size;
+        while (data--)
+        {
+            if (block->available)
+                printf("         . ");
+            else
+                printf("         d ");
+
+            if (++i % 10 == 0) {
+                printf("\n");
+            }
+        }
+        meta = sizeof(struct metadata);
+        while (meta--)
+        {
+            printf("       }}} ");
+            if (++i % 10 == 0) {
+                printf("\n");
+            }
+        }
+
+        if (block == last_valid_address)
+            break ;
+        else
+        {
+            void *new_block = NEXT(block);
+            block = (struct metadata *)new_block;
+        }
+    }
+    printf("\n");
+}
+
+void dump(void)
+{
+    struct metadata *block = (struct metadata *)memory_start;
+
+    while (1)
+    {
+        void *end = (char *)block + sizeof(struct metadata) + block->size;
+        struct metadata *end_meta = (struct metadata *)end;
+
+        printf("%p=%lu (%u, %u)=(%u, %u)\n", block, (unsigned long)block, block->available, block->size, end_meta->available, end_meta->size);
+
+        void *new_block = NEXT(block);
+
+        if (block == last_valid_address)
+            break ;
+        else
+            block = (struct metadata *)new_block;
+    }
+
+    printf("\n");
+}
+
+void mem_dump(void *buf, int len)
+{
+	char *mem = (char *)buf;
+	int i = 0;
+	while (i < len) {
+		printf("%#10x ", mem[i]);
+		i++;
+		if (i % 10 == 0)
+			printf("\n");
+	}
+}
+
+void mem_clear(void *buf, int len)
+{
+	char *mem = (char *)buf;
+	int i = 0;
+	while (i++ < len) {
+		mem[i] = 0;
+	}
+}
+
 void myfree(void *p)
 {
     struct metadata *b = (struct metadata *)((char *)p - sizeof(struct metadata));
     b->available = 1;
 
-    END(b)->available = b->available;
+    END(b)->available = b->available; // TODO: duplication ?
     END(b)->size = b->size;
 
-    if (b < last_valid_address) {
+    if ((void *)b < last_valid_address) {
         struct metadata *next = NEXT(b);
         if (next->available) {
 
@@ -47,7 +139,7 @@ void myfree(void *p)
         }
     }
 
-	if (b > memory_start) {
+	if ((void *)b > memory_start) {
 		struct metadata *prev = PREV(b);
 		if (prev->available) {
 			
@@ -63,7 +155,7 @@ void myfree(void *p)
 	}
 }
 
-void mysetup(void *buf, std::size_t size)
+void mysetup(void *buf, unsigned long size)
 {
     memory_start = buf;
     last_valid_address = buf;
@@ -78,7 +170,7 @@ void mysetup(void *buf, std::size_t size)
     meta_end->size = b0->size;
 }
 
-struct metadata *get_suitable_block(std::size_t size) /* last valid address oriented */
+struct metadata *get_suitable_block(unsigned long size) /* last valid address oriented */
 {
     if (!size)
         return (NULL);
@@ -95,7 +187,7 @@ struct metadata *get_suitable_block(std::size_t size) /* last valid address orie
 
             struct metadata *next_block_addr = NEXT(res);
 
-            if (next_block_addr >= last_valid_address)
+            if ((void *)next_block_addr >= last_valid_address)
                 return (NULL);
             else
                 res = (struct metadata *)next_block_addr;
@@ -105,7 +197,7 @@ struct metadata *get_suitable_block(std::size_t size) /* last valid address orie
     return (NULL);
 }
 
-void *myalloc(std::size_t size) // TODO: return ptr to data
+void *myalloc(unsigned long size) // TODO: return ptr to data
 {
     struct metadata *new_block = get_suitable_block(size);
 
@@ -131,10 +223,16 @@ void *myalloc(std::size_t size) // TODO: return ptr to data
         if (reduced_addr > last_valid_address)
             last_valid_address = reduced_addr;
 
+        // printf("new: %p %lu %u\n", new_block, new_block, new_block->size);
+        // printf("new end: %p %lu %u\n", new_block_end, new_block_end, new_block_end->size);
+        // printf("reduced: %p %lu %u\n", reduced_block, reduced_block, reduced_block->size);
+        // printf("reduced end: %p %lu %u\n", reduced_block_end, reduced_block_end, reduced_block_end->size);
+
         return ((char *)new_block + sizeof(struct metadata));
     }
     else if (new_block && new_block->size >= size)
     {
+        printf("maybe not filled fully, but doesn't matter\n");
         new_block->available = 0; /* not filled fully, but doesn't matter */
         void *end = (char *)new_block + sizeof(struct metadata) + new_block->size;
         struct metadata *meta_end = (struct metadata *)end;
@@ -143,6 +241,7 @@ void *myalloc(std::size_t size) // TODO: return ptr to data
     }
     else
     {
+        printf("no space\n");
         return (NULL);
     }
 }
@@ -152,8 +251,10 @@ int main(void)
     size_t total_mem = 100;
 	void *buf = malloc(total_mem);
 
+    mem_clear(buf, total_mem);
     mysetup(buf, total_mem);
 
+    myalloc(1000);
     void *a = myalloc(10);
     void *b = myalloc(10);
     void *c = myalloc(10);
@@ -162,11 +263,16 @@ int main(void)
     myalloc(10);
     myalloc(10);
     myalloc(6);
+    myalloc(1000);
 
 	myfree(c);
 	myfree(b);
 	myfree(d);
 	myfree(a);
+
+    dump();
+    dump_visual();
+	mem_dump(buf, total_mem);
 
     free(buf);
     return (0);

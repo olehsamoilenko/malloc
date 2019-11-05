@@ -1,3 +1,3 @@
 all:
-	gcc -c malloc.c
+	gcc malloc.c -o malloc
 	
