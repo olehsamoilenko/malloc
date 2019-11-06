@@ -22,7 +22,7 @@
 # DYLD_INSERT_LIBRARIES="libft_malloc.so" export DYLD_FORCE_FLAT_NAMESPACE=1 $@
 
 all:
-	gcc malloc.c -o malloc
+	gcc malloc.c testing.c -o malloc
 
 # TODO:
 # $> nm libft_malloc.so
