@@ -3,29 +3,9 @@
 struct metadata *memory_start = NULL; // TODO: get rid of memory start
 struct metadata *last_valid_address = NULL;
 
-// TODO
-// Each zone must contain at least 100 allocations.
-// ◦ “TINY” mallocs, from 1 to n bytes, will be stored in N bytes big zones.
-// ◦ “SMALL” mallocs, from (n+1) to m bytes, will be stored in M bytes big zones.
-// ◦ “LARGE” mallocs, fron (m+1) bytes and more, will be stored out of zone,
-// which simply means with mmap(), they will be in a zone on their own.
-// • It’s up to you to define the size of n, m, N and M so that you find a good compromise
-// between speed (saving on system recall) and saving memory.
-// void show_alloc_mem();
-// The visual will be formatted by increasing addresses such as:
-// TINY : 0xA0000
-// 0xA0020 - 0xA004A : 42 bytes
-// 0xA006A - 0xA00BE : 84 bytes
-// SMALL : 0xAD000
-// 0xAD020 - 0xADEAD : 3725 bytes
-// LARGE : 0xB0000
-// 0xB0020 - 0xBBEEF : 48847 bytes
-// Total : 52698 bytes
-
 // TODO: realloc
 
-// TODO: La free() function deallocates the memory allocation pointed to by “ptr”. If “ptr”is
-// a NULL pointer, no operation is performed.
+// TODO: If “ptr” is a NULL pointer, no operation is performed.
 
 // TODO: We will compare the number of "reclaims" with the number of test0 and test1. If there is so much
 // of "page reclaims" or more than test1, the free does not work.
@@ -38,10 +18,10 @@ void myfree(void *p)
     END(b)->available = b->available; // TODO: duplication ?
     END(b)->size = b->size;
 
-    if (b < last_valid_address) {
+    if (b < last_valid_address) { // TODO: GETNEXT ?
         struct metadata *next = NEXT(b);
 
-        if (next->available) { // TODO: bug?
+        if (next->available && next->type == b->type) {
 
             b->size += next->size + 2 * sizeof(struct metadata);
 
@@ -54,8 +34,9 @@ void myfree(void *p)
     }
 
 	if (b > memory_start) {
-		struct metadata *prev = PREV(b);
-		if (prev->available) {
+
+		struct metadata *prev = PREV(b); // TODO: GETPREV ?
+		if (prev->available && prev->type == b->type) {
 			
 			struct metadata *big_block_end = END(b);
 			big_block_end->size += prev->size + 2 * sizeof(struct metadata);
@@ -64,6 +45,7 @@ void myfree(void *p)
 			
 			if (b == last_valid_address) {
 				last_valid_address = START(prev); /* prev block eaten */
+				// TODO: unmap several pages ?
 			}
 		}
 	}
@@ -73,43 +55,84 @@ struct metadata *get_suitable_block(unsigned long size) /* last valid address or
 {
     if (!size)
         return (NULL);
-    struct metadata *res = ((struct metadata *)last_valid_address);
-    if (res->available && res->size >= size)
-        return (res);
-    else
-    {
-        res = (struct metadata *)memory_start;
-        while (1)
-        {
-            if (res->available && res->size >= size)
-                return (res);
 
-            res = NEXT(res);
-            if (!res)
-                return (NULL);
-        }
-    }
+	int type;
+	if (size <= MAX_TINY_SIZE) {
+		type = TINY;
+		#if DEBUG
+			printf("Block type: TINY\n");
+		#endif
+	}
+	else if (size <= MAX_SMALL_SIZE) {
+		type = SMALL;
+		#if DEBUG
+			printf("Block type: SMALL\n");
+		#endif
+	}
+	else {
+		type = LARGE;
+		#if DEBUG
+			printf("Block type: LARGE\n");
+		#endif
+	}
 
+	struct metadata *res = (struct metadata *)memory_start;
+	while (1)
+	{
+		if (res->available && res->type == type && res->size >= size)
+			return (res);
+
+		res = GETNEXT(res);
+		if (!res)
+			break ;
+	}
+
+	#if DEBUG
+		printf("No suitable space: size = %lu\n", size);
+	#endif
     return (NULL);
 }
 
+void show_alloc_mem()
+{
+	struct metadata *block = (struct metadata *)memory_start;
 
-// TODO: With performance in mind, you must limit the number of calls to mmap(), but also
-// to munmap(). You have to “pre-allocate” some memory zones to store your “small”
-// and “medium” malloc.
-// • The size of these zones must be a multiple of getpagesize().
-// Pre-allocated zones
-// Check in the source code that pre-allocated areas according to different sizes
-// malloc can store at least 100 times the maximum size for this type of zone.
-// Also check that the size of the fields is a multiple of getpagesize ().
-// If any of these points are missing, leave No.
+	const char *labels[] = {"TINY", "SMALL", "LARGE"};
 
-// TODO: We see in this example that this malloc used 1024 pages or 4MBytes to store
-// 1Mbyte.
+	int current_type = -1;
+	unsigned long sum = 0;
+
+    while (1)
+    {
+		if (current_type != block->type)
+		{
+			printf("%s : 0x%lX\n", labels[block->type], (unsigned long)block);
+			current_type = block->type;
+		}
+
+		if (!block->available)
+		{
+			printf("0x%lX - 0x%lX : %u bytes\n",
+				(unsigned long)(char *)block + sizeof(struct metadata),
+				(unsigned long)END(block), block->size);
+			sum += block->size;
+		}
+
+        block = GETNEXT(block);
+		if (!block)
+		{
+			printf("Total : %lu", sum);
+			break ;
+		}
+    }
+
+    printf("\n");
+}
+
+// TODO
 // Count the number of pages used and adjust the score as follows:
 // - less than 255 pages, the reserved memory is insufficient: 0
-// - 1023 pages and more, the malloc works but consumes a minimum page each
-// allocation: 1
+// - 1023 pages and more, the malloc works but consumes a minimum page each allocation: 1
 // - between 513 pages and 1022 pages, the malloc works but the overhead is too important: 2
 // - between 313 pages and 512 pages, the malloc works but the overhead is very important: 3
 // - between 273 pages and 312 pages, the malloc works but the overhead is important: 4
@@ -126,10 +149,11 @@ void *myalloc(unsigned long size)
 
         void *reduced_addr = (char *)new_block_end_addr + sizeof(struct metadata);
         struct metadata *reduced_block = (struct metadata *)reduced_addr;
-        reduced_block->available = new_block->available;
+        reduced_block->available = new_block->available; // 1
         reduced_block->size = new_block->size - 2 * sizeof(struct metadata) - size;
+		reduced_block->type = new_block->type;
 
-        struct metadata *reduced_block_end = END(reduced_block); /* initialized */
+        struct metadata *reduced_block_end = END(reduced_block);
         reduced_block_end->available = reduced_block->available;
         reduced_block_end->size = reduced_block->size;
 
@@ -137,6 +161,7 @@ void *myalloc(unsigned long size)
         new_block->size = size;
         new_block_end->available = new_block->available;
         new_block_end->size = new_block->size;
+		new_block_end->type = new_block->type;
 
         if (reduced_block > last_valid_address)
             last_valid_address = reduced_block;
@@ -163,9 +188,7 @@ void *myalloc(unsigned long size)
     else
     {
         /* there is no suitable block */
-		#if DEBUG
-			printf("no suitable block\n");
-		#endif
+		
         return (NULL);
     }
 }
@@ -175,6 +198,7 @@ void testing(void);
 int main(void)
 {
     testing();
+	// getpagesize() - 4096
     return (0);
 }
 
