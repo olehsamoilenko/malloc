@@ -161,7 +161,8 @@ void *myalloc(unsigned long size) // TODO: return ptr to data
     }
     else
     {
-        printf("no space\n");
+        /* there is no suitable block */
+		printf("no suitable block\n");
         return (NULL);
     }
 }

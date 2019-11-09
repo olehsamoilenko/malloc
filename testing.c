@@ -111,69 +111,271 @@ void mysetup(void *buf, unsigned long size)
     meta_end->size = b0->size;
 }
 
-void test_1(void)
+int	check(int availables[], int sizes[])
+{
+	struct metadata *block = (struct metadata *)memory_start;
+
+	int i = -1;
+
+    while (1)
+    {
+		++i;
+
+        void *end = (char *)block + sizeof(struct metadata) + block->size;
+		// TODO: use END
+        struct metadata *end_meta = (struct metadata *)end;
+
+		if (block->available != end_meta->available
+			|| block->size != end_meta->size
+			|| block->size != sizes[i]
+			|| block->available != availables[i])
+		return (0);
+
+        void *new_block = NEXT(block);
+
+        if (block == last_valid_address)
+            break ;
+        else
+            block = (struct metadata *)new_block;
+    }
+	return (1);
+}
+
+void test_0(void) /* simple allocation */
 {
     size_t total_mem = 100;
 	void *buf = malloc(total_mem);
     mem_clear(buf, total_mem);
     mysetup(buf, total_mem);
 
-    myalloc(100);
-    
-    dump();
-    dump_visual();
-	mem_dump(buf, total_mem);
+    myalloc(10);
+	myalloc(11);
+	myalloc(12);
+	myalloc(13);
+	myalloc(3);
+
+	int availables[] =	{0,  0,  0,  0};
+	int sizes[] =		{10, 11, 12, 3};
+	if (check(availables, sizes))
+		printf("Test 0 OK\n");
+	else
+	{
+		printf("Test 0 ERROR\n");
+		dump();
+		dump_visual();
+		mem_dump(buf, total_mem);
+	}
 
     free(buf);
 }
 
-void test_N(void)
+void test_1(void) /* too big allocation */
 {
     size_t total_mem = 100;
 	void *buf = malloc(total_mem);
     mem_clear(buf, total_mem);
     mysetup(buf, total_mem);
 
-    myalloc(1000);
-    void *a = myalloc(10);
-    void *b = myalloc(10);
-    void *c = myalloc(10);
-    void *d = myalloc(6);
-    myalloc(10);
-    myalloc(10);
-    myalloc(10);
-    myalloc(6);
-    myalloc(1000);
+    void *a = myalloc(100); // too much
+	myalloc(1);
 
-	myfree(c);
+	int availables[] =	{0, 1};
+	int sizes[] =		{1, 67};
+	if (check(availables, sizes)
+		&& a == NULL)
+		printf("Test 1 OK\n");
+	else
+	{
+		printf("Test 1 ERROR\n");
+		dump();
+		dump_visual();
+		mem_dump(buf, total_mem);
+	}
+
+    free(buf);
+}
+
+void test_2(void) /* too big allocation */
+{
+    size_t total_mem = 100;
+	void *buf = malloc(total_mem);
+    mem_clear(buf, total_mem);
+    mysetup(buf, total_mem);
+
+	myalloc(1);
+    void *a = myalloc(100); // too much
+	myalloc(2);
+
+	int availables[] =	{0, 0, 1};
+	int sizes[] =		{1, 2, 49};
+	if (check(availables, sizes)
+		&& a == NULL)
+		printf("Test 2 OK\n");
+	else
+	{
+		printf("Test 2 ERROR\n");
+		dump();
+		dump_visual();
+		mem_dump(buf, total_mem);
+	}
+
+    free(buf);
+}
+
+void test_3(void) /* space left only for meta */
+{
+    size_t total_mem = 100;
+	void *buf = malloc(total_mem);
+    mem_clear(buf, total_mem);
+    mysetup(buf, total_mem);
+
+	myalloc(84);
+	void *a = myalloc(0); // no space for meta
+	void *b = myalloc(1); // no space
+
+	int availables[] =	{0};
+	int sizes[] =		{84};
+	if (check(availables, sizes)
+		&& a == NULL
+		&& b == NULL)
+		printf("Test 3 OK\n");
+	else
+	{
+		printf("Test 3 ERROR\n");
+		dump();
+		dump_visual();
+		mem_dump(buf, total_mem);
+	}
+
+    free(buf);
+}
+
+void test_4(void) /* right block eating */
+{
+    size_t total_mem = 100;
+	void *buf = malloc(total_mem);
+    mem_clear(buf, total_mem);
+    mysetup(buf, total_mem);
+
+	void *a = myalloc(20);
+	void *b = myalloc(20);
 	myfree(b);
-	myfree(d);
 	myfree(a);
 
-    dump();
-    dump_visual();
-	mem_dump(buf, total_mem);
+	int availables[] =	{1};
+	int sizes[] =		{84};
+	if (check(availables, sizes))
+		printf("Test 4 OK\n");
+	else
+	{
+		printf("Test 4 ERROR\n");
+		dump();
+		dump_visual();
+		mem_dump(buf, total_mem);
+	}
 
     free(buf);
 }
 
-// Failed. Runtime error
-// myalloc returned out-of-range block
-// Aborted (core dumped)
+void test_5(void) /* left block eating */
+{
+    size_t total_mem = 100;
+	void *buf = malloc(total_mem);
+    mem_clear(buf, total_mem);
+    mysetup(buf, total_mem);
 
-// Failed. Runtime error
-// Segmentation fault (core dumped)
+	void *a = myalloc(20);
+	void *b = myalloc(20);
+	void *c = myalloc(12);
+	myfree(a);
+	myfree(b);
+	myfree(c);
 
-// Failed. Runtime error
-// For heap size of 524288 bytes, max allocated size 262153 bytes is too small
-// Aborted (core dumped)
+	int availables[] =	{1};
+	int sizes[] =		{84};
+	if (check(availables, sizes))
+		printf("Test 5 OK\n");
+	else
+	{
+		printf("Test 5 ERROR\n");
+		dump();
+		dump_visual();
+		mem_dump(buf, total_mem);
+	}
 
-// Failed. Runtime error
-// Heap fragmentation (max) (alloc size = 16)
-// Aborted (core dumped)
+    free(buf);
+}
+
+void test_6(void) /* several retries */
+{
+    size_t total_mem = 100;
+	void *buf = malloc(total_mem);
+    mem_clear(buf, total_mem);
+    mysetup(buf, total_mem);
+
+	void *a;
+	a = myalloc(20);
+	myfree(a);
+	a = myalloc(20);
+	myfree(a);
+	a = myalloc(20);
+	myfree(a);
+	a = myalloc(20);
+	myfree(a);
+	a = myalloc(20);
+	myfree(a);
+
+	int availables[] =	{1};
+	int sizes[] =		{84};
+	if (check(availables, sizes))
+		printf("Test 6 OK\n");
+	else
+	{
+		printf("Test 6 ERROR\n");
+		dump();
+		dump_visual();
+		mem_dump(buf, total_mem);
+	}
+
+    free(buf);
+}
+
+void test_7(void) /* fragmentation */
+{
+    size_t total_mem = 100;
+	void *buf = malloc(total_mem);
+    mem_clear(buf, total_mem);
+    mysetup(buf, total_mem);
+
+	myalloc(1);
+	myalloc(1);
+	myalloc(1);
+	myalloc(1);
+	myalloc(1);
+
+	int availables[] =	{0, 0, 0, 0, 0 };
+	int sizes[] =		{1, 1, 1, 1, 16};
+	if (check(availables, sizes))
+		printf("Test 7 OK\n");
+	else
+	{
+		printf("Test 7 ERROR\n");
+		dump();
+		dump_visual();
+		mem_dump(buf, total_mem);
+	}
+
+    free(buf);
+}
 
 void testing(void)
 {
+	test_0();
     test_1();
-    test_N();
+	test_2();
+	test_3();
+	test_4();
+	test_5();
+	test_6();
+	test_7();
 }

@@ -2,3 +2,4 @@ a.out
 malloc
 .vscode
 *.o
+.DS_Store
