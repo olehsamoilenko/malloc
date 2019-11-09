@@ -1,7 +1,7 @@
 #include "malloc.h"
 
-void *memory_start = NULL; // TODO: get rid of memory start
-void *last_valid_address = NULL;
+struct metadata *memory_start = NULL; // TODO: get rid of memory start
+struct metadata *last_valid_address = NULL;
 
 // TODO
 // Each zone must contain at least 100 allocations.
@@ -38,9 +38,10 @@ void myfree(void *p)
     END(b)->available = b->available; // TODO: duplication ?
     END(b)->size = b->size;
 
-    if ((void *)b < last_valid_address) {
+    if (b < last_valid_address) {
         struct metadata *next = NEXT(b);
-        if (next->available) {
+
+        if (next->available) { // TODO: bug?
 
             b->size += next->size + 2 * sizeof(struct metadata);
 
@@ -52,7 +53,7 @@ void myfree(void *p)
         }
     }
 
-	if ((void *)b > memory_start) {
+	if (b > memory_start) {
 		struct metadata *prev = PREV(b);
 		if (prev->available) {
 			
@@ -83,12 +84,9 @@ struct metadata *get_suitable_block(unsigned long size) /* last valid address or
             if (res->available && res->size >= size)
                 return (res);
 
-            struct metadata *next_block_addr = NEXT(res);
-
-            if ((void *)next_block_addr >= last_valid_address)
+            res = NEXT(res);
+            if (!res)
                 return (NULL);
-            else
-                res = (struct metadata *)next_block_addr;
         }
     }
 
@@ -117,7 +115,7 @@ struct metadata *get_suitable_block(unsigned long size) /* last valid address or
 // - between 273 pages and 312 pages, the malloc works but the overhead is important: 4
 // - between 255 and 272 pages, the malloc works and the overhead is reasonable: 5
 
-void *myalloc(unsigned long size) // TODO: return ptr to data
+void *myalloc(unsigned long size)
 {
     struct metadata *new_block = get_suitable_block(size);
 
@@ -130,8 +128,8 @@ void *myalloc(unsigned long size) // TODO: return ptr to data
         struct metadata *reduced_block = (struct metadata *)reduced_addr;
         reduced_block->available = new_block->available;
         reduced_block->size = new_block->size - 2 * sizeof(struct metadata) - size;
-        void *reduced_block_end_addr = (char *)reduced_block + sizeof(struct metadata) + reduced_block->size;
-        struct metadata *reduced_block_end = (struct metadata *)reduced_block_end_addr; /* initialized */
+
+        struct metadata *reduced_block_end = END(reduced_block); /* initialized */
         reduced_block_end->available = reduced_block->available;
         reduced_block_end->size = reduced_block->size;
 
@@ -140,29 +138,34 @@ void *myalloc(unsigned long size) // TODO: return ptr to data
         new_block_end->available = new_block->available;
         new_block_end->size = new_block->size;
 
-        if (reduced_addr > last_valid_address)
-            last_valid_address = reduced_addr;
+        if (reduced_block > last_valid_address)
+            last_valid_address = reduced_block;
 
-        // printf("new: %p %lu %u\n", new_block, new_block, new_block->size);
-        // printf("new end: %p %lu %u\n", new_block_end, new_block_end, new_block_end->size);
-        // printf("reduced: %p %lu %u\n", reduced_block, reduced_block, reduced_block->size);
-        // printf("reduced end: %p %lu %u\n", reduced_block_end, reduced_block_end, reduced_block_end->size);
+		#if DEBUG
+			printf("new: %p %lu %u\n", new_block, (unsigned long)new_block, new_block->size);
+			printf("new end: %p %lu %u\n", new_block_end, (unsigned long)new_block_end, new_block_end->size);
+			printf("reduced: %p %lu %u\n", reduced_block, (unsigned long)reduced_block, reduced_block->size);
+			printf("reduced end: %p %lu %u\n", reduced_block_end, (unsigned long)reduced_block_end, reduced_block_end->size);
+		#endif
 
         return ((char *)new_block + sizeof(struct metadata));
     }
     else if (new_block && new_block->size >= size)
     {
-        printf("maybe not filled fully, but doesn't matter\n");
+		#if DEBUG
+        	printf("maybe not filled fully, but doesn't matter\n");
+		#endif
         new_block->available = 0; /* not filled fully, but doesn't matter */
-        void *end = (char *)new_block + sizeof(struct metadata) + new_block->size;
-        struct metadata *meta_end = (struct metadata *)end;
-        meta_end->available = new_block->available;
+
+        END(new_block)->available = new_block->available;
         return ((char *)new_block + sizeof(struct metadata));
     }
     else
     {
         /* there is no suitable block */
-		printf("no suitable block\n");
+		#if DEBUG
+			printf("no suitable block\n");
+		#endif
         return (NULL);
     }
 }
@@ -176,15 +179,18 @@ int main(void)
 }
 
 // BONUSES:
-//          Manage the malloc debug environment variables. You can imitate those from malloc
+// PROGRESS Manage the malloc debug environment variables. You can imitate those from malloc
 //          system or invent your own.
+//          - Malloc has debug environment variables
+
 //          • Create a show_alloc_mem_ex() function that displays more details, for example,
 //          a history of allocations, or an hexa dump of the allocated zones.
+//          - A function allows to dump hexa allocated zones
+
 // DONE     • “Defragment” the freed memory.
-//          • Manage the use of your malloc in a multi-threaded program (so to be “thread safe”
-//          using the pthread lib).
 //          - During free, the project "defragments" free memory by grouping free blocks
 //          concomitant in one
-//          - Malloc has debug environment variables
-//          - A function allows to dump hexa allocated zones
+
+//          • Manage the use of your malloc in a multi-threaded program (so to be “thread safe”
+//          using the pthread lib).
 //          - A function makes it possible to display a history of the memory allocations made

@@ -3,9 +3,13 @@
 
 # define MALLOC_H
 
-# define NEXT(block) (   \
-    (struct metadata *)((char *)block + 2 * sizeof(struct metadata) + block->size) \
-) // TODO: check last_valid_addr here
+# define NEXT(block) ({														\
+    struct metadata *next = (struct metadata *)((char *)block 				\
+							+ 2 * sizeof(struct metadata) + block->size);	\
+	if (next > last_valid_address)									\
+		next = NULL;														\
+	next;																	\
+})
 
 # define PREV(block) (   \
     (struct metadata *)((char *)block - sizeof(struct metadata)) \

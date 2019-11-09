@@ -1,8 +1,8 @@
 #include "malloc.h"
 #include <stdlib.h>
 
-extern void *last_valid_address;
-extern void *memory_start;
+extern struct metadata *last_valid_address;
+extern struct metadata *memory_start;
 
 void dump_visual(void)
 {
@@ -46,7 +46,7 @@ void dump_visual(void)
             break ;
         else
         {
-            void *new_block = NEXT(block);
+            struct metadata *new_block = NEXT(block);
             block = (struct metadata *)new_block;
         }
     }
@@ -59,12 +59,11 @@ void dump(void)
 
     while (1)
     {
-        void *end = (char *)block + sizeof(struct metadata) + block->size;
-        struct metadata *end_meta = (struct metadata *)end;
+        struct metadata *end_meta = END(block);
 
         printf("%p=%lu (%u, %u)=(%u, %u)\n", block, (unsigned long)block, block->available, block->size, end_meta->available, end_meta->size);
 
-        void *new_block = NEXT(block);
+        struct metadata *new_block = NEXT(block);
 
         if (block == last_valid_address)
             break ;
@@ -105,8 +104,7 @@ void mysetup(void *buf, unsigned long size)
     b0->available = 1;
     b0->size = size - 2 * sizeof(struct metadata);
 
-    void *end = (char *)b0 + sizeof(struct metadata) + b0->size;
-    struct metadata *meta_end = (struct metadata *)end;
+    struct metadata *meta_end = END(b0);
     meta_end->available = 1;
     meta_end->size = b0->size;
 }
@@ -121,9 +119,7 @@ int	check(int availables[], int sizes[])
     {
 		++i;
 
-        void *end = (char *)block + sizeof(struct metadata) + block->size;
-		// TODO: use END
-        struct metadata *end_meta = (struct metadata *)end;
+        struct metadata *end_meta = END(block);
 
 		if (block->available != end_meta->available
 			|| block->size != end_meta->size
@@ -165,6 +161,11 @@ void test_0(void) /* simple allocation */
 		dump_visual();
 		mem_dump(buf, total_mem);
 	}
+	#if DEBUG
+		dump();
+		dump_visual();
+		mem_dump(buf, total_mem);
+	#endif
 
     free(buf);
 }
@@ -191,6 +192,11 @@ void test_1(void) /* too big allocation */
 		dump_visual();
 		mem_dump(buf, total_mem);
 	}
+	#if DEBUG
+		dump();
+		dump_visual();
+		mem_dump(buf, total_mem);
+	#endif
 
     free(buf);
 }
@@ -218,6 +224,11 @@ void test_2(void) /* too big allocation */
 		dump_visual();
 		mem_dump(buf, total_mem);
 	}
+	#if DEBUG
+		dump();
+		dump_visual();
+		mem_dump(buf, total_mem);
+	#endif
 
     free(buf);
 }
@@ -246,6 +257,11 @@ void test_3(void) /* space left only for meta */
 		dump_visual();
 		mem_dump(buf, total_mem);
 	}
+	#if DEBUG
+		dump();
+		dump_visual();
+		mem_dump(buf, total_mem);
+	#endif
 
     free(buf);
 }
@@ -273,6 +289,11 @@ void test_4(void) /* right block eating */
 		dump_visual();
 		mem_dump(buf, total_mem);
 	}
+	#if DEBUG
+		dump();
+		dump_visual();
+		mem_dump(buf, total_mem);
+	#endif
 
     free(buf);
 }
@@ -302,6 +323,11 @@ void test_5(void) /* left block eating */
 		dump_visual();
 		mem_dump(buf, total_mem);
 	}
+	#if DEBUG
+		dump();
+		dump_visual();
+		mem_dump(buf, total_mem);
+	#endif
 
     free(buf);
 }
@@ -336,6 +362,11 @@ void test_6(void) /* several retries */
 		dump_visual();
 		mem_dump(buf, total_mem);
 	}
+	#if DEBUG
+		dump();
+		dump_visual();
+		mem_dump(buf, total_mem);
+	#endif
 
     free(buf);
 }
@@ -364,6 +395,11 @@ void test_7(void) /* fragmentation */
 		dump_visual();
 		mem_dump(buf, total_mem);
 	}
+	#if DEBUG
+		dump();
+		dump_visual();
+		mem_dump(buf, total_mem);
+	#endif
 
     free(buf);
 }
