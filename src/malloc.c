@@ -18,35 +18,29 @@ void myfree(void *p)
     END(b)->available = b->available; // TODO: duplication ?
     END(b)->size = b->size;
 
-    if (b < last_valid_address) { // TODO: GETNEXT ?
-        struct metadata *next = NEXT(b);
+    struct metadata *next = GETNEXT(b);
+	if (next && next->available && next->type == b->type) {
 
-        if (next->available && next->type == b->type) {
+		b->size += next->size + 2 * sizeof(struct metadata);
 
-            b->size += next->size + 2 * sizeof(struct metadata);
+		END(b)->size = b->size;
 
-			END(b)->size = b->size;
+		if (next == last_valid_address) {
+			last_valid_address = b; /* next block is eaten */
+		}
+	}
 
-            if (next == last_valid_address) {
-                last_valid_address = b; /* next block is eaten */
-            }
-        }
-    }
+	struct metadata *prev = GETPREV(b);
+	if (prev && prev->available && prev->type == b->type) {
+		
+		struct metadata *big_block_end = END(b);
+		big_block_end->size += prev->size + 2 * sizeof(struct metadata);
 
-	if (b > memory_start) {
-
-		struct metadata *prev = PREV(b); // TODO: GETPREV ?
-		if (prev->available && prev->type == b->type) {
-			
-			struct metadata *big_block_end = END(b);
-			big_block_end->size += prev->size + 2 * sizeof(struct metadata);
-
-			START(prev)->size = big_block_end->size; 
-			
-			if (b == last_valid_address) {
-				last_valid_address = START(prev); /* prev block eaten */
-				// TODO: unmap several pages ?
-			}
+		START(prev)->size = big_block_end->size; 
+		
+		if (b == last_valid_address) {
+			last_valid_address = START(prev); /* prev block eaten */
+			// TODO: unmap several pages ?
 		}
 	}
 }
@@ -129,8 +123,7 @@ void show_alloc_mem()
     printf("\n");
 }
 
-// TODO
-// Count the number of pages used and adjust the score as follows:
+// TODO Count the number of pages used and adjust the score as follows:
 // - less than 255 pages, the reserved memory is insufficient: 0
 // - 1023 pages and more, the malloc works but consumes a minimum page each allocation: 1
 // - between 513 pages and 1022 pages, the malloc works but the overhead is too important: 2
@@ -203,7 +196,7 @@ int main(void)
 }
 
 // BONUSES:
-// PROGRESS Manage the malloc debug environment variables. You can imitate those from malloc
+// DONE     Manage the malloc debug environment variables. You can imitate those from malloc
 //          system or invent your own.
 //          - Malloc has debug environment variables
 

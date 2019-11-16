@@ -8,16 +8,23 @@
     (struct metadata *)((char *)block + 2 * sizeof(struct metadata) + block->size)	\
 ) /* from start */
 
-# define GETNEXT(block) ({														\
-    struct metadata *next = NEXT(block); \
-	if (next > last_valid_address)									\
-		next = NULL;														\
-	next;																	\
+# define GETNEXT(block) ({					\
+    struct metadata *next = NEXT(block);	\
+	if (next > last_valid_address)			\
+		next = NULL;						\
+	next;									\
 }) /* from start */
 
 # define PREV(block) (   \
     (struct metadata *)((char *)block - sizeof(struct metadata)) \
 ) /* from start */
+
+# define GETPREV(block) ({					\
+    struct metadata *prev = PREV(block);	\
+	if (prev < memory_start)				\
+		prev = NULL;						\
+	prev;									\
+}) /* from start */
 
 # define START(block) (   \
 	(struct metadata *)((char *)block - block->size - sizeof(struct metadata)) \
@@ -35,16 +42,16 @@
 
 enum block_type
 {
-	// ZERO, // TODO: remove
+	// ZERO, // good for debug
 	TINY,
 	SMALL,
 	LARGE
 };
 
 struct metadata {
-    unsigned int available;
+    unsigned int available; // TODO: 1 bit
     unsigned int size;
-	enum block_type type;
+	enum block_type type; // TODO: 2 bits
 };
 
 void myfree(void *p);

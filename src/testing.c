@@ -443,20 +443,16 @@ void test_9(void) /* right block eating */
     mem_clear(buf, total_mem);
     mysetup2(buf);
 
-	dump();
 	void *t1 = myalloc(1);
-	dump();
 	void *s1 = myalloc(6);
 	void *t2 = myalloc(1);
 	void *s2 = myalloc(6);
 	void *t3 = myalloc(1);
 	void *s3 = myalloc(6);
 
-
 	myfree(s3);
 	myfree(s2);
 	myfree(s1);
-
 
 	myfree(t3);
 	myfree(t2);
@@ -531,6 +527,6 @@ void testing(void)
 	*/
 
 	// test_8();
-	// test_9();
+	test_9();
 	test_10();
 }
