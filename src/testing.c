@@ -81,13 +81,25 @@ int	check(int availables[], int sizes[])
 	return (1);
 }
 
+#include <errno.h>
 
 void test_8(void)
 {
 	printf("Test 8 ... ");
     mysetup();
 	void *a = myalloc(60); // large block
-	mmap_zone(10);
+	// ft_strcpy(a, "hello");
+	// TODO CONTINUE: mmap => unmap => mmap. same addr ?
+	// void *tounmap = mmap_zone(10);
+	printf("%d\n", munmap(a, getpagesize()));
+	printf("%s\n", strerror(errno));
+	// struct metadata *test = tounmap;
+	// test->available = 1;
+
+	// mmap_zone(10);
+	// mmap_zone(10);
+	// mmap_zone(10);
+
 
 	#if DEBUG
 		show_alloc_mem_ex();

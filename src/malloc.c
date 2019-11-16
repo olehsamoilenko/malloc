@@ -101,7 +101,7 @@ struct metadata *get_suitable_block(unsigned long size) /* last valid address or
 
 void *mmap_zone(unsigned long size)
 {
-	unsigned long to_request = 0;
+	unsigned long to_request;
 	char type;
 
 	if (size <= MAX_TINY_SIZE) {
@@ -116,7 +116,6 @@ void *mmap_zone(unsigned long size)
 		to_request = LARGE_ZONE(size); // TODO: check overflowing, TODO: page + 1 ?
 		type = LARGE;
 	}
-	// printf("%d\n", to_request);
 
 	struct metadata *zone = mmap(NULL, to_request, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 	zone->available = true;
@@ -127,6 +126,8 @@ void *mmap_zone(unsigned long size)
     END(zone)->size = to_request - 2 * sizeof(struct metadata);
 
 	last_valid_address = zone;
+
+	printf("%p\n", zone);
 
 	return (zone);
 }
