@@ -11,10 +11,10 @@
 # **************************************************************************** #
 
 NAME =			malloc
-HEADER =		malloc.h#./includes/asm.h
-INC =			-I .#-I ./includes \
+HEADER =		./includes/malloc.h
+INC =			-I ./includes \
 				-I ./libft/includes
-LIB =			-lft -L libft
+LIB =			-lft -L ./libft
 FLAGS =			#-Wall -Wextra -Werror
 LIST =			malloc \
 				testing
@@ -48,7 +48,6 @@ PURPLELIGHT=\033[38;2;102;102;255m
 # cat run.sh #!/bin/sh export DYLD_LIBRARY_PATH=. export
 # DYLD_INSERT_LIBRARIES="libft_malloc.so" export DYLD_FORCE_FLAT_NAMESPACE=1 $@
 
-	
 # TODO: $> nm libft_malloc.so
 # 0000000000000000 T _free
 # 0000000000000000 T _malloc
@@ -63,16 +62,11 @@ PURPLELIGHT=\033[38;2;102;102;255m
 all: $(NAME)
 
 obj/%.o: src/%.c $(HEADER)
-	@gcc $(FLAGS) -c $< -o $@ $(INC)
+	gcc $(FLAGS) -c $< -o $@ $(INC) -D DEBUG  # TODO: refactor
 	@echo "$(PURPLELIGHT)Compiling $(WHITE)$< $(PURPLELIGHT)done$(OFF)"
 
 $(NAME): ./libft/libft.a obj $(OBJ)
 	@gcc $(OBJ) -o $(NAME) $(LIB)
-	@echo "$(PURPLEBOLD)$(NAME)$(PURPLE) is ready$(OFF)"
-
-debug: ./libft/libft.a obj $(OBJ) # TODO: refactor
-	# gcc malloc.c testing.c -o malloc -D DEBUG
-	@gcc $(OBJ) -o $(NAME) $(LIB) -D DEBUG
 	@echo "$(PURPLEBOLD)$(NAME)$(PURPLE) is ready$(OFF)"
 
 ./libft/libft.a:
