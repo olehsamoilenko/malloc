@@ -13,6 +13,7 @@
 #ifndef MALLOC_H
 # include <stdio.h> // TODO: remove
 # include <unistd.h> // TODO: swap with libft
+# include "libft.h"
 
 # define MALLOC_H
 
@@ -50,7 +51,9 @@
 # define N 80 /* tiny zone size: meta + blocks TODO: // Each zone must contain at least 100 allocations. */ 
 # define M 150 /* small zone size: meta + blocks  TODO: // • The size of these zones must be a multiple of getpagesize().*/
 # define MAX_TINY_SIZE 5 // TODO: change to normal values
-# define MAX_SMALL_SIZE 10 
+# define MAX_SMALL_SIZE 10
+
+
 
 enum block_type
 {
@@ -69,5 +72,6 @@ struct metadata {
 void myfree(void *p);
 void *myalloc(unsigned long size);
 void show_alloc_mem(void);
+void show_alloc_mem_ex(void);
 
 #endif

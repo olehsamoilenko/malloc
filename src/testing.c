@@ -86,22 +86,14 @@ void dump(void)
     printf("\n");
 }
 
-// void mem_dump(void *buf, int len) TODO: show_alloc_mem_ex()
-// {
-// 	char *mem = (char *)buf;
-// 	int i = 0;
-// 	while (i < len) {
-// 		printf("%#10x ", mem[i]);
-// 		i++;
-// 		if (i % 10 == 0)
-// 			printf("\n");
-// 	}
-// }
+
+
+
 
 void mem_clear(void *buf, int len)
 {
 	char *mem = (char *)buf;
-	int i = 0;
+	unsigned int i = 0;
 	while (i++ < len) {
 		mem[i] = 0;
 	}
@@ -229,10 +221,13 @@ void test_10(void) /* left block eating */
 	void *s2 = myalloc(6);
 	void *t3 = myalloc(1);
 	void *s3 = myalloc(6);
+	ft_strcpy(s3, "hello");
 
 	#if DEBUG
 		show_alloc_mem();
 	#endif
+
+	show_alloc_mem_ex();
 
 	myfree(s1);
 	myfree(s2);

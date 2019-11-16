@@ -17,7 +17,8 @@ INC =			-I ./includes \
 LIB =			-lft -L ./libft
 FLAGS =			#-Wall -Wextra -Werror
 LIST =			malloc \
-				testing
+				testing \
+				dump
 OBJ =			$(addprefix obj/, $(addsuffix .o, $(LIST)))
 
 ifeq ("$(DEBUG)", "1")

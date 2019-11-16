@@ -99,42 +99,6 @@ struct metadata *get_suitable_block(unsigned long size) /* last valid address or
     return (NULL);
 }
 
-void show_alloc_mem()
-{
-	struct metadata *block = (struct metadata *)memory_start;
-
-	const char *labels[] = {"TINY", "SMALL", "LARGE"};
-
-	int current_type = -1;
-	unsigned long sum = 0;
-
-    while (1)
-    {
-		if (current_type != block->type)
-		{
-			printf("%s : 0x%lX\n", labels[block->type], (unsigned long)block);
-			current_type = block->type;
-		}
-
-		if (!block->available)
-		{
-			printf("0x%lX - 0x%lX : %u bytes\n",
-				(unsigned long)(char *)block + sizeof(struct metadata),
-				(unsigned long)END(block), block->size);
-			sum += block->size;
-		}
-
-        block = GETNEXT(block);
-		if (!block)
-		{
-			printf("Total : %lu", sum);
-			break ;
-		}
-    }
-
-    printf("\n");
-}
-
 // TODO Count the number of pages used and adjust the score as follows:
 // - less than 255 pages, the reserved memory is insufficient: 0
 // - 1023 pages and more, the malloc works but consumes a minimum page each allocation: 1
@@ -193,7 +157,6 @@ void *myalloc(unsigned long size)
     else
     {
         /* there is no suitable block */
-		
         return (NULL);
     }
 }
@@ -212,7 +175,7 @@ int main(void)
 //          system or invent your own.
 //          - Malloc has debug environment variables
 
-//          • Create a show_alloc_mem_ex() function that displays more details, for example,
+// DONE     • Create a show_alloc_mem_ex() function that displays more details, for example,
 //          a history of allocations, or an hexa dump of the allocated zones.
 //          - A function allows to dump hexa allocated zones
 
