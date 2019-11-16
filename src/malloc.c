@@ -99,6 +99,38 @@ struct metadata *get_suitable_block(unsigned long size) /* last valid address or
     return (NULL);
 }
 
+void *mmap_zone(unsigned long size)
+{
+	unsigned long to_request = 0;
+	char type;
+
+	if (size <= MAX_TINY_SIZE) {
+		to_request = TINY_ZONE;
+		type = TINY;
+	}
+	else if (size <= MAX_SMALL_SIZE) {
+		to_request = SMALL_ZONE;
+		type = SMALL;
+	}
+	else {
+		to_request = LARGE_ZONE(size); // TODO: check overflowing, TODO: page + 1 ?
+		type = LARGE;
+	}
+	// printf("%d\n", to_request);
+
+	struct metadata *zone = mmap(NULL, to_request, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+	zone->available = true;
+	zone->type = type;
+    zone->size = to_request - 2 * sizeof(struct metadata);
+    END(zone)->available = 1;
+	END(zone)->type = type;
+    END(zone)->size = to_request - 2 * sizeof(struct metadata);
+
+	last_valid_address = zone;
+
+	return (zone);
+}
+
 // TODO Count the number of pages used and adjust the score as follows:
 // - less than 255 pages, the reserved memory is insufficient: 0
 // - 1023 pages and more, the malloc works but consumes a minimum page each allocation: 1
@@ -106,10 +138,14 @@ struct metadata *get_suitable_block(unsigned long size) /* last valid address or
 // - between 313 pages and 512 pages, the malloc works but the overhead is very important: 3
 // - between 273 pages and 312 pages, the malloc works but the overhead is important: 4
 // - between 255 and 272 pages, the malloc works and the overhead is reasonable: 5
-
 void *myalloc(unsigned long size)
 {
     struct metadata *new_block = get_suitable_block(size);
+	if (!new_block)
+	{
+		mmap_zone(size);
+		new_block = get_suitable_block(size);
+	}
 
     if (new_block && new_block->size >= size + 2 * sizeof(struct metadata))
     {
@@ -166,8 +202,6 @@ void testing(void);
 int main(void)
 {
     testing();
-	
-	// getpagesize() - 4096
     return (0);
 }
 

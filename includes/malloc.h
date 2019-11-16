@@ -51,10 +51,15 @@
 # define MAX_SMALL_SIZE 10
 # define TINY_ZONE (getpagesize()) /* in subject: N */
 # define SMALL_ZONE (getpagesize()) /* in subject: M */
+# define LARGE_ZONE(n) ({							\
+	unsigned long res = getpagesize();				\
+	while (res < n + 2 * sizeof(struct metadata))	\
+		res += getpagesize();						\
+	res;											\
+}) // TODO: check macros
 
 enum block_type
 {
-	// ZERO, // good for debug
 	TINY,
 	SMALL,
 	LARGE
@@ -62,7 +67,7 @@ enum block_type
 
 struct metadata {
     unsigned int available; // TODO: 1 bit
-    unsigned int size;
+    unsigned int size; // TODO: long ?
 	enum block_type type; // TODO: 2 bits
 };
 

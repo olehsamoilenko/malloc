@@ -16,80 +16,6 @@
 extern struct metadata *last_valid_address;
 extern struct metadata *memory_start;
 
-void dump_visual(void)
-{
-    int i = 0;
-    struct metadata *block = (struct metadata *)memory_start;
-
-    while (1)
-    {
-        int meta;
-        
-        meta = sizeof(struct metadata);
-        while (meta--)
-        {
-            printf("       {{{ ");
-            if (++i % 10 == 0) {
-                printf("\n");
-            }
-        }
-        int data = block->size;
-        while (data--)
-        {
-            if (block->available)
-                printf("         . ");
-            else
-                printf("         d ");
-
-            if (++i % 10 == 0) {
-                printf("\n");
-            }
-        }
-        meta = sizeof(struct metadata);
-        while (meta--)
-        {
-            printf("       }}} ");
-            if (++i % 10 == 0) {
-                printf("\n");
-            }
-        }
-
-        if (block == last_valid_address)
-            break ;
-        else
-        {
-            struct metadata *new_block = NEXT(block);
-            block = (struct metadata *)new_block;
-        }
-    }
-    printf("\n");
-}
-
-void dump(void)
-{
-    struct metadata *block = (struct metadata *)memory_start;
-
-    while (1)
-    {
-        struct metadata *end_meta = END(block);
-
-        printf("%p=%lu (%u, %u, %d)=(%u, %u, %d)\n",
-			block, (unsigned long)block,
-			block->available, block->size, block->type,
-			end_meta->available, end_meta->size, end_meta->type);
-
-        block = GETNEXT(block);
-		if (!block)
-			break ;
-    }
-
-    printf("\n");
-}
-
-
-
-
-
 void mem_clear(void *buf, int len)
 {
 	char *mem = (char *)buf;
@@ -155,23 +81,21 @@ int	check(int availables[], int sizes[])
 	return (1);
 }
 
-/*
+
 void test_8(void)
 {
 	printf("Test 8 ... ");
-	size_t total_mem = 300;
-	void *buf = malloc(total_mem);
-    mem_clear(buf, total_mem);
-    mysetup(buf);
+    mysetup();
 	void *a = myalloc(60); // large block
-	
-	printf("OK\n");
+	mmap_zone(10);
+
 	#if DEBUG
-		dump();
-		dump_visual();
+		show_alloc_mem_ex();
+		show_alloc_mem();
 	#endif
 }
 
+/*
 void test_9(void)
 {
 	printf("Test 9 ... ");
@@ -264,9 +188,9 @@ void test_mmap(void)
 
 void testing(void)
 {
-	// test_8();
+	test_8();
 	// test_9();
 	// test_10();
 
-	test_mmap();
+	// test_mmap();
 }
