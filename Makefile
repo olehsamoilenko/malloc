@@ -20,6 +20,10 @@ LIST =			malloc \
 				testing
 OBJ =			$(addprefix obj/, $(addsuffix .o, $(LIST)))
 
+ifeq ("$(DEBUG)", "1")
+	DEBUGFLAG="-D DEBUG"
+endif
+
 OFF=\033[0m
 PURPLE=\033[0;35m
 PURPLEBOLD=\033[1;35m
@@ -62,7 +66,7 @@ PURPLELIGHT=\033[38;2;102;102;255m
 all: $(NAME)
 
 obj/%.o: src/%.c $(HEADER)
-	gcc $(FLAGS) -c $< -o $@ $(INC) -D DEBUG  # TODO: refactor
+	@gcc $(FLAGS) -c $< -o $@ $(INC) $(DEBUGFLAG)
 	@echo "$(PURPLELIGHT)Compiling $(WHITE)$< $(PURPLELIGHT)done$(OFF)"
 
 $(NAME): ./libft/libft.a obj $(OBJ)
@@ -70,17 +74,18 @@ $(NAME): ./libft/libft.a obj $(OBJ)
 	@echo "$(PURPLEBOLD)$(NAME)$(PURPLE) is ready$(OFF)"
 
 ./libft/libft.a:
-	@make -C ./libft
+	# TODO: uncomment
+	# @make -C ./libft
 
 obj:
 	@mkdir obj
 
 clean:
-	@make -C ./libft clean
+	@# @make -C ./libft clean
 	@rm -rf obj
 	
 fclean: clean
-	@make -C ./libft fclean
+	@# @make -C ./libft fclean
 	@rm -f $(NAME)
 
 re: fclean all

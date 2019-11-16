@@ -12,7 +12,7 @@
 
 #include "malloc.h"
 
-struct metadata *memory_start = NULL; // TODO: get rid of memory start
+struct metadata *memory_start = NULL; // TODO: get rid of memory start (mb static, mmap(0))
 struct metadata *last_valid_address = NULL;
 
 // TODO: realloc

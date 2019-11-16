@@ -86,7 +86,7 @@ void dump(void)
     printf("\n");
 }
 
-// void mem_dump(void *buf, int len) TODO: cut
+// void mem_dump(void *buf, int len) TODO: show_alloc_mem_ex()
 // {
 // 	char *mem = (char *)buf;
 // 	int i = 0;
@@ -107,21 +107,7 @@ void mem_clear(void *buf, int len)
 	}
 }
 
-void mysetup(void *buf, unsigned long size)
-{
-    memory_start = buf;
-    last_valid_address = buf;
-
-    struct metadata *b0 = (struct metadata *)buf;
-    b0->available = 1;
-    b0->size = size - 2 * sizeof(struct metadata);
-
-    struct metadata *meta_end = END(b0);
-    meta_end->available = 1;
-    meta_end->size = b0->size;
-}
-
-void mysetup2(void *buf)
+void mysetup(void *buf)
 {
     memory_start = buf;
 
@@ -172,272 +158,13 @@ int	check(int availables[], int sizes[])
 	return (1);
 }
 
-void test_0(void) /* simple allocation */
-{
-	printf("Test 0 ... ");
-    size_t total_mem = 100;
-	void *buf = malloc(total_mem);
-    mem_clear(buf, total_mem);
-    mysetup(buf, total_mem);
-
-    myalloc(10);
-	myalloc(11);
-	myalloc(12);
-	myalloc(13);
-	myalloc(3);
-
-	int availables[] =	{0,  0,  0,  0};
-	int sizes[] =		{10, 11, 12, 3};
-	if (check(availables, sizes))
-		printf("OK\n");
-	else
-	{
-		printf("ERROR\n");
-		dump();
-		dump_visual();
-	}
-	#if DEBUG
-		dump();
-		dump_visual();
-	#endif
-
-    free(buf);
-}
-
-void test_1(void) /* too big allocation */
-{
-	printf("Test 1 ... ");
-    size_t total_mem = 100;
-	void *buf = malloc(total_mem);
-    mem_clear(buf, total_mem);
-    mysetup(buf, total_mem);
-
-    void *a = myalloc(100); // too much
-	myalloc(1);
-
-	int availables[] =	{0, 1};
-	int sizes[] =		{1, 67};
-	if (check(availables, sizes)
-		&& a == NULL)
-		printf("OK\n");
-	else
-	{
-		printf("ERROR\n");
-		dump();
-		dump_visual();
-	}
-	#if DEBUG
-		dump();
-		dump_visual();
-	#endif
-
-    free(buf);
-}
-
-void test_2(void) /* too big allocation */
-{
-	printf("Test 2 ... ");
-    size_t total_mem = 100;
-	void *buf = malloc(total_mem);
-    mem_clear(buf, total_mem);
-    mysetup(buf, total_mem);
-
-	myalloc(1);
-    void *a = myalloc(100); // too much
-	myalloc(2);
-
-	int availables[] =	{0, 0, 1};
-	int sizes[] =		{1, 2, 49};
-	if (check(availables, sizes)
-		&& a == NULL)
-		printf("OK\n");
-	else
-	{
-		printf("ERROR\n");
-		dump();
-		dump_visual();
-	}
-	#if DEBUG
-		dump();
-		dump_visual();
-	#endif
-
-    free(buf);
-}
-
-void test_3(void) /* space left only for meta */
-{
-	printf("Test 3 ... ");
-    size_t total_mem = 100;
-	void *buf = malloc(total_mem);
-    mem_clear(buf, total_mem);
-    mysetup(buf, total_mem);
-
-	myalloc(84);
-	void *a = myalloc(0); // no space for meta
-	void *b = myalloc(1); // no space
-
-	int availables[] =	{0};
-	int sizes[] =		{84};
-	if (check(availables, sizes)
-		&& a == NULL
-		&& b == NULL)
-		printf("OK\n");
-	else
-	{
-		printf("ERROR\n");
-		dump();
-		dump_visual();
-	}
-	#if DEBUG
-		dump();
-		dump_visual();
-	#endif
-
-    free(buf);
-}
-
-void test_4(void) /* right block eating */
-{
-	printf("Test 4 ... ");
-    size_t total_mem = 100;
-	void *buf = malloc(total_mem);
-    mem_clear(buf, total_mem);
-    mysetup(buf, total_mem);
-
-	void *a = myalloc(20);
-	void *b = myalloc(20);
-	myfree(b);
-	myfree(a);
-
-	int availables[] =	{1};
-	int sizes[] =		{84};
-	if (check(availables, sizes))
-		printf("OK\n");
-	else
-	{
-		printf("ERROR\n");
-		dump();
-		dump_visual();
-	}
-	#if DEBUG
-		dump();
-		dump_visual();
-	#endif
-
-    free(buf);
-}
-
-void test_5(void) /* left block eating */
-{
-	printf("Test 5 ... ");
-    size_t total_mem = 100;
-	void *buf = malloc(total_mem);
-    mem_clear(buf, total_mem);
-    mysetup(buf, total_mem);
-
-	void *a = myalloc(20);
-	void *b = myalloc(20);
-	void *c = myalloc(12);
-	myfree(a);
-	myfree(b);
-	myfree(c);
-
-	int availables[] =	{1};
-	int sizes[] =		{84};
-	if (check(availables, sizes))
-		printf("OK\n");
-	else
-	{
-		printf("ERROR\n");
-		dump();
-		dump_visual();
-	}
-	#if DEBUG
-		dump();
-		dump_visual();
-	#endif
-
-    free(buf);
-}
-
-void test_6(void) /* several retries */
-{
-	printf("Test 6 ... ");
-    size_t total_mem = 100;
-	void *buf = malloc(total_mem);
-    mem_clear(buf, total_mem);
-    mysetup(buf, total_mem);
-
-	void *a;
-	a = myalloc(20);
-	myfree(a);
-	a = myalloc(20);
-	myfree(a);
-	a = myalloc(20);
-	myfree(a);
-	a = myalloc(20);
-	myfree(a);
-	a = myalloc(20);
-	myfree(a);
-
-	int availables[] =	{1};
-	int sizes[] =		{84};
-	if (check(availables, sizes))
-		printf("OK\n");
-	else
-	{
-		printf("ERROR\n");
-		dump();
-		dump_visual();
-	}
-	#if DEBUG
-		dump();
-		dump_visual();
-	#endif
-
-    free(buf);
-}
-
-void test_7(void) /* fragmentation */
-{
-	printf("Test 7 ... ");
-    size_t total_mem = 100;
-	void *buf = malloc(total_mem);
-    mem_clear(buf, total_mem);
-    mysetup(buf, total_mem);
-
-	myalloc(1);
-	myalloc(1);
-	myalloc(1);
-	myalloc(1);
-	myalloc(1);
-
-	int availables[] =	{0, 0, 0, 0, 0 };
-	int sizes[] =		{1, 1, 1, 1, 16};
-	if (check(availables, sizes))
-		printf("OK\n");
-	else
-	{
-		printf("ERROR\n");
-		dump();
-		dump_visual();
-	}
-	#if DEBUG
-		dump();
-		dump_visual();
-	#endif
-
-    free(buf);
-}
-
 void test_8(void)
 {
 	printf("Test 8 ... ");
 	size_t total_mem = 300;
 	void *buf = malloc(total_mem);
     mem_clear(buf, total_mem);
-    mysetup2(buf);
+    mysetup(buf);
 	void *a = myalloc(60); // large block
 	
 	printf("OK\n");
@@ -453,7 +180,7 @@ void test_9(void) /* right block eating */
 	size_t total_mem = 300;
 	void *buf = malloc(total_mem);
     mem_clear(buf, total_mem);
-    mysetup2(buf);
+    mysetup(buf);
 
 	void *t1 = myalloc(1);
 	void *s1 = myalloc(6);
@@ -494,7 +221,7 @@ void test_10(void) /* left block eating */
 	size_t total_mem = 300;
 	void *buf = malloc(total_mem);
     mem_clear(buf, total_mem);
-    mysetup2(buf);
+    mysetup(buf);
 
 	void *t1 = myalloc(1);
 	void *s1 = myalloc(6);
@@ -527,18 +254,7 @@ void test_10(void) /* left block eating */
 
 void testing(void)
 {
-	/* were ok when struct is 8 bytes
-	test_0();
-    test_1();
-	test_2();
-	test_3();
-	test_4();
-	test_5();
-	test_6();
-	test_7();
-	*/
-
-	// test_8();
+	test_8();
 	test_9();
 	test_10();
 }
