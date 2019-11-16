@@ -99,27 +99,32 @@ void mem_clear(void *buf, int len)
 	}
 }
 
-void mysetup(void *buf)
+void mysetup(void)
 {
-    memory_start = buf;
+	if (memory_start == NULL)
+    	memory_start = mmap(NULL, TINY_ZONE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 
-    struct metadata *tiny = (struct metadata *)buf;
+	printf("Memory start: %p\n", memory_start);
+
+    struct metadata *tiny = (struct metadata *)memory_start;
     tiny->available = 1;
 	tiny->type = TINY;
-    tiny->size = N;
+    tiny->size = TINY_ZONE - 2 * sizeof(struct metadata);
     END(tiny)->available = 1;
 	END(tiny)->type = TINY;
-    END(tiny)->size = N;
+    END(tiny)->size = TINY_ZONE - 2 * sizeof(struct metadata);
 
-	struct metadata *small = NEXT(tiny);
+	struct metadata *small = mmap(NULL, SMALL_ZONE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+	printf("Small zone: %p\n", small);
+
 	small->available = 1;
 	small->type = SMALL;
-	small->size = M;
+	small->size = SMALL_ZONE - 2 * sizeof(struct metadata);
 	END(small)->available = 1;
 	END(small)->type = SMALL;
-	END(small)->size = M;
+	END(small)->size = SMALL_ZONE - 2 * sizeof(struct metadata);
 
-    last_valid_address = small;
+    last_valid_address = small; /* = NEXT(tiny) */
 }
 
 int	check(int availables[], int sizes[])
@@ -150,6 +155,7 @@ int	check(int availables[], int sizes[])
 	return (1);
 }
 
+/*
 void test_8(void)
 {
 	printf("Test 8 ... ");
@@ -166,7 +172,7 @@ void test_8(void)
 	#endif
 }
 
-void test_9(void) /* right block eating */
+void test_9(void)
 {
 	printf("Test 9 ... ");
 	size_t total_mem = 300;
@@ -207,7 +213,7 @@ void test_9(void) /* right block eating */
     free(buf);
 }
 
-void test_10(void) /* left block eating */
+void test_10(void)
 {
 	printf("Test 10 ... ");
 	size_t total_mem = 300;
@@ -225,9 +231,9 @@ void test_10(void) /* left block eating */
 
 	#if DEBUG
 		show_alloc_mem();
+		show_alloc_mem_ex();
 	#endif
 
-	show_alloc_mem_ex();
 
 	myfree(s1);
 	myfree(s2);
@@ -245,11 +251,22 @@ void test_10(void) /* left block eating */
 		printf("ERROR\n");
 
     free(buf);
+}*/
+
+void test_mmap(void)
+{
+	printf("Test mmap ... \n");
+	
+	mysetup();
+	show_alloc_mem();
+	show_alloc_mem_ex();
 }
 
 void testing(void)
 {
-	test_8();
-	test_9();
-	test_10();
+	// test_8();
+	// test_9();
+	// test_10();
+
+	test_mmap();
 }
