@@ -92,11 +92,22 @@ void test_unmap()
 	myfree(b);
 }
 
+void test_refactor()
+{
+	// struct metadata *m = get_memory_start();
+	void *n = myalloc(2);
+	void *n2 = myalloc(3);
+	void *n3 = myalloc(1);
+
+	
+}
+
 void testing(void)
 {
 	// test_8();
 	// test_many_small();
-	test_unmap();
-	show_alloc_mem_ex();
-	show_alloc_mem();
+	// test_unmap();
+	test_refactor();
+	// show_alloc_mem_ex();
+	// show_alloc_mem();
 }

@@ -69,6 +69,8 @@ struct metadata {
     unsigned int available; // TODO: 1 bit
     unsigned int size; // TODO: long ?
 	enum block_type type; // TODO: 2 bits
+	struct metadata *next;
+	struct metadata *prev;
 };
 
 struct metadata *get_memory_start(); // TODO: replace from header

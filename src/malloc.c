@@ -23,9 +23,13 @@ struct metadata *get_memory_start() {
 		tiny->available = 1;
 		tiny->type = TINY;
 		tiny->size = TINY_ZONE - 2 * sizeof(struct metadata);
+		tiny->next = NULL;
+		tiny->prev = NULL;
 		END(tiny)->available = 1;
 		END(tiny)->type = TINY;
 		END(tiny)->size = TINY_ZONE - 2 * sizeof(struct metadata);
+		END(tiny)->next = NULL;
+		END(tiny)->prev = NULL;
 		last_valid_address = mem_start;
 	}
 	return (mem_start);
@@ -166,6 +170,10 @@ void *mmap_zone(unsigned long size)
 // - between 255 and 272 pages, the malloc works and the overhead is reasonable: 5
 void *myalloc(unsigned long size)
 {
+	// TODO: get rid of end meta
+	// TODO: get rid of last valid addr
+	// TODO: rename new and reduced blocks
+
     struct metadata *new_block = get_suitable_block(size);
 	if (!new_block)
 	{
@@ -184,6 +192,11 @@ void *myalloc(unsigned long size)
         reduced_block->size = new_block->size - 2 * sizeof(struct metadata) - size;
 		reduced_block->type = new_block->type;
 
+		reduced_block->next = new_block->next;
+		reduced_block->prev = new_block;
+		new_block->next = reduced_block;
+		// new_block->prev OK
+	
         struct metadata *reduced_block_end = END(reduced_block);
         reduced_block_end->available = reduced_block->available;
         reduced_block_end->size = reduced_block->size;
@@ -194,15 +207,39 @@ void *myalloc(unsigned long size)
         new_block_end->size = new_block->size;
 		new_block_end->type = new_block->type;
 
+		reduced_block_end->next = reduced_block->next;
+		reduced_block_end->prev = reduced_block->prev;
+		new_block_end->next = new_block->next;
+		new_block_end->prev = new_block->prev; // ok, need it
+
         if (reduced_block > last_valid_address)
             last_valid_address = reduced_block;
 
 		#if DEBUG
-			// printf("new: %p %lu %u\n", new_block, (unsigned long)new_block, new_block->size);
-			// printf("new end: %p %lu %u\n", new_block_end, (unsigned long)new_block_end, new_block_end->size);
-			// printf("reduced: %p %lu %u\n", reduced_block, (unsigned long)reduced_block, reduced_block->size);
-			// printf("reduced end: %p %lu %u\n", reduced_block_end, (unsigned long)reduced_block_end, reduced_block_end->size);
+			printf("new: %p %lu %u\n", new_block, (unsigned long)new_block, new_block->size);
+			printf("new end: %p %lu %u\n", new_block_end, (unsigned long)new_block_end, new_block_end->size);
+			printf("reduced: %p %lu %u\n", reduced_block, (unsigned long)reduced_block, reduced_block->size);
+			printf("reduced end: %p %lu %u\n", reduced_block_end, (unsigned long)reduced_block_end, reduced_block_end->size);
 		#endif
+
+		printf("me: %p   next: %p=%p   prev: %p=%p\n",
+			new_block,
+			new_block->next, END(new_block)->next,
+			new_block->prev, END(new_block)->prev);
+		if (new_block->next || new_block_end->next) {
+			struct metadata *nxt = new_block->next;
+			printf("my next: %p   next: %p=%p   prev: %p=%p\n",
+				nxt,
+				nxt->next, END(nxt)->next,
+				nxt->prev, END(nxt)->prev);
+		}
+		if (new_block->prev || new_block_end->prev) {
+			struct metadata *prv = new_block->prev;
+			printf("my prev: %p   next: %p=%p   prev: %p=%p\n",
+				prv,
+				prv->next, END(prv)->next,
+				prv->prev, END(prv)->prev);
+		}
 
         return ((char *)new_block + sizeof(struct metadata));
     }
