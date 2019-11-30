@@ -40,17 +40,17 @@ void mysetup(void)
 	END(tiny)->type = TINY;
     END(tiny)->size = TINY_ZONE - 2 * sizeof(struct metadata);
 
-	struct metadata *small = mmap(NULL, SMALL_ZONE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
-	printf("Small zone: %p\n", small);
+	// struct metadata *small = mmap(NULL, SMALL_ZONE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+	// printf("Small zone: %p\n", small);
 
-	small->available = 1;
-	small->type = SMALL;
-	small->size = SMALL_ZONE - 2 * sizeof(struct metadata);
-	END(small)->available = 1;
-	END(small)->type = SMALL;
-	END(small)->size = SMALL_ZONE - 2 * sizeof(struct metadata);
+	// small->available = 1;
+	// small->type = SMALL;
+	// small->size = SMALL_ZONE - 2 * sizeof(struct metadata);
+	// END(small)->available = 1;
+	// END(small)->type = SMALL;
+	// END(small)->size = SMALL_ZONE - 2 * sizeof(struct metadata);
 
-    last_valid_address = small; /* = NEXT(tiny) */
+    last_valid_address = tiny;
 }
 
 int	check(int availables[], int sizes[])
@@ -88,18 +88,9 @@ void test_8(void)
 	printf("Test 8 ... ");
     mysetup();
 	void *a = myalloc(60); // large block
-	// ft_strcpy(a, "hello");
-	// TODO CONTINUE: mmap => unmap => mmap. same addr ?
-	// void *tounmap = mmap_zone(10);
-	printf("%d\n", munmap(a, getpagesize()));
-	printf("%s\n", strerror(errno));
-	// struct metadata *test = tounmap;
-	// test->available = 1;
-
-	// mmap_zone(10);
-	// mmap_zone(10);
-	// mmap_zone(10);
-
+	myfree(a);
+	void *b = myalloc(60); // large block
+	myfree(a);
 
 	#if DEBUG
 		show_alloc_mem_ex();
