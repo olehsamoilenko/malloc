@@ -69,7 +69,25 @@ void test_8(void)
 	#endif
 }
 
+void test_many_small()
+{
+	for (int i = 0; i < 100; i++)
+		myalloc(9); // small
+
+	myalloc(60);
+
+	for (int i = 0; i < 100; i++)
+		myalloc(9); // small
+
+	myalloc(60);
+	myalloc(4000);
+	myalloc(8000);
+}
+
 void testing(void)
 {
-	test_8();
+	// test_8();
+	test_many_small();
+	show_alloc_mem_ex();
+	show_alloc_mem();
 }
