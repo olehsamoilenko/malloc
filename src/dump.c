@@ -18,13 +18,12 @@
 #define BGCYAN		"\e[44m"
 
 extern struct metadata *last_valid_address;
-extern struct metadata *memory_start;
 
 const char *labels[] = {"TINY", "SMALL", "LARGE"};
 
 void show_alloc_mem()
 {
-	struct metadata *block = (struct metadata *)memory_start;
+	struct metadata *block = (struct metadata *)get_memory_start();
 
 
 	int current_type = -1;
@@ -124,7 +123,7 @@ void print_meta(struct metadata *block, unsigned int *counter, unsigned char *te
 void show_alloc_mem_ex(void)
 {
 	printf("\n");
-	struct metadata *block = (struct metadata *)memory_start;
+	struct metadata *block = (struct metadata *)get_memory_start();
 	unsigned int i = 0;
 	unsigned char *text;
 

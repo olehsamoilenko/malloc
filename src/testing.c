@@ -14,81 +14,6 @@
 #include <stdlib.h>
 
 extern struct metadata *last_valid_address;
-extern struct metadata *memory_start;
-
-void dump_visual(void)
-{
-    int i = 0;
-    struct metadata *block = (struct metadata *)memory_start;
-
-    while (1)
-    {
-        int meta;
-        
-        meta = sizeof(struct metadata);
-        while (meta--)
-        {
-            printf("       {{{ ");
-            if (++i % 10 == 0) {
-                printf("\n");
-            }
-        }
-        int data = block->size;
-        while (data--)
-        {
-            if (block->available)
-                printf("         . ");
-            else
-                printf("         d ");
-
-            if (++i % 10 == 0) {
-                printf("\n");
-            }
-        }
-        meta = sizeof(struct metadata);
-        while (meta--)
-        {
-            printf("       }}} ");
-            if (++i % 10 == 0) {
-                printf("\n");
-            }
-        }
-
-        if (block == last_valid_address)
-            break ;
-        else
-        {
-            struct metadata *new_block = NEXT(block);
-            block = (struct metadata *)new_block;
-        }
-    }
-    printf("\n");
-}
-
-void dump(void)
-{
-    struct metadata *block = (struct metadata *)memory_start;
-
-    while (1)
-    {
-        struct metadata *end_meta = END(block);
-
-        printf("%p=%lu (%u, %u, %d)=(%u, %u, %d)\n",
-			block, (unsigned long)block,
-			block->available, block->size, block->type,
-			end_meta->available, end_meta->size, end_meta->type);
-
-        block = GETNEXT(block);
-		if (!block)
-			break ;
-    }
-
-    printf("\n");
-}
-
-
-
-
 
 void mem_clear(void *buf, int len)
 {
@@ -99,32 +24,9 @@ void mem_clear(void *buf, int len)
 	}
 }
 
-void mysetup(void *buf)
-{
-    memory_start = buf;
-
-    struct metadata *tiny = (struct metadata *)buf;
-    tiny->available = 1;
-	tiny->type = TINY;
-    tiny->size = N;
-    END(tiny)->available = 1;
-	END(tiny)->type = TINY;
-    END(tiny)->size = N;
-
-	struct metadata *small = NEXT(tiny);
-	small->available = 1;
-	small->type = SMALL;
-	small->size = M;
-	END(small)->available = 1;
-	END(small)->type = SMALL;
-	END(small)->size = M;
-
-    last_valid_address = small;
-}
-
 int	check(int availables[], int sizes[])
 {
-	struct metadata *block = (struct metadata *)memory_start;
+	struct metadata *block = (struct metadata *)get_memory_start();
 
 	int i = -1;
 
@@ -150,106 +52,51 @@ int	check(int availables[], int sizes[])
 	return (1);
 }
 
+#include <errno.h>
+
 void test_8(void)
 {
 	printf("Test 8 ... ");
-	size_t total_mem = 300;
-	void *buf = malloc(total_mem);
-    mem_clear(buf, total_mem);
-    mysetup(buf);
-	void *a = myalloc(60); // large block
-	
-	printf("OK\n");
-	#if DEBUG
-		dump();
-		dump_visual();
-	#endif
-}
 
-void test_9(void) /* right block eating */
-{
-	printf("Test 9 ... ");
-	size_t total_mem = 300;
-	void *buf = malloc(total_mem);
-    mem_clear(buf, total_mem);
-    mysetup(buf);
-
-	void *t1 = myalloc(1);
-	void *s1 = myalloc(6);
-	void *t2 = myalloc(1);
-	void *s2 = myalloc(6);
-	void *t3 = myalloc(1);
-	void *s3 = myalloc(6);
-
-	myfree(s3);
-	myfree(s2);
-	myfree(s1);
-
-	myfree(t3);
-	myfree(t2);
-	myfree(t1);
-
-	int availables[] =	{1,  1  };
-	int sizes[] =		{80, 150};
-	if (check(availables, sizes))
-		printf("OK\n");
-	else
-	{
-		printf("ERROR\n");
-		dump();
-		dump_visual();
-	}
-	#if DEBUG
-		dump();
-		dump_visual();
-	#endif
-
-    free(buf);
-}
-
-void test_10(void) /* left block eating */
-{
-	printf("Test 10 ... ");
-	size_t total_mem = 300;
-	void *buf = malloc(total_mem);
-    mem_clear(buf, total_mem);
-    mysetup(buf);
-
-	void *t1 = myalloc(1);
-	void *s1 = myalloc(6);
-	void *t2 = myalloc(1);
-	void *s2 = myalloc(6);
-	void *t3 = myalloc(1);
-	void *s3 = myalloc(6);
-	ft_strcpy(s3, "hello");
+	void *a = myalloc(1); // tiny block
+	void *b = myalloc(60); // large block
+	myfree(b);
+	myfree(a);
 
 	#if DEBUG
+		show_alloc_mem_ex();
 		show_alloc_mem();
 	#endif
+}
 
-	show_alloc_mem_ex();
+void test_many_small()
+{
+	for (int i = 0; i < 100; i++)
+		myalloc(9); // small
 
-	myfree(s1);
-	myfree(s2);
-	myfree(s3);
+	myalloc(60);
 
-	myfree(t1);
-	myfree(t2);
-	myfree(t3);
-	
-	int availables[] =	{1,  1  };
-	int sizes[] =		{80, 150};
-	if (check(availables, sizes))
-		printf("OK\n");
-	else
-		printf("ERROR\n");
+	for (int i = 0; i < 100; i++)
+		myalloc(9); // small
 
-    free(buf);
+	myalloc(60);
+	myalloc(4000);
+	myalloc(8000);
+	myalloc(getpagesize());
+}
+
+void test_unmap()
+{
+	void *a = myalloc(4072);
+	void *b = myalloc(4072);
+	myfree(b);
 }
 
 void testing(void)
 {
-	test_8();
-	test_9();
-	test_10();
+	// test_8();
+	// test_many_small();
+	test_unmap();
+	show_alloc_mem_ex();
+	show_alloc_mem();
 }
