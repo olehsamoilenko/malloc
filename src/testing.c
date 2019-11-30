@@ -82,12 +82,21 @@ void test_many_small()
 	myalloc(60);
 	myalloc(4000);
 	myalloc(8000);
+	myalloc(getpagesize());
+}
+
+void test_unmap()
+{
+	void *a = myalloc(4072);
+	void *b = myalloc(4072);
+	myfree(b);
 }
 
 void testing(void)
 {
 	// test_8();
-	test_many_small();
+	// test_many_small();
+	test_unmap();
 	show_alloc_mem_ex();
 	show_alloc_mem();
 }

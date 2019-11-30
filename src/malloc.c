@@ -138,6 +138,7 @@ void *mmap_zone(unsigned long size)
 	}
 	else {
 		to_request = LARGE_ZONE(size); // TODO: check overflowing, TODO: page + 1 ?
+		printf("To request: %d\n", to_request);
 		type = LARGE;
 	}
 
@@ -146,6 +147,7 @@ void *mmap_zone(unsigned long size)
 	zone->available = true;
 	zone->type = type;
     zone->size = to_request - 2 * sizeof(struct metadata);
+	// TODO: free after mmap to avoid fragmentation
     END(zone)->available = 1;
 	END(zone)->type = type;
     END(zone)->size = to_request - 2 * sizeof(struct metadata);
