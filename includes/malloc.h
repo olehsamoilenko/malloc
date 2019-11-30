@@ -11,11 +11,11 @@
 /* ************************************************************************** */
 
 #ifndef MALLOC_H
+# define MALLOC_H
+
 # include <stdio.h> // TODO: remove
 # include <sys/mman.h>
 # include "libft.h"
-
-# define MALLOC_H
 
 # define NEXT(block) (														\
     (struct metadata *)((char *)block + 2 * sizeof(struct metadata) + block->size)	\
@@ -34,7 +34,7 @@
 
 # define GETPREV(block) ({					\
     struct metadata *prev = PREV(block);	\
-	if (prev < memory_start)				\
+	if (prev < get_memory_start())				\
 		prev = NULL;						\
 	prev;									\
 }) /* from start */
@@ -70,6 +70,8 @@ struct metadata {
     unsigned int size; // TODO: long ?
 	enum block_type type; // TODO: 2 bits
 };
+
+struct metadata *get_memory_start(); // TODO: replace from header
 
 void myfree(void *p);
 void *myalloc(unsigned long size);

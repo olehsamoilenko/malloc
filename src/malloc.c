@@ -12,9 +12,24 @@
 
 #include "malloc.h"
 
-struct metadata *memory_start = NULL; // TODO: get rid of memory start (mb static, mmap(0))
 struct metadata *last_valid_address = NULL;
 
+struct metadata *get_memory_start() {
+	static void *mem_start = NULL;
+
+	if (mem_start == NULL) {
+		mem_start = mmap(NULL, 1, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0); // TODO: 1 => TINY_SIZE
+		struct metadata *tiny = (struct metadata *)mem_start;
+		tiny->available = 1;
+		tiny->type = TINY;
+		tiny->size = TINY_ZONE - 2 * sizeof(struct metadata);
+		END(tiny)->available = 1;
+		END(tiny)->type = TINY;
+		END(tiny)->size = TINY_ZONE - 2 * sizeof(struct metadata);
+		last_valid_address = mem_start;
+	}
+	return (mem_start);
+}
 // TODO: realloc
 
 // TODO: If “ptr” is a NULL pointer, no operation is performed.
@@ -58,7 +73,7 @@ void myfree(void *p)
 		else {
 			if (b == last_valid_address) {
 				printf("Yes, it's last, need to unmap\n");
-				int res = munmap(b, b->size); // TODO: if unmap several pages
+				int res = munmap(b, b->size); // TODO: if unmap several pages, don't unmap first page!
 				printf("Unmap result: %d\n", res);
 				last_valid_address = START(prev); // TODO: duplication
 			}
@@ -91,7 +106,7 @@ struct metadata *get_suitable_block(unsigned long size) /* last valid address or
 		#endif
 	}
 
-	struct metadata *res = (struct metadata *)memory_start;
+	struct metadata *res = (struct metadata *)get_memory_start();
 	while (1)
 	{
 		if (res->available && res->type == type && res->size >= size)

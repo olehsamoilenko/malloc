@@ -14,7 +14,6 @@
 #include <stdlib.h>
 
 extern struct metadata *last_valid_address;
-extern struct metadata *memory_start;
 
 void mem_clear(void *buf, int len)
 {
@@ -25,37 +24,9 @@ void mem_clear(void *buf, int len)
 	}
 }
 
-void mysetup(void)
-{
-	if (memory_start == NULL)
-    	memory_start = mmap(NULL, TINY_ZONE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
-
-	printf("Memory start: %p\n", memory_start);
-
-    struct metadata *tiny = (struct metadata *)memory_start;
-    tiny->available = 1;
-	tiny->type = TINY;
-    tiny->size = TINY_ZONE - 2 * sizeof(struct metadata);
-    END(tiny)->available = 1;
-	END(tiny)->type = TINY;
-    END(tiny)->size = TINY_ZONE - 2 * sizeof(struct metadata);
-
-	// struct metadata *small = mmap(NULL, SMALL_ZONE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
-	// printf("Small zone: %p\n", small);
-
-	// small->available = 1;
-	// small->type = SMALL;
-	// small->size = SMALL_ZONE - 2 * sizeof(struct metadata);
-	// END(small)->available = 1;
-	// END(small)->type = SMALL;
-	// END(small)->size = SMALL_ZONE - 2 * sizeof(struct metadata);
-
-    last_valid_address = tiny;
-}
-
 int	check(int availables[], int sizes[])
 {
-	struct metadata *block = (struct metadata *)memory_start;
+	struct metadata *block = (struct metadata *)get_memory_start();
 
 	int i = -1;
 
@@ -86,114 +57,19 @@ int	check(int availables[], int sizes[])
 void test_8(void)
 {
 	printf("Test 8 ... ");
-    mysetup();
-	void *a = myalloc(60); // large block
-	myfree(a);
+
+	void *a = myalloc(1); // tiny block
 	void *b = myalloc(60); // large block
+	myfree(b);
 	myfree(a);
 
 	#if DEBUG
 		show_alloc_mem_ex();
 		show_alloc_mem();
 	#endif
-}
-
-/*
-void test_9(void)
-{
-	printf("Test 9 ... ");
-	size_t total_mem = 300;
-	void *buf = malloc(total_mem);
-    mem_clear(buf, total_mem);
-    mysetup(buf);
-
-	void *t1 = myalloc(1);
-	void *s1 = myalloc(6);
-	void *t2 = myalloc(1);
-	void *s2 = myalloc(6);
-	void *t3 = myalloc(1);
-	void *s3 = myalloc(6);
-
-	myfree(s3);
-	myfree(s2);
-	myfree(s1);
-
-	myfree(t3);
-	myfree(t2);
-	myfree(t1);
-
-	int availables[] =	{1,  1  };
-	int sizes[] =		{80, 150};
-	if (check(availables, sizes))
-		printf("OK\n");
-	else
-	{
-		printf("ERROR\n");
-		dump();
-		dump_visual();
-	}
-	#if DEBUG
-		dump();
-		dump_visual();
-	#endif
-
-    free(buf);
-}
-
-void test_10(void)
-{
-	printf("Test 10 ... ");
-	size_t total_mem = 300;
-	void *buf = malloc(total_mem);
-    mem_clear(buf, total_mem);
-    mysetup(buf);
-
-	void *t1 = myalloc(1);
-	void *s1 = myalloc(6);
-	void *t2 = myalloc(1);
-	void *s2 = myalloc(6);
-	void *t3 = myalloc(1);
-	void *s3 = myalloc(6);
-	ft_strcpy(s3, "hello");
-
-	#if DEBUG
-		show_alloc_mem();
-		show_alloc_mem_ex();
-	#endif
-
-
-	myfree(s1);
-	myfree(s2);
-	myfree(s3);
-
-	myfree(t1);
-	myfree(t2);
-	myfree(t3);
-	
-	int availables[] =	{1,  1  };
-	int sizes[] =		{80, 150};
-	if (check(availables, sizes))
-		printf("OK\n");
-	else
-		printf("ERROR\n");
-
-    free(buf);
-}*/
-
-void test_mmap(void)
-{
-	printf("Test mmap ... \n");
-	
-	mysetup();
-	show_alloc_mem();
-	show_alloc_mem_ex();
 }
 
 void testing(void)
 {
 	test_8();
-	// test_9();
-	// test_10();
-
-	// test_mmap();
 }
