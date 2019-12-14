@@ -25,11 +25,6 @@ struct metadata *get_memory_start() {
 		tiny->size = TINY_ZONE - 2 * sizeof(struct metadata);
 		tiny->next = NULL;
 		tiny->prev = NULL;
-		END(tiny)->available = 1;
-		END(tiny)->type = TINY;
-		END(tiny)->size = TINY_ZONE - 2 * sizeof(struct metadata);
-		END(tiny)->next = NULL;
-		END(tiny)->prev = NULL;
 		last_valid_address = mem_start;
 	}
 	return (mem_start);
@@ -46,15 +41,10 @@ void myfree(void *p)
     struct metadata *b = (struct metadata *)((char *)p - sizeof(struct metadata));
     b->available = true;
 
-    // END(b)->available = b->available; // TODO: duplication ?
-    // END(b)->size = b->size;
-
     struct metadata *next = b->next;
 	if (next && next->available && next->type == b->type) {
 
 		b->size += next->size + 2 * sizeof(struct metadata);
-
-		// END(b)->size = b->size;
 
 		if (next == last_valid_address) {
 			last_valid_address = b; /* next block is eaten */
@@ -65,8 +55,6 @@ void myfree(void *p)
 	if (prev && prev->available) {
 		
 		if (prev->type == b->type) {
-			// struct metadata *big_block_end = END(b);
-			// big_block_end->size += prev->size + 2 * sizeof(struct metadata);
 
 			prev->size = prev->size + 2 * sizeof(struct metadata);
 			
@@ -152,9 +140,6 @@ void *mmap_zone(unsigned long size)
 	zone->type = type;
     zone->size = to_request - 2 * sizeof(struct metadata);
 	// TODO: free after mmap to avoid fragmentation
-    END(zone)->available = 1;
-	END(zone)->type = type;
-    END(zone)->size = to_request - 2 * sizeof(struct metadata);
 
 	last_valid_address = zone;
 
@@ -183,10 +168,10 @@ void *myalloc(unsigned long size)
 
     if (new_block && new_block->size >= size + 2 * sizeof(struct metadata))
     {
-        void *new_block_end_addr = (char *)new_block + sizeof(struct metadata) + size;
-        struct metadata *new_block_end = (struct metadata *)new_block_end_addr;
+        // void *new_block_end_addr = (char *)new_block + sizeof(struct metadata) + size;
+        // struct metadata *new_block_end = (struct metadata *)new_block_end_addr;
 
-        void *reduced_addr = (char *)new_block_end_addr + sizeof(struct metadata);
+        void *reduced_addr = (char *)new_block + sizeof(struct metadata) + size + sizeof(struct metadata);
         struct metadata *reduced_block = (struct metadata *)reduced_addr;
         reduced_block->available = new_block->available; // 1
         reduced_block->size = new_block->size - 2 * sizeof(struct metadata) - size;
@@ -197,48 +182,35 @@ void *myalloc(unsigned long size)
 		new_block->next = reduced_block;
 		// new_block->prev OK
 	
-        struct metadata *reduced_block_end = END(reduced_block);
-        reduced_block_end->available = reduced_block->available;
-        reduced_block_end->size = reduced_block->size;
-
         new_block->available = 0;
         new_block->size = size;
-        new_block_end->available = new_block->available;
-        new_block_end->size = new_block->size;
-		new_block_end->type = new_block->type;
+        // new_block_end->available = new_block->available;
+        // new_block_end->size = new_block->size;
+		// new_block_end->type = new_block->type;
 
-		reduced_block_end->next = reduced_block->next;
-		reduced_block_end->prev = reduced_block->prev;
-		new_block_end->next = new_block->next;
-		new_block_end->prev = new_block->prev; // ok, need it
+		// new_block_end->next = new_block->next;
+		// new_block_end->prev = new_block->prev; // ok, need it
 
         if (reduced_block > last_valid_address)
             last_valid_address = reduced_block;
 
 		#if DEBUG
 			printf("new: %p %lu %u\n", new_block, (unsigned long)new_block, new_block->size);
-			printf("new end: %p %lu %u\n", new_block_end, (unsigned long)new_block_end, new_block_end->size);
+			// printf("new end: %p %lu %u\n", new_block_end, (unsigned long)new_block_end, new_block_end->size);
 			printf("reduced: %p %lu %u\n", reduced_block, (unsigned long)reduced_block, reduced_block->size);
-			printf("reduced end: %p %lu %u\n", reduced_block_end, (unsigned long)reduced_block_end, reduced_block_end->size);
 		#endif
 
-		printf("me: %p   next: %p=%p   prev: %p=%p\n",
-			new_block,
-			new_block->next, END(new_block)->next,
-			new_block->prev, END(new_block)->prev);
-		if (new_block->next || new_block_end->next) {
+		printf("me: %p   next: %p   prev: %p\n",
+			new_block, new_block->next, new_block->prev);
+		if (new_block->next) {
 			struct metadata *nxt = new_block->next;
-			printf("my next: %p   next: %p=%p   prev: %p=%p\n",
-				nxt,
-				nxt->next, END(nxt)->next,
-				nxt->prev, END(nxt)->prev);
+			printf("my next: %p   next: %p   prev: %p\n",
+				nxt, nxt->next, nxt->prev);
 		}
-		if (new_block->prev || new_block_end->prev) {
+		if (new_block->prev) {
 			struct metadata *prv = new_block->prev;
-			printf("my prev: %p   next: %p=%p   prev: %p=%p\n",
-				prv,
-				prv->next, END(prv)->next,
-				prv->prev, END(prv)->prev);
+			printf("my prev: %p   next: %p   prev: %p\n",
+				prv, prv->next, prv->prev);
 		}
 
         return ((char *)new_block + sizeof(struct metadata));
@@ -250,7 +222,6 @@ void *myalloc(unsigned long size)
 		#endif
         new_block->available = 0; /* not filled fully, but doesn't matter */
 
-        END(new_block)->available = new_block->available;
         return ((char *)new_block + sizeof(struct metadata));
     }
     else

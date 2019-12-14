@@ -39,14 +39,6 @@
 	prev;									\
 }) /* from start */ // TODO: remove
 
-# define START(block) (   \
-	(struct metadata *)((char *)block - block->size - sizeof(struct metadata)) \
-) /* from end */ // TODO: remove
-
-# define END(block) (   \
-	(struct metadata *)((char *)block + sizeof(struct metadata) + block->size) \
-) /* from start */
-
 # define MAX_TINY_SIZE 5 /* TODO: at least 100 allocations */
 # define MAX_SMALL_SIZE 10
 # define TINY_ZONE (getpagesize()) /* in subject: N */

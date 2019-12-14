@@ -34,11 +34,7 @@ int	check(int availables[], int sizes[])
     {
 		++i;
 
-        struct metadata *end_meta = END(block);
-
-		if (block->available != end_meta->available
-			|| block->size != end_meta->size
-			|| block->size != sizes[i]
+		if (block->size != sizes[i]
 			|| block->available != availables[i])
 		return (0);
 
