@@ -23,9 +23,8 @@ struct metadata *get_memory_start() {
 		tiny->available = 1;
 		tiny->type = TINY;
 		tiny->size = TINY_ZONE - 2 * sizeof(struct metadata);
-		END(tiny)->available = 1;
-		END(tiny)->type = TINY;
-		END(tiny)->size = TINY_ZONE - 2 * sizeof(struct metadata);
+		tiny->next = NULL;
+		tiny->prev = NULL;
 		last_valid_address = mem_start;
 	}
 	return (mem_start);
@@ -39,43 +38,38 @@ struct metadata *get_memory_start() {
 // $> ./ run.sh / usr / bin / time -l ./test2
 void myfree(void *p)
 {
-    struct metadata *b = (struct metadata *)((char *)p - sizeof(struct metadata));
-    b->available = 1;
+    struct metadata *block = (struct metadata *)((char *)p - sizeof(struct metadata));
+    block->available = true;
 
-    END(b)->available = b->available; // TODO: duplication ?
-    END(b)->size = b->size;
+    struct metadata *next = block->next;
+	if (next && next->available && next->type == block->type) {
 
-    struct metadata *next = GETNEXT(b);
-	if (next && next->available && next->type == b->type) {
-
-		b->size += next->size + 2 * sizeof(struct metadata);
-
-		END(b)->size = b->size;
+		block->size += next->size + sizeof(struct metadata);
+		block->next = next->next;
 
 		if (next == last_valid_address) {
-			last_valid_address = b; /* next block is eaten */
+			last_valid_address = block; /* next block is eaten */
 		}
 	}
 
-	struct metadata *prev = GETPREV(b);
+	struct metadata *prev = block->prev;
 	if (prev && prev->available) {
 		
-		if (prev->type == b->type) {
-			struct metadata *big_block_end = END(b);
-			big_block_end->size += prev->size + 2 * sizeof(struct metadata);
+		if (prev->type == block->type) {
 
-			START(prev)->size = big_block_end->size; 
+			prev->size += block->size + sizeof(struct metadata);
+			prev->next = block->next;
 			
-			if (b == last_valid_address) {
-				last_valid_address = START(prev); /* prev block eaten */
+			if (block == last_valid_address) {
+				last_valid_address = prev; /* prev block eaten */
 			}
 		}
 		else {
-			if (b == last_valid_address) {
+			if (block == last_valid_address) {
 				printf("Yes, it's last, need to unmap\n");
-				int res = munmap(b, b->size); // TODO: if unmap several pages, don't unmap first page!
+				int res = munmap(block, block->size); // TODO: if unmap several pages, don't unmap first page!
 				printf("Unmap result: %d\n", res);
-				last_valid_address = START(prev); // TODO: duplication
+				last_valid_address = prev; // TODO: duplication
 			}
 		}
 	}
@@ -112,7 +106,7 @@ struct metadata *get_suitable_block(unsigned long size) /* last valid address or
 		if (res->available && res->type == type && res->size >= size)
 			return (res);
 
-		res = GETNEXT(res);
+		res = res->next;
 		if (!res)
 			break ;
 	}
@@ -146,11 +140,8 @@ void *mmap_zone(unsigned long size)
 	printf("\tMapping new zone, size = %lu, zone start = %p\n", to_request, zone);
 	zone->available = true;
 	zone->type = type;
-    zone->size = to_request - 2 * sizeof(struct metadata);
+    zone->size = to_request - sizeof(struct metadata);
 	// TODO: free after mmap to avoid fragmentation
-    END(zone)->available = 1;
-	END(zone)->type = type;
-    END(zone)->size = to_request - 2 * sizeof(struct metadata);
 
 	last_valid_address = zone;
 
@@ -166,6 +157,9 @@ void *mmap_zone(unsigned long size)
 // - between 255 and 272 pages, the malloc works and the overhead is reasonable: 5
 void *myalloc(unsigned long size)
 {
+	// TODO: get rid of last valid addr
+	// TODO: rename new and reduced blocks
+
     struct metadata *new_block = get_suitable_block(size);
 	if (!new_block)
 	{
@@ -173,36 +167,40 @@ void *myalloc(unsigned long size)
 		new_block = get_suitable_block(size);
 	}
 
-    if (new_block && new_block->size >= size + 2 * sizeof(struct metadata))
+    if (new_block && new_block->size >= size + sizeof(struct metadata))
     {
-        void *new_block_end_addr = (char *)new_block + sizeof(struct metadata) + size;
-        struct metadata *new_block_end = (struct metadata *)new_block_end_addr;
-
-        void *reduced_addr = (char *)new_block_end_addr + sizeof(struct metadata);
-        struct metadata *reduced_block = (struct metadata *)reduced_addr;
-        reduced_block->available = new_block->available; // 1
-        reduced_block->size = new_block->size - 2 * sizeof(struct metadata) - size;
+        struct metadata *reduced_block = (struct metadata *)((char *)new_block + sizeof(struct metadata) + size);
+        reduced_block->available = true;
+        reduced_block->size = new_block->size - sizeof(struct metadata) - size;
 		reduced_block->type = new_block->type;
 
-        struct metadata *reduced_block_end = END(reduced_block);
-        reduced_block_end->available = reduced_block->available;
-        reduced_block_end->size = reduced_block->size;
-
-        new_block->available = 0;
+		reduced_block->next = new_block->next;
+		reduced_block->prev = new_block;
+		new_block->next = reduced_block;
+	
+        new_block->available = false;
         new_block->size = size;
-        new_block_end->available = new_block->available;
-        new_block_end->size = new_block->size;
-		new_block_end->type = new_block->type;
 
         if (reduced_block > last_valid_address)
             last_valid_address = reduced_block;
 
 		#if DEBUG
-			// printf("new: %p %lu %u\n", new_block, (unsigned long)new_block, new_block->size);
-			// printf("new end: %p %lu %u\n", new_block_end, (unsigned long)new_block_end, new_block_end->size);
-			// printf("reduced: %p %lu %u\n", reduced_block, (unsigned long)reduced_block, reduced_block->size);
-			// printf("reduced end: %p %lu %u\n", reduced_block_end, (unsigned long)reduced_block_end, reduced_block_end->size);
+			printf("new: %p %lu %u\n", new_block, (unsigned long)new_block, new_block->size);
+			printf("reduced: %p %lu %u\n", reduced_block, (unsigned long)reduced_block, reduced_block->size);
 		#endif
+
+		printf("me: %p   next: %p   prev: %p\n",
+			new_block, new_block->next, new_block->prev);
+		if (new_block->next) {
+			struct metadata *nxt = new_block->next;
+			printf("my next: %p   next: %p   prev: %p\n",
+				nxt, nxt->next, nxt->prev);
+		}
+		if (new_block->prev) {
+			struct metadata *prv = new_block->prev;
+			printf("my prev: %p   next: %p   prev: %p\n",
+				prv, prv->next, prv->prev);
+		}
 
         return ((char *)new_block + sizeof(struct metadata));
     }
@@ -211,15 +209,13 @@ void *myalloc(unsigned long size)
 		#if DEBUG
         	printf("maybe not filled fully, but doesn't matter\n");
 		#endif
-        new_block->available = 0; /* not filled fully, but doesn't matter */
+        new_block->available = false; /* not filled fully, but doesn't matter */
 
-        END(new_block)->available = new_block->available;
         return ((char *)new_block + sizeof(struct metadata));
     }
     else
     {
-        /* there is no suitable block */
-        return (NULL);
+        return (NULL); /* there is no suitable block */
     }
 }
 

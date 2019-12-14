@@ -41,11 +41,16 @@ void show_alloc_mem()
 		{
 			printf("0x%lX - 0x%lX : %u bytes\n",
 				(unsigned long)(char *)block + sizeof(struct metadata),
-				(unsigned long)END(block), block->size);
+				(unsigned long)(char *)block + sizeof(struct metadata) + block->size,
+				block->size);
 			sum += block->size;
 		}
+		else // TODO: remove
+		{
+			printf("Available : %u bytes\n", block->size);
+		}
 
-        block = GETNEXT(block);
+        block = block->next;
 		if (!block)
 		{
 			printf("Total : %lu", sum);
@@ -60,7 +65,7 @@ void print_meta(struct metadata *block, unsigned int *counter, unsigned char *te
 {
 	unsigned int len;
 	
-	len = sizeof(block->available);
+	len = sizeof(struct metadata);
 	char *cur_color;
 
 	while (len--)
@@ -68,44 +73,6 @@ void print_meta(struct metadata *block, unsigned int *counter, unsigned char *te
 		if (!len)
 		{
 			printf("%s AV: %4d %s ", BGCYAN, block->available, BGDEFAULT);
-			cur_color = BGDEFAULT;
-		}
-		else
-		{
-			printf("%s%10c ", BGCYAN, ' ');
-			cur_color = BGCYAN;
-		}
-		*counter += 1;
-		if (*counter % 10 == 0) {
-			printf("%s\n%s", BGDEFAULT, cur_color);
-		}
-	}
-
-	len = sizeof(block->size);
-	while (len--)
-	{
-		if (!len)
-		{
-			printf("%s S: %5d %s ", BGCYAN, block->size, BGDEFAULT);
-			cur_color = BGDEFAULT;
-		}
-		else
-		{
-			printf("%s%10c ", BGCYAN, ' ');
-			cur_color = BGCYAN;
-		}
-		*counter += 1;
-		if (*counter % 10 == 0) {
-			printf("%s\n%s", BGDEFAULT, cur_color);
-		}
-	}
-
-	len = sizeof(block->type);
-	while (len--)
-	{
-		if (!len)
-		{
-			printf("%s%9s %s ", BGCYAN, labels[block->type], BGDEFAULT);
 			cur_color = BGDEFAULT;
 		}
 		else
@@ -155,9 +122,9 @@ void show_alloc_mem_ex(void)
             }
         }
 
-        print_meta(block, &i, text);
+        // print_meta(block, &i, text);
 
-        block = GETNEXT(block);
+        block = block->next;
 		if (!block)
 			break ;
     }

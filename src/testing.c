@@ -24,34 +24,6 @@ void mem_clear(void *buf, int len)
 	}
 }
 
-int	check(int availables[], int sizes[])
-{
-	struct metadata *block = (struct metadata *)get_memory_start();
-
-	int i = -1;
-
-    while (1)
-    {
-		++i;
-
-        struct metadata *end_meta = END(block);
-
-		if (block->available != end_meta->available
-			|| block->size != end_meta->size
-			|| block->size != sizes[i]
-			|| block->available != availables[i])
-		return (0);
-
-        void *new_block = NEXT(block);
-
-        if (block == last_valid_address)
-            break ;
-        else
-            block = (struct metadata *)new_block;
-    }
-	return (1);
-}
-
 #include <errno.h>
 
 void test_8(void)
@@ -92,11 +64,26 @@ void test_unmap()
 	myfree(b);
 }
 
+void test_refactor()
+{
+	// struct metadata *m = get_memory_start();
+	void *n = myalloc(2);
+	void *n2 = myalloc(3);
+	void *n3 = myalloc(1);
+
+	myfree(n);
+	show_alloc_mem();
+	show_alloc_mem_ex();
+	myfree(n2);
+	// myfree(n3);
+
+	show_alloc_mem();
+	show_alloc_mem_ex();
+
+
+}
+
 void testing(void)
 {
-	// test_8();
-	// test_many_small();
-	test_unmap();
-	show_alloc_mem_ex();
-	show_alloc_mem();
+	test_refactor();
 }
