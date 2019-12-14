@@ -45,10 +45,6 @@ void show_alloc_mem()
 				block->size);
 			sum += block->size;
 		}
-		else // TODO: remove
-		{
-			printf("Available : %u bytes\n", block->size);
-		}
 
         block = block->next;
 		if (!block)

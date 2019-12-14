@@ -43,6 +43,14 @@ struct metadata {
 	struct metadata *prev;
 };
 
+struct page_meta {
+	// busy_blocks : int
+	// size : int
+	// type : block_type
+	struct page_meta *prev;
+	struct page_meta *next;
+};
+
 struct metadata *get_memory_start(); // TODO: replace from header
 
 void myfree(void *p);
