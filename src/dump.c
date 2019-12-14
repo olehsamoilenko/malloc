@@ -41,11 +41,16 @@ void show_alloc_mem()
 		{
 			printf("0x%lX - 0x%lX : %u bytes\n",
 				(unsigned long)(char *)block + sizeof(struct metadata),
-				(unsigned long)END(block), block->size);
+				(unsigned long)(char *)block + sizeof(struct metadata) + block->size,
+				block->size);
 			sum += block->size;
 		}
+		else // TODO: remove
+		{
+			printf("Available : %u bytes\n", block->size);
+		}
 
-        block = GETNEXT(block);
+        block = block->next;
 		if (!block)
 		{
 			printf("Total : %lu", sum);
@@ -157,7 +162,7 @@ void show_alloc_mem_ex(void)
 
         print_meta(block, &i, text);
 
-        block = GETNEXT(block);
+        block = block->next;
 		if (!block)
 			break ;
     }

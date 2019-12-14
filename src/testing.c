@@ -99,7 +99,14 @@ void test_refactor()
 	void *n2 = myalloc(3);
 	void *n3 = myalloc(1);
 
-	
+	myfree(n2);
+	myfree(n);
+	myfree(n3);
+
+	show_alloc_mem();
+	// show_alloc_mem_ex();
+
+
 }
 
 void testing(void)

@@ -26,7 +26,7 @@
 	if (next > last_valid_address)			\
 		next = NULL;						\
 	next;									\
-}) /* from start */
+}) /* from start */ // TODO: remove
 
 # define PREV(block) (   \
     (struct metadata *)((char *)block - sizeof(struct metadata)) \
@@ -37,11 +37,11 @@
 	if (prev < get_memory_start())				\
 		prev = NULL;						\
 	prev;									\
-}) /* from start */
+}) /* from start */ // TODO: remove
 
 # define START(block) (   \
 	(struct metadata *)((char *)block - block->size - sizeof(struct metadata)) \
-) /* from end */
+) /* from end */ // TODO: remove
 
 # define END(block) (   \
 	(struct metadata *)((char *)block + sizeof(struct metadata) + block->size) \
@@ -67,7 +67,7 @@ enum block_type
 
 struct metadata {
     unsigned int available; // TODO: 1 bit
-    unsigned int size; // TODO: long ?
+    unsigned int size;
 	enum block_type type; // TODO: 2 bits
 	struct metadata *next;
 	struct metadata *prev;

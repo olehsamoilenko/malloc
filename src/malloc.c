@@ -44,34 +44,34 @@ struct metadata *get_memory_start() {
 void myfree(void *p)
 {
     struct metadata *b = (struct metadata *)((char *)p - sizeof(struct metadata));
-    b->available = 1;
+    b->available = true;
 
-    END(b)->available = b->available; // TODO: duplication ?
-    END(b)->size = b->size;
+    // END(b)->available = b->available; // TODO: duplication ?
+    // END(b)->size = b->size;
 
-    struct metadata *next = GETNEXT(b);
+    struct metadata *next = b->next;
 	if (next && next->available && next->type == b->type) {
 
 		b->size += next->size + 2 * sizeof(struct metadata);
 
-		END(b)->size = b->size;
+		// END(b)->size = b->size;
 
 		if (next == last_valid_address) {
 			last_valid_address = b; /* next block is eaten */
 		}
 	}
 
-	struct metadata *prev = GETPREV(b);
+	struct metadata *prev = b->prev;
 	if (prev && prev->available) {
 		
 		if (prev->type == b->type) {
-			struct metadata *big_block_end = END(b);
-			big_block_end->size += prev->size + 2 * sizeof(struct metadata);
+			// struct metadata *big_block_end = END(b);
+			// big_block_end->size += prev->size + 2 * sizeof(struct metadata);
 
-			START(prev)->size = big_block_end->size; 
+			prev->size = prev->size + 2 * sizeof(struct metadata);
 			
 			if (b == last_valid_address) {
-				last_valid_address = START(prev); /* prev block eaten */
+				last_valid_address = prev; /* prev block eaten */
 			}
 		}
 		else {
@@ -79,7 +79,7 @@ void myfree(void *p)
 				printf("Yes, it's last, need to unmap\n");
 				int res = munmap(b, b->size); // TODO: if unmap several pages, don't unmap first page!
 				printf("Unmap result: %d\n", res);
-				last_valid_address = START(prev); // TODO: duplication
+				last_valid_address = prev; // TODO: duplication
 			}
 		}
 	}
