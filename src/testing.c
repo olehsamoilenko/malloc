@@ -13,7 +13,7 @@
 #include "malloc.h"
 #include <stdlib.h>
 
-extern struct metadata *last_valid_address;
+extern struct block_meta *last_valid_address;
 
 void mem_clear(void *buf, int len)
 {
@@ -28,7 +28,7 @@ void mem_clear(void *buf, int len)
 
 void test_8(void)
 {
-	printf("Test 8 ... ");
+	ft_printf("Test 8 ... ");
 
 	void *a = myalloc(1); // tiny block
 	void *b = myalloc(60); // large block
@@ -66,7 +66,6 @@ void test_unmap()
 
 void test_refactor()
 {
-	// struct metadata *m = get_memory_start();
 	void *n = myalloc(2);
 	void *n2 = myalloc(3);
 	void *n3 = myalloc(1);
@@ -83,7 +82,25 @@ void test_refactor()
 
 }
 
+struct block_meta *get_suitable_block(unsigned long size);
+void test_paging()
+{
+    void *n = myalloc(1);
+    void *n2 = myalloc(2);
+    void *n3 = myalloc(50);
+	void *n4 = myalloc(4);
+
+
+    myfree(n4);
+    myfree(n3);
+    myfree(n2);
+    myfree(n);
+
+    show_alloc_mem_ex();
+}
+
 void testing(void)
 {
-	test_refactor();
+	// test_refactor();
+    test_paging();
 }
