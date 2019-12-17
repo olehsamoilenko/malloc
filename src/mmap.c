@@ -12,9 +12,9 @@
 
 #include "malloc.h"
 
-void insert_zone_to_list(struct page_meta *zone)
+void insert_zone_to_list(struct zone_meta *zone)
 {
-    struct page_meta *lst = get_first_zone();
+    struct zone_meta *lst = get_first_zone();
 
     while (lst && lst->next)
         lst = lst->next;
@@ -23,7 +23,7 @@ void insert_zone_to_list(struct page_meta *zone)
     zone->prev = lst;
 }
 
-struct page_meta *mmap_zone(unsigned long size)
+struct zone_meta *mmap_zone(unsigned long size)
 {
 	unsigned long bytes_to_request;
 	enum zone_type zone_type;
@@ -45,14 +45,14 @@ struct page_meta *mmap_zone(unsigned long size)
 	}
 
 	void *page = mmap(NULL, bytes_to_request, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
-	struct page_meta *zone = (struct page_meta *)page;
+	struct zone_meta *zone = (struct zone_meta *)page;
     zone->type = zone_type;
 	zone->prev = NULL;
 	zone->next = NULL;
 
-	struct block_meta *first_block = (struct block_meta *)(page + sizeof(struct page_meta));
+	struct block_meta *first_block = (struct block_meta *)(page + sizeof(struct zone_meta));
 	first_block->available = true;
-	first_block->size = bytes_to_request - sizeof(struct page_meta) - sizeof(struct block_meta);
+	first_block->size = bytes_to_request - sizeof(struct zone_meta) - sizeof(struct block_meta);
 	first_block->next = NULL;
 	first_block->prev = NULL;
 
@@ -63,7 +63,7 @@ struct page_meta *mmap_zone(unsigned long size)
 	return (zone);
 }
 
-struct page_meta *get_first_zone()
+struct zone_meta *get_first_zone()
 {
 	static void *first_page = NULL;
 

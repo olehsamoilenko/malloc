@@ -23,7 +23,7 @@ const char *labels[] = {"TINY", "SMALL", "LARGE"}; // TODO: to macro
 
 void show_alloc_mem()
 {
-    struct page_meta *zone = get_first_zone();
+    struct zone_meta *zone = get_first_zone();
 
 	unsigned long sum = 0;
     while (zone)
@@ -90,19 +90,51 @@ void print_meta(struct block_meta *block, unsigned int *counter, unsigned char *
 	}
 }
 
+// TODO: colors
+// TODO: real data
+// TODO: aligning
 void show_alloc_mem_ex(void)
 {
-	// ft_printf("\n");
-	// struct block_meta *block = (struct block_meta *)get_memory_start();
-	// unsigned int i = 0;
-	// unsigned char *text;
+	struct zone_meta *zone = get_first_zone();
+	unsigned int i = 0;
 
-    // while (1)
-    // {
+    while (zone)
+    {
+        // zone meta
+        i = -1;
+        while (++i < sizeof(struct zone_meta))
+            ft_printf("Z");
+        ft_printf("\n");
+
+        struct block_meta *block = FIRST_BLOCK(zone);
+        while (block)
+        {
+            // block meta
+            i = -1;
+            while (++i < sizeof(struct block_meta))
+                ft_printf("B");
+            ft_printf("\n");
+            
+            // block data
+            i = -1;
+            while (++i < block->size)
+            {
+                if (block->available)
+                    ft_printf(".");
+                else
+                    ft_printf("x");
+            }
+            ft_printf("\n");
+
+            block = block->next;
+        }
+        
+
+        zone = zone->next;
+    }
+
 	// 	text = (unsigned char *)block;
-
 	// 	print_meta(block, &i, text);
-
     //     int data = block->size;
 	// 	text = (unsigned char *)block + sizeof(struct block_meta);
     //     while (data--)
@@ -111,26 +143,16 @@ void show_alloc_mem_ex(void)
 	// 			ft_printf("%s", BGGREEN);
 	// 		else
 	// 			ft_printf("%s", BGRED);
-
 	// 		if (ft_isprint(*text))
     //         	ft_printf("%10c", *text);
 	// 		else
 	// 			ft_printf("%10c", '?');
-
 	// 		ft_printf("%s ", BGDEFAULT);
 	// 		text++;
-
     //         if (++i % 10 == 0) {
     //             ft_printf("\n");
     //         }
     //     }
-
     //     // print_meta(block, &i, text);
 
-    //     block = block->next;
-	// 	if (!block)
-	// 		break ;
-    // }
-
-    // ft_printf("\n");
 }

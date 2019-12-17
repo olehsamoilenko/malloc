@@ -87,7 +87,7 @@ void test_paging()
 {
     void *n = myalloc(1);
     void *n2 = myalloc(2);
-    void *n3 = myalloc(3);
+    void *n3 = myalloc(50);
 	void *n4 = myalloc(4);
 
 
@@ -96,7 +96,7 @@ void test_paging()
     myfree(n2);
     myfree(n);
 
-    show_alloc_mem();
+    show_alloc_mem_ex();
 }
 
 void testing(void)

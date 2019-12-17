@@ -91,7 +91,7 @@ struct block_meta *get_suitable_block(unsigned long size)
 		#endif
 	}
 
-    struct page_meta *zone = get_first_zone();
+    struct zone_meta *zone = get_first_zone();
     while (zone)
     {
         if (zone->type == type)
