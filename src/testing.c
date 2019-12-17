@@ -85,13 +85,18 @@ void test_refactor()
 struct block_meta *get_suitable_block(unsigned long size);
 void test_paging()
 {
-    void *n = myalloc(2);
-    void *n2 = myalloc(50);
+    void *n = myalloc(1);
+    void *n2 = myalloc(2);
     void *n3 = myalloc(3);
-	void *n4 = myalloc(1);
-    show_alloc_mem();
-    // insert_zone_to_list(NULL);
+	void *n4 = myalloc(4);
 
+
+    myfree(n4);
+    myfree(n3);
+    myfree(n2);
+    myfree(n);
+
+    show_alloc_mem();
 }
 
 void testing(void)

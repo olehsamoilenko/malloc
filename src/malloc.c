@@ -23,41 +23,47 @@ struct block_meta *last_valid_address = NULL;
 // $> ./ run.sh / usr / bin / time -l ./test2
 void myfree(void *p)
 {
-    // struct block_meta *block = (struct block_meta *)((char *)p - sizeof(struct block_meta));
-    // block->available = true;
+    struct block_meta *block = (struct block_meta *)((char *)p - sizeof(struct block_meta));
+    block->available = true;
 
-    // struct block_meta *next = block->next;
-	// if (next && next->available && next->type == block->type) {
+    struct block_meta *next = block->next;
+	if (next && next->available) {
 
-	// 	block->size += next->size + sizeof(struct block_meta);
-	// 	block->next = next->next;
+        #if DEBUG
+            ft_printf("[FREE] Eating next block\n");
+        #endif
 
-	// 	if (next == last_valid_address) {
-	// 		last_valid_address = block; /* next block is eaten */
-	// 	}
-	// }
+		block->size += next->size + sizeof(struct block_meta);
+		block->next = next->next;
 
-	// struct block_meta *prev = block->prev;
-	// if (prev && prev->available) {
-		
-	// 	if (prev->type == block->type) {
+        struct block_meta *nextnext = next->next;
+        if (nextnext) // TODO: find test for check
+            nextnext->prev = block;
 
-	// 		prev->size += block->size + sizeof(struct block_meta);
-	// 		prev->next = block->next;
-			
-	// 		if (block == last_valid_address) {
-	// 			last_valid_address = prev; /* prev block eaten */
-	// 		}
-	// 	}
-	// 	else {
-	// 		if (block == last_valid_address) {
-	// 			ft_printf("Yes, it's last, need to unmap\n");
-	// 			int res = munmap(block, block->size); // TODO: if unmap several pages, don't unmap first page!
-	// 			ft_printf("Unmap result: %d\n", res);
-	// 			last_valid_address = prev; // TODO: duplication
-	// 		}
-	// 	}
-	// }
+		if (next == last_valid_address) {
+			last_valid_address = block;
+		}
+	}
+
+	struct block_meta *prev = block->prev;
+	if (prev && prev->available) {
+
+        #if DEBUG
+            ft_printf("[FREE] Eating previous block\n");
+        #endif
+
+        prev->size += block->size + sizeof(struct block_meta);
+        prev->next = block->next;
+        struct block_meta *next = block->next;
+        if (next)
+            next->prev = prev;
+
+        
+        if (block == last_valid_address) {
+            last_valid_address = prev;
+        }
+    }
+    // TODO: if unmap several pages, don't unmap first page!
 }
 
 struct block_meta *get_suitable_block(unsigned long size)
