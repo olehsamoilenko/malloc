@@ -17,125 +17,120 @@
 #define BGGREEN		"\e[30;42m" //"\e[92m"
 #define BGCYAN		"\e[44m"
 
-extern struct metadata *last_valid_address;
+extern struct block_meta *last_valid_address;
 
-const char *labels[] = {"TINY", "SMALL", "LARGE"};
+const char *labels[] = {"TINY", "SMALL", "LARGE"}; // TODO: to macro
 
 void show_alloc_mem()
 {
-    struct page_meta *page = get_first_page();
+    struct page_meta *zone = get_first_zone();
 
 	unsigned long sum = 0;
-    while (page)
+    while (zone)
     {
-        struct metadata *block = FIRST_BLOCK(page);
+        ft_printf("%s : 0x%lX\n", labels[zone->type], (unsigned long)zone); // TODO: check output
+        struct block_meta *block = FIRST_BLOCK(zone);
 
         while (block)
         {
+            #if DEBUG // TODO: refactor
+                if (block->available)
+                    ft_printf("[AVAILABLE] ");
+            #endif
+
             #if !DEBUG
                 if (!block->available)
                 {
-            #else
-                printf("[AVAILABLE] ");
             #endif
-                    printf("0x%lX - 0x%lX : %u bytes\n",
-                            (unsigned long)(char *)block + sizeof(struct metadata),
-                            (unsigned long)(char *)block + sizeof(struct metadata) + block->size,
-                            block->size);
-                    sum += block->size;
+                ft_printf("0x%lX - 0x%lX : %u bytes\n",
+                        (unsigned long)(char *)block + sizeof(struct block_meta),
+                        (unsigned long)(char *)block + sizeof(struct block_meta) + block->size,
+                        block->size);
             #if !DEBUG
                 }
             #endif
 
+            if (!block->available)
+                sum += block->size;
+
             block = block->next;
         }
 
-        page = page->next;
+        zone = zone->next;
     }
 
 
-    printf("Total : %lu\n", sum);
-
-    // TODO: block type
-	// int current_type = -1;
-
-    // while (1)
-    // {
-	// 	if (current_type != block->type)
-	// 	{
-	// 		printf("%s : 0x%lX\n", labels[block->type], (unsigned long)block);
-	// 		current_type = block->type;
-	// 	}
+    ft_printf("Total : %lu\n", sum);
 
 }
 
-void print_meta(struct metadata *block, unsigned int *counter, unsigned char *text)
+void print_meta(struct block_meta *block, unsigned int *counter, unsigned char *text)
 {
 	unsigned int len;
 	
-	len = sizeof(struct metadata);
+	len = sizeof(struct block_meta);
 	char *cur_color;
 
 	while (len--)
 	{
 		if (!len)
 		{
-			printf("%s AV: %4d %s ", BGCYAN, block->available, BGDEFAULT);
+			ft_printf("%s AV: %4d %s ", BGCYAN, block->available, BGDEFAULT);
 			cur_color = BGDEFAULT;
 		}
 		else
 		{
-			printf("%s%10c ", BGCYAN, ' ');
+			ft_printf("%s%10c ", BGCYAN, ' ');
 			cur_color = BGCYAN;
 		}
 		*counter += 1;
 		if (*counter % 10 == 0) {
-			printf("%s\n%s", BGDEFAULT, cur_color);
+			ft_printf("%s\n%s", BGDEFAULT, cur_color);
 		}
 	}
 }
 
 void show_alloc_mem_ex(void)
 {
-	printf("\n");
-	struct metadata *block = (struct metadata *)get_memory_start();
-	unsigned int i = 0;
-	unsigned char *text;
+	// ft_printf("\n");
+	// struct block_meta *block = (struct block_meta *)get_memory_start();
+	// unsigned int i = 0;
+	// unsigned char *text;
 
-    while (1)
-    {
-		text = (unsigned char *)block;
+    // while (1)
+    // {
+	// 	text = (unsigned char *)block;
 
-		print_meta(block, &i, text);
+	// 	print_meta(block, &i, text);
 
-        int data = block->size;
-		text = (unsigned char *)block + sizeof(struct metadata);
-        while (data--)
-        {
-            if (block->available)
-				printf("%s", BGGREEN);
-			else
-				printf("%s", BGRED);
+    //     int data = block->size;
+	// 	text = (unsigned char *)block + sizeof(struct block_meta);
+    //     while (data--)
+    //     {
+    //         if (block->available)
+	// 			ft_printf("%s", BGGREEN);
+	// 		else
+	// 			ft_printf("%s", BGRED);
 
-			if (ft_isprint(*text))
-            	printf("%10c", *text);
-			else
-				printf("%10c", '?');
+	// 		if (ft_isprint(*text))
+    //         	ft_printf("%10c", *text);
+	// 		else
+	// 			ft_printf("%10c", '?');
 
-			printf("%s ", BGDEFAULT);
-			text++;
+	// 		ft_printf("%s ", BGDEFAULT);
+	// 		text++;
 
-            if (++i % 10 == 0) {
-                printf("\n");
-            }
-        }
+    //         if (++i % 10 == 0) {
+    //             ft_printf("\n");
+    //         }
+    //     }
 
-        // print_meta(block, &i, text);
+    //     // print_meta(block, &i, text);
 
-        block = block->next;
-		if (!block)
-			break ;
-    }
+    //     block = block->next;
+	// 	if (!block)
+	// 		break ;
+    // }
 
-    printf("\n");
+    // ft_printf("\n");
 }
