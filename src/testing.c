@@ -83,7 +83,14 @@ void test_refactor()
 
 }
 
+void test_paging()
+{
+    void *p = get_first_page();
+    show_alloc_mem();
+}
+
 void testing(void)
 {
-	test_refactor();
+	// test_refactor();
+    test_paging();
 }

@@ -17,6 +17,7 @@
 # include <sys/mman.h>
 # include "libft.h"
 
+# define FIRST_BLOCK(page) ((struct metadata *)((char *)page + sizeof(struct page_meta)))
 # define MAX_TINY_SIZE 5 /* TODO: at least 100 allocations */
 # define MAX_SMALL_SIZE 10
 # define TINY_ZONE (getpagesize()) /* in subject: N */
@@ -57,5 +58,9 @@ void myfree(void *p);
 void *myalloc(unsigned long size);
 void show_alloc_mem(void);
 void show_alloc_mem_ex(void);
+
+// TODO: remove
+struct page_meta *mmap_zone(unsigned long size);
+struct page_meta *get_first_page();
 
 #endif

@@ -18,7 +18,8 @@ LIB =			-lft -L ./libft
 FLAGS =			#-Wall -Wextra -Werror
 LIST =			malloc \
 				testing \
-				dump
+				dump \
+				mmap
 OBJ =			$(addprefix obj/, $(addsuffix .o, $(LIST)))
 
 ifeq ("$(DEBUG)", "1")
@@ -82,11 +83,11 @@ obj:
 	@mkdir obj
 
 clean:
-	@# @make -C ./libft clean
+	@# @make -C ./libft clean TODO: uncomment
 	@rm -rf obj
 	
 fclean: clean
-	@# @make -C ./libft fclean
+	@# @make -C ./libft fclean TODO: uncomment
 	@rm -f $(NAME)
 
 re: fclean all

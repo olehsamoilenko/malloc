@@ -23,38 +23,50 @@ const char *labels[] = {"TINY", "SMALL", "LARGE"};
 
 void show_alloc_mem()
 {
-	struct metadata *block = (struct metadata *)get_memory_start();
+    struct page_meta *page = get_first_page();
 
-
-	int current_type = -1;
 	unsigned long sum = 0;
-
-    while (1)
+    while (page)
     {
-		if (current_type != block->type)
-		{
-			printf("%s : 0x%lX\n", labels[block->type], (unsigned long)block);
-			current_type = block->type;
-		}
+        struct metadata *block = FIRST_BLOCK(page);
 
-		if (!block->available)
-		{
-			printf("0x%lX - 0x%lX : %u bytes\n",
-				(unsigned long)(char *)block + sizeof(struct metadata),
-				(unsigned long)(char *)block + sizeof(struct metadata) + block->size,
-				block->size);
-			sum += block->size;
-		}
+        while (block)
+        {
+            #if !DEBUG
+                if (!block->available)
+                {
+            #else
+                printf("[AVAILABLE] ");
+            #endif
+                    printf("0x%lX - 0x%lX : %u bytes\n",
+                            (unsigned long)(char *)block + sizeof(struct metadata),
+                            (unsigned long)(char *)block + sizeof(struct metadata) + block->size,
+                            block->size);
+                    sum += block->size;
+            #if !DEBUG
+                }
+            #endif
 
-        block = block->next;
-		if (!block)
-		{
-			printf("Total : %lu", sum);
-			break ;
-		}
+            block = block->next;
+        }
+
+        page = page->next;
     }
 
-    printf("\n");
+
+    printf("Total : %lu\n", sum);
+
+    // TODO: block type
+	// int current_type = -1;
+
+    // while (1)
+    // {
+	// 	if (current_type != block->type)
+	// 	{
+	// 		printf("%s : 0x%lX\n", labels[block->type], (unsigned long)block);
+	// 		current_type = block->type;
+	// 	}
+
 }
 
 void print_meta(struct metadata *block, unsigned int *counter, unsigned char *text)
