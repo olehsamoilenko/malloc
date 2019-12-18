@@ -14,6 +14,8 @@
 
 struct block_meta *last_valid_address = NULL;
 
+struct zone_meta *first_zone = NULL;
+
 // TODO: realloc
 
 // TODO: If “ptr” is a NULL pointer, no operation is performed.
@@ -63,7 +65,54 @@ void myfree(void *p)
             last_valid_address = prev;
         }
     }
-    // TODO: if unmap several pages, don't unmap first page!
+
+    // searching for zone meta
+    while (block->prev)
+        block = block->prev;
+    // block is first block now
+    struct zone_meta *cur_zone = (struct zone_meta *)((char *)block - sizeof(struct zone_meta));
+    t_bool all_available = true;
+    while (block)
+    {
+        if (!block->available)
+        {
+            all_available = false;
+            break ;
+        }
+        block = block->next;
+    }
+
+    if (all_available)
+    {
+        #if DEBUG
+            ft_printf("[UNMAP] Zone available\n");
+        #endif
+        // remove zone from list
+        struct zone_meta *next = cur_zone->next;
+        struct zone_meta *prev = cur_zone->prev;
+
+        if (prev)
+        {
+            prev->next = next;
+        }
+
+        if (next)
+        {
+            next->prev = prev;
+        }
+
+        if (cur_zone == first_zone)
+        {
+            #if DEBUG
+                ft_printf("[UNMAP] First zone changed\n");
+            #endif
+
+            first_zone = next;
+        }
+
+        // TODO: unmap zone
+
+    }
 }
 
 struct block_meta *get_suitable_block(unsigned long size)
@@ -91,7 +140,7 @@ struct block_meta *get_suitable_block(unsigned long size)
 		#endif
 	}
 
-    struct zone_meta *zone = get_first_zone();
+    struct zone_meta *zone = first_zone;
     while (zone)
     {
         if (zone->type == type)

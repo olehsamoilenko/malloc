@@ -14,13 +14,20 @@
 
 void insert_zone_to_list(struct zone_meta *zone)
 {
-    struct zone_meta *lst = get_first_zone();
+    struct zone_meta *lst = first_zone;
 
     while (lst && lst->next)
         lst = lst->next;
 
-    lst->next = zone;
-    zone->prev = lst;
+    if (lst)
+    {
+        lst->next = zone;
+        zone->prev = lst;
+    }
+    else
+    {
+        first_zone = zone;
+    }
 }
 
 struct zone_meta *mmap_zone(unsigned long size)
@@ -61,15 +68,4 @@ struct zone_meta *mmap_zone(unsigned long size)
 	#endif
 
 	return (zone);
-}
-
-struct zone_meta *get_first_zone()
-{
-	static void *first_page = NULL;
-
-	if (first_page == NULL)
-	{
-		first_page = mmap_zone(MAX_TINY_SIZE);
-	}
-	return (first_page);
 }

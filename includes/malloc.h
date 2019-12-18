@@ -28,14 +28,15 @@
 	res;											\
 }) // TODO: check macros
 
-enum zone_type // TODO: zone_type
+enum zone_type
 {
 	TINY,
 	SMALL,
 	LARGE
 };
 
-struct block_meta { // TODO: block_meta
+struct block_meta
+{
     unsigned int available; // TODO: 1 bit
     unsigned int size;
 	// enum zone_type type; // TODO: move to zone_meta
@@ -43,13 +44,16 @@ struct block_meta { // TODO: block_meta
 	struct block_meta *prev;
 };
 
-struct zone_meta {
+struct zone_meta
+{
 	// busy_blocks : int
 	// size : int
 	enum zone_type type; // TODO: 2 bits
 	struct zone_meta *prev;
 	struct zone_meta *next;
 };
+
+extern struct zone_meta *first_zone;
 
 void myfree(void *p);
 void *myalloc(unsigned long size);
@@ -58,7 +62,6 @@ void show_alloc_mem_ex(void);
 
 // TODO: remove
 struct zone_meta *mmap_zone(unsigned long size);
-struct zone_meta *get_first_zone();
 void insert_zone_to_list(struct zone_meta *zone);
 
 #endif

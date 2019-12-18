@@ -24,7 +24,7 @@ const char *labels[] = {"TINY", "SMALL", "LARGE"}; // TODO: to macro
 
 void show_alloc_mem()
 {
-    struct zone_meta *zone = get_first_zone();
+    struct zone_meta *zone = first_zone;
 
 	unsigned long sum = 0;
     while (zone)
@@ -114,7 +114,7 @@ void print_symbol(char sym, char *color)
 // TODO: real data
 void show_alloc_mem_ex(void)
 {
-	struct zone_meta *zone = get_first_zone();
+	struct zone_meta *zone = first_zone;
 	unsigned int i = 0;
 
     while (zone)

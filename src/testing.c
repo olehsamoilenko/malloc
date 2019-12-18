@@ -15,15 +15,6 @@
 
 extern struct block_meta *last_valid_address;
 
-void mem_clear(void *buf, int len)
-{
-	char *mem = (char *)buf;
-	unsigned int i = 0;
-	while (i++ < len) {
-		mem[i] = 0;
-	}
-}
-
 #include <errno.h>
 
 void test_8(void)
@@ -57,32 +48,13 @@ void test_many_small()
 	myalloc(getpagesize());
 }
 
-void test_unmap()
+void test_unmap() // TODO: try
 {
 	void *a = myalloc(4072);
 	void *b = myalloc(4072);
 	myfree(b);
 }
 
-void test_refactor()
-{
-	void *n = myalloc(2);
-	void *n2 = myalloc(3);
-	void *n3 = myalloc(1);
-
-	myfree(n);
-	show_alloc_mem();
-	show_alloc_mem_ex();
-	myfree(n2);
-	// myfree(n3);
-
-	show_alloc_mem();
-	show_alloc_mem_ex();
-
-
-}
-
-struct block_meta *get_suitable_block(unsigned long size);
 void test_paging()
 {
     void *n = myalloc(1);
@@ -90,17 +62,19 @@ void test_paging()
     void *n3 = myalloc(50);
 	void *n4 = myalloc(4);
 
-
     myfree(n4);
     myfree(n3);
-    // myfree(n2);
+    myfree(n2);
     myfree(n);
 
+    void *n5 = myalloc(10);
+    myfree(n5);
+
+    show_alloc_mem();
     show_alloc_mem_ex();
 }
 
 void testing(void)
 {
-	// test_refactor();
     test_paging();
 }
