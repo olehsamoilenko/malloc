@@ -13,25 +13,6 @@
 #include "malloc.h"
 #include <stdlib.h>
 
-extern struct block_meta *last_valid_address;
-
-#include <errno.h>
-
-void test_8(void)
-{
-	ft_printf("Test 8 ... ");
-
-	void *a = myalloc(1); // tiny block
-	void *b = myalloc(60); // large block
-	myfree(b);
-	myfree(a);
-
-	#if DEBUG
-		show_alloc_mem_ex();
-		show_alloc_mem();
-	#endif
-}
-
 void test_many_small()
 {
 	for (int i = 0; i < 100; i++)
@@ -48,11 +29,15 @@ void test_many_small()
 	myalloc(getpagesize());
 }
 
-void test_unmap() // TODO: try
+void test_unmap()
 {
-	void *a = myalloc(4072);
-	void *b = myalloc(4072);
-	myfree(b);
+    int i = 0;
+    while (++i < 50)
+    {
+        void *a = myalloc(10);
+        myfree(a);
+    }
+
 }
 
 void test_paging()
@@ -68,13 +53,16 @@ void test_paging()
     myfree(n);
 
     void *n5 = myalloc(10);
-    myfree(n5);
+    // myfree(n5);
 
     show_alloc_mem();
     show_alloc_mem_ex();
 }
 
+
+
 void testing(void)
 {
-    test_paging();
+    // test_paging();
+    test_unmap();
 }

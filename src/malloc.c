@@ -12,17 +12,12 @@
 
 #include "malloc.h"
 
-struct block_meta *last_valid_address = NULL;
-
 struct zone_meta *first_zone = NULL;
 
 // TODO: realloc
 
 // TODO: If “ptr” is a NULL pointer, no operation is performed.
 
-// TODO: We will compare the number of "reclaims" with the number of test0 and test1. If there is so much
-// of "page reclaims" or more than test1, the free does not work.
-// $> ./ run.sh / usr / bin / time -l ./test2
 void myfree(void *p)
 {
     struct block_meta *block = (struct block_meta *)((char *)p - sizeof(struct block_meta));
@@ -42,9 +37,6 @@ void myfree(void *p)
         if (nextnext) // TODO: find test for check
             nextnext->prev = block;
 
-		if (next == last_valid_address) {
-			last_valid_address = block;
-		}
 	}
 
 	struct block_meta *prev = block->prev;
@@ -60,10 +52,6 @@ void myfree(void *p)
         if (next)
             next->prev = prev;
 
-        
-        if (block == last_valid_address) {
-            last_valid_address = prev;
-        }
     }
 
     // searching for zone meta
@@ -110,8 +98,17 @@ void myfree(void *p)
             first_zone = next;
         }
 
-        // TODO: unmap zone
+        // TODO: We will compare the number of "reclaims" with the number of test0 and test1. If there is so much
+        // of "page reclaims" or more than test1, the free does not work.
 
+        // /usr/bin/time -l ./test to check page reclaims
+        // ps -o min_flt,maj_flt $(pgrep malloc) - ubuntu
+
+        // TODO: test unmap, investigate page reclaims
+        int res = munmap(cur_zone, getpagesize());
+        #if DEBUG
+            ft_printf("[UNMAP] munmap result: %d\n", res);
+        #endif
     }
 }
 
@@ -198,9 +195,6 @@ void *myalloc(unsigned long size)
         new_block->available = false;
         new_block->size = size;
 
-        if (reduced_block > last_valid_address)
-            last_valid_address = reduced_block;
-
 		#if DEBUG
 			ft_printf("[ALLOC] New: %p %u; Reduced: %p %u\n", new_block, new_block->size, reduced_block, reduced_block->size);
 		#endif
@@ -240,30 +234,27 @@ void testing(void);
 int main(void)
 {
     testing();
+    while (true)
+        ;
     return (0);
 }
 
 // BONUSES:
-// DONE     Manage the malloc debug environment variables. You can imitate those from malloc
+// 2. DONE  Manage the malloc debug environment variables. You can imitate those from malloc
 //          system or invent your own.
 //          - Malloc has debug environment variables
 
-// DONE     • Create a show_alloc_mem_ex() function that displays more details, for example,
+// 3. DONE  • Create a show_alloc_mem_ex() function that displays more details, for example,
 //          a history of allocations, or an hexa dump of the allocated zones.
 //          - A function allows to dump hexa allocated zones
 
-// DONE     • “Defragment” the freed memory.
+// 1. DONE  • “Defragment” the freed memory.
 //          - During free, the project "defragments" free memory by grouping free blocks
 //          concomitant in one
 
 //          • Manage the use of your malloc in a multi-threaded program (so to be “thread safe”
 //          using the pthread lib).
+
 //          - A function makes it possible to display a history of the memory allocations made
 
-// void *zone = mmap(NULL, getpagesize(), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
-// void *zone2 = mmap(zone, getpagesize(), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
-// void *zone3 = mmap(zone2 + 1, getpagesize(), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
-// munmap(zone2, getpagesize());
-// // myfree(a);
-// ft_printf("%p %p %p\n", zone, zone2, zone3);
-// zone2 unmaped, map it before use
+//          own segfault

@@ -18,8 +18,6 @@
 #define BGCYAN		"\e[97;44m"
 // TODO: new color for zone_meta
 
-extern struct block_meta *last_valid_address;
-
 const char *labels[] = {"TINY", "SMALL", "LARGE"}; // TODO: to macro
 
 void show_alloc_mem()
