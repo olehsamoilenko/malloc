@@ -90,9 +90,18 @@ void print_meta(struct block_meta *block, unsigned int *counter, unsigned char *
 	}
 }
 
+void print_symbol(char sym)
+{
+    static int counter = 0;
+
+    ft_putchar(sym);
+    counter++;
+    if (counter % 100 == 0)
+        ft_putchar('\n');
+}
+
 // TODO: colors
 // TODO: real data
-// TODO: aligning
 void show_alloc_mem_ex(void)
 {
 	struct zone_meta *zone = get_first_zone();
@@ -103,8 +112,7 @@ void show_alloc_mem_ex(void)
         // zone meta
         i = -1;
         while (++i < sizeof(struct zone_meta))
-            ft_printf("Z");
-        ft_printf("\n");
+            print_symbol('Z');
 
         struct block_meta *block = FIRST_BLOCK(zone);
         while (block)
@@ -112,19 +120,17 @@ void show_alloc_mem_ex(void)
             // block meta
             i = -1;
             while (++i < sizeof(struct block_meta))
-                ft_printf("B");
-            ft_printf("\n");
+                print_symbol('B');
             
             // block data
             i = -1;
             while (++i < block->size)
             {
                 if (block->available)
-                    ft_printf(".");
+                    print_symbol('.');
                 else
-                    ft_printf("x");
+                    print_symbol('x');
             }
-            ft_printf("\n");
 
             block = block->next;
         }
@@ -132,6 +138,8 @@ void show_alloc_mem_ex(void)
 
         zone = zone->next;
     }
+
+    ft_putchar('\n');
 
 	// 	text = (unsigned char *)block;
 	// 	print_meta(block, &i, text);
@@ -149,9 +157,6 @@ void show_alloc_mem_ex(void)
 	// 			ft_printf("%10c", '?');
 	// 		ft_printf("%s ", BGDEFAULT);
 	// 		text++;
-    //         if (++i % 10 == 0) {
-    //             ft_printf("\n");
-    //         }
     //     }
     //     // print_meta(block, &i, text);
 
