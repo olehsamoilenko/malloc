@@ -93,7 +93,7 @@ void test_paging()
 
     myfree(n4);
     myfree(n3);
-    myfree(n2);
+    // myfree(n2);
     myfree(n);
 
     show_alloc_mem_ex();

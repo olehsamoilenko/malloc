@@ -13,9 +13,10 @@
 #include "malloc.h"
 
 #define BGDEFAULT	"\e[97;49m"
-#define BGRED		"\e[41m" //"\e[91m"
-#define BGGREEN		"\e[30;42m" //"\e[92m"
-#define BGCYAN		"\e[44m"
+#define BGRED		"\e[97;41m"
+#define BGGREEN		"\e[30;42m"
+#define BGCYAN		"\e[97;44m"
+// TODO: new color for zone_meta
 
 extern struct block_meta *last_valid_address;
 
@@ -90,17 +91,26 @@ void print_meta(struct block_meta *block, unsigned int *counter, unsigned char *
 	}
 }
 
-void print_symbol(char sym)
+void print_symbol(char sym, char *color)
 {
     static int counter = 0;
+    static char *g_color = BGDEFAULT;
 
+    if (!ft_strequ(color, g_color))
+    {
+        g_color = color;
+        ft_putstr(color);
+    }
     ft_putchar(sym);
     counter++;
     if (counter % 100 == 0)
+    {
+        ft_putstr(BGDEFAULT);
         ft_putchar('\n');
+        ft_putstr(g_color);
+    }
 }
 
-// TODO: colors
 // TODO: real data
 void show_alloc_mem_ex(void)
 {
@@ -112,7 +122,7 @@ void show_alloc_mem_ex(void)
         // zone meta
         i = -1;
         while (++i < sizeof(struct zone_meta))
-            print_symbol('Z');
+            print_symbol('Z', BGCYAN);
 
         struct block_meta *block = FIRST_BLOCK(zone);
         while (block)
@@ -120,44 +130,32 @@ void show_alloc_mem_ex(void)
             // block meta
             i = -1;
             while (++i < sizeof(struct block_meta))
-                print_symbol('B');
-            
+                print_symbol('B', BGCYAN);
+
             // block data
             i = -1;
             while (++i < block->size)
             {
                 if (block->available)
-                    print_symbol('.');
+                    print_symbol('.', BGGREEN);
                 else
-                    print_symbol('x');
+                    print_symbol('x', BGRED);
             }
 
             block = block->next;
         }
-        
 
         zone = zone->next;
     }
 
+    ft_putstr(BGDEFAULT);
     ft_putchar('\n');
 
-	// 	text = (unsigned char *)block;
-	// 	print_meta(block, &i, text);
-    //     int data = block->size;
-	// 	text = (unsigned char *)block + sizeof(struct block_meta);
-    //     while (data--)
-    //     {
-    //         if (block->available)
-	// 			ft_printf("%s", BGGREEN);
-	// 		else
-	// 			ft_printf("%s", BGRED);
-	// 		if (ft_isprint(*text))
-    //         	ft_printf("%10c", *text);
-	// 		else
-	// 			ft_printf("%10c", '?');
-	// 		ft_printf("%s ", BGDEFAULT);
-	// 		text++;
-    //     }
-    //     // print_meta(block, &i, text);
+	// text = (unsigned char *)block;
+    // if (ft_isprint(*text))
+    //     ft_printf("%10c", *text);
+    // else
+    //     ft_printf("%10c", '?');
+    // text++;
 
 }
