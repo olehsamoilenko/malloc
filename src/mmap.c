@@ -54,6 +54,7 @@ struct zone_meta *mmap_zone(unsigned long size)
 	void *page = mmap(NULL, bytes_to_request, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 	struct zone_meta *zone = (struct zone_meta *)page;
     zone->type = zone_type;
+    zone->size = bytes_to_request;
 	zone->prev = NULL;
 	zone->next = NULL;
 

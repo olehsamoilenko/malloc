@@ -26,7 +26,7 @@
 	while (res < n + sizeof(struct block_meta))		\
 		res += getpagesize();						\
 	res;											\
-}) // TODO: check macros
+}) // TODO: check macros // TODO: need it? refactor
 
 enum zone_type
 {
@@ -39,16 +39,15 @@ struct block_meta
 {
     unsigned int available; // TODO: 1 bit
     unsigned int size;
-	// enum zone_type type; // TODO: move to zone_meta
-	struct block_meta *next;
 	struct block_meta *prev;
+	struct block_meta *next;
 };
 
 struct zone_meta
 {
-	// busy_blocks : int
-	// size : int
+	// TODOMB :busy_blocks : int
 	enum zone_type type; // TODO: 2 bits
+    unsigned int size;
 	struct zone_meta *prev;
 	struct zone_meta *next;
 };

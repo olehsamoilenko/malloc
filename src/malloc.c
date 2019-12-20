@@ -98,14 +98,14 @@ void myfree(void *p)
             first_zone = next;
         }
 
-        // TODO: We will compare the number of "reclaims" with the number of test0 and test1. If there is so much
-        // of "page reclaims" or more than test1, the free does not work.
+        /*
+            To check page reclaims:
+            Mac:    /usr/bin/time -l ./test
+            Ubuntu: /usr/bin/time --verbose ./test
+        */
 
-        // /usr/bin/time -l ./test to check page reclaims
-        // ps -o min_flt,maj_flt $(pgrep malloc) - ubuntu
-
-        // TODO: test unmap, investigate page reclaims
-        int res = munmap(cur_zone, getpagesize());
+        // TODO: test unmap with LARGE blocks
+        int res = munmap(cur_zone, cur_zone->size);
         #if DEBUG
             ft_printf("[UNMAP] munmap result: %d\n", res);
         #endif
@@ -120,7 +120,7 @@ struct block_meta *get_suitable_block(unsigned long size)
 	enum zone_type type;
 	if (size <= MAX_TINY_SIZE) {
 		type = TINY;
-		#if DEBUG
+		#if DEBUG // TODO: refactor
 			ft_printf("[BLOCK] Block type: TINY\n");
 		#endif
 	}
@@ -172,7 +172,6 @@ struct block_meta *get_suitable_block(unsigned long size)
 // - between 255 and 272 pages, the malloc works and the overhead is reasonable: 5
 void *myalloc(unsigned long size)
 {
-	// TODO: get rid of last valid addr
 	// TODO: rename new and reduced blocks
 
     struct block_meta *new_block = get_suitable_block(size);
@@ -199,25 +198,12 @@ void *myalloc(unsigned long size)
 			ft_printf("[ALLOC] New: %p %u; Reduced: %p %u\n", new_block, new_block->size, reduced_block, reduced_block->size);
 		#endif
 
-		// ft_printf("me: %p   next: %p   prev: %p\n",
-		// 	new_block, new_block->next, new_block->prev);
-		// if (new_block->next) {
-		// 	struct block_meta *nxt = new_block->next;
-		// 	ft_printf("my next: %p   next: %p   prev: %p\n",
-		// 		nxt, nxt->next, nxt->prev);
-		// }
-		// if (new_block->prev) {
-		// 	struct block_meta *prv = new_block->prev;
-		// 	ft_printf("my prev: %p   next: %p   prev: %p\n",
-		// 		prv, prv->next, prv->prev);
-		// }
-
         return ((char *)new_block + sizeof(struct block_meta));
     }
     else if (new_block && new_block->size >= size)
     {
 		#if DEBUG
-        	ft_printf("maybe not filled fully, but doesn't matter\n");
+        	ft_printf("[ALLOC] Take last block in zone\n");
 		#endif
         new_block->available = false; /* not filled fully, but doesn't matter */
 
@@ -225,7 +211,10 @@ void *myalloc(unsigned long size)
     }
     else
     {
-        return (NULL); /* there is no suitable block */
+        #if DEBUG
+        	ft_printf("[ALLOC] No suitable block\n");
+		#endif
+        return (NULL);
     }
 }
 
@@ -234,8 +223,6 @@ void testing(void);
 int main(void)
 {
     testing();
-    while (true)
-        ;
     return (0);
 }
 

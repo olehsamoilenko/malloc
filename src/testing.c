@@ -32,12 +32,11 @@ void test_many_small()
 void test_unmap()
 {
     int i = 0;
-    while (++i < 50)
+    while (++i < 1000)
     {
-        void *a = myalloc(10);
+        void *a = myalloc(100);
         myfree(a);
     }
-
 }
 
 void test_paging()
