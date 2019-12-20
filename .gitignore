@@ -3,3 +3,4 @@ malloc
 .vscode
 *.o
 .DS_Store
+libft_malloc*.so

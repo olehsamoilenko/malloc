@@ -220,12 +220,6 @@ void *myalloc(unsigned long size)
 
 void testing(void);
 
-int main(void)
-{
-    testing();
-    return (0);
-}
-
 // BONUSES:
 // 2. DONE  Manage the malloc debug environment variables. You can imitate those from malloc
 //          system or invent your own.
