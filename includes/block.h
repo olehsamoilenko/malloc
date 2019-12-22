@@ -17,6 +17,16 @@
 
 # include <sys/mman.h>
 # include <stdio.h> // TODO: remove
+// # TODO: $> nm libft_malloc.so
+// # 0000000000000000 T _free
+// # 0000000000000000 T _malloc
+// # 0000000000000000 T _realloc
+// # 0000000000000000 T _show_alloc_mem
+// # U _mmap
+// # U _munmap
+// # U _getpagesize
+// # U _write
+// # U dyld_stub_binder
 # include "libft.h"
 
 # define FIRST_BLOCK(zone) ((struct block_meta *)((char *)zone + sizeof(struct zone_meta)))
