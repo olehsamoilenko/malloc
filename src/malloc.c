@@ -17,8 +17,7 @@ struct zone_meta *first_zone = NULL;
 // TODO: realloc
 
 // TODO: If “ptr” is a NULL pointer, no operation is performed.
-
-void EXPORT myfree(void *p)
+void EXPORT free(void *p)
 {
     struct block_meta *block = (struct block_meta *)((char *)p - sizeof(struct block_meta));
     block->available = true;
@@ -27,7 +26,7 @@ void EXPORT myfree(void *p)
 	if (next && next->available) {
 
         #if DEBUG
-            ft_printf("[FREE] Eating next block\n");
+            printf("[FREE] Eating next block\n");
         #endif
 
 		block->size += next->size + sizeof(struct block_meta);
@@ -43,7 +42,7 @@ void EXPORT myfree(void *p)
 	if (prev && prev->available) {
 
         #if DEBUG
-            ft_printf("[FREE] Eating previous block\n");
+            printf("[FREE] Eating previous block\n");
         #endif
 
         prev->size += block->size + sizeof(struct block_meta);
@@ -73,7 +72,7 @@ void EXPORT myfree(void *p)
     if (all_available)
     {
         #if DEBUG
-            ft_printf("[UNMAP] Zone available\n");
+            printf("[UNMAP] Zone available\n");
         #endif
         // remove zone from list
         struct zone_meta *next = cur_zone->next;
@@ -92,7 +91,7 @@ void EXPORT myfree(void *p)
         if (cur_zone == first_zone)
         {
             #if DEBUG
-                ft_printf("[UNMAP] First zone changed\n");
+                printf("[UNMAP] First zone changed\n");
             #endif
 
             first_zone = next;
@@ -107,12 +106,12 @@ void EXPORT myfree(void *p)
         // TODO: test unmap with LARGE blocks
         int res = munmap(cur_zone, cur_zone->size);
         #if DEBUG
-            ft_printf("[UNMAP] munmap result: %d\n", res);
+            printf("[UNMAP] munmap result: %d\n", res);
         #endif
     }
 }
 
-struct block_meta *get_suitable_block(unsigned long size)
+struct block_meta *get_suitable_block(size_t size)
 {
     if (!size)
         return (NULL);
@@ -121,19 +120,19 @@ struct block_meta *get_suitable_block(unsigned long size)
 	if (size <= MAX_TINY_SIZE) {
 		type = TINY;
 		#if DEBUG // TODO: refactor
-			ft_printf("[BLOCK] Block type: TINY\n");
+			printf("[BLOCK] Block type: TINY\n");
 		#endif
 	}
 	else if (size <= MAX_SMALL_SIZE) {
 		type = SMALL;
 		#if DEBUG
-			ft_printf("[BLOCK] Block type: SMALL\n");
+			printf("[BLOCK] Block type: SMALL\n");
 		#endif
 	}
 	else {
 		type = LARGE;
 		#if DEBUG
-			ft_printf("[BLOCK] Block type: LARGE\n");
+			printf("[BLOCK] Block type: LARGE\n");
 		#endif
 	}
 
@@ -157,7 +156,7 @@ struct block_meta *get_suitable_block(unsigned long size)
     }
 
 	#if DEBUG
-		ft_printf("[BLOCK] No suitable space: size = %lu\n", size); // TODO: type
+		printf("[BLOCK] No suitable space: size = %lu\n", size); // TODO: type
 	#endif
 
     return (NULL);
@@ -173,9 +172,11 @@ struct block_meta *get_suitable_block(unsigned long size)
 
 // TODO tests: https://github.com/Haradric/ft_malloc/tree/master/tests
 // TODO tests: https://github.com/mtupikov42/malloc/tree/master/test
-void EXPORT *myalloc(unsigned long size)
+void EXPORT *malloc(size_t size)
 {
 	// TODO: rename new and reduced blocks
+
+	printf("HELLO\n");
 
     struct block_meta *new_block = get_suitable_block(size);
 	if (!new_block)
@@ -198,7 +199,7 @@ void EXPORT *myalloc(unsigned long size)
         new_block->size = size;
 
 		#if DEBUG
-			ft_printf("[ALLOC] New: %p %u; Reduced: %p %u\n", new_block, new_block->size, reduced_block, reduced_block->size);
+			printf("[ALLOC] New: %p %u; Reduced: %p %u\n", new_block, new_block->size, reduced_block, reduced_block->size);
 		#endif
 
         return ((char *)new_block + sizeof(struct block_meta));
@@ -206,7 +207,7 @@ void EXPORT *myalloc(unsigned long size)
     else if (new_block && new_block->size >= size)
     {
 		#if DEBUG
-        	ft_printf("[ALLOC] Take last block in zone\n");
+        	printf("[ALLOC] Take last block in zone\n");
 		#endif
         new_block->available = false; /* not filled fully, but doesn't matter */
 
@@ -215,7 +216,7 @@ void EXPORT *myalloc(unsigned long size)
     else
     {
         #if DEBUG
-        	ft_printf("[ALLOC] No suitable block\n");
+        	printf("[ALLOC] No suitable block\n");
 		#endif
         return (NULL);
     }

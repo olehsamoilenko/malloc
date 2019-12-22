@@ -16,6 +16,7 @@
 # define BLOCK_H
 
 # include <sys/mman.h>
+# include <stdio.h> // TODO: remove
 # include "libft.h"
 
 # define FIRST_BLOCK(zone) ((struct block_meta *)((char *)zone + sizeof(struct zone_meta)))

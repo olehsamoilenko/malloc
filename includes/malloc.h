@@ -13,8 +13,10 @@
 #ifndef MALLOC_H
 # define MALLOC_H
 
-void myfree(void *p);
-void *myalloc(unsigned long size); // TODO check: unsigned long ?
+# include <stdlib.h>
+
+void free(void *p);
+void *malloc(size_t size); // TODO check: unsigned long ?
 void show_alloc_mem(void);
 void show_alloc_mem_ex(void);
 
