@@ -22,7 +22,6 @@ INC =			-I ./includes \
 LIB =			-lft -L ./libft
 FLAGS =			-fvisibility=hidden # -fPIC # TODO: -Wall -Wextra -Werror
 LIST =			malloc \
-				testing \
 				dump \
 				mmap
 OBJ =			$(addprefix obj/, $(addsuffix .o, $(LIST)))
@@ -86,4 +85,4 @@ re: fclean all
 tests: $(LINK_NAME) test_0 # TODO: console log
 
 test_0:
-	@gcc -lft_malloc -L . -I ./includes tests/test_0.c -o test_0
+	@gcc $(INC) tests/test_0.c -o test_0 -lft -L libft -lft_malloc -L .

@@ -27,21 +27,21 @@ void EXPORT show_alloc_mem()
 	unsigned long sum = 0;
     while (zone)
     {
-        ft_printf("%s : 0x%lX\n", labels[zone->type], (unsigned long)zone); // TODO: check output
+        printf("%s : 0x%lX\n", labels[zone->type], (unsigned long)zone); // TODO: check output
         struct block_meta *block = FIRST_BLOCK(zone);
 
         while (block)
         {
             #if DEBUG // TODO: refactor
                 if (block->available)
-                    ft_printf("[AVAILABLE] ");
+                    printf("[AVAILABLE] ");
             #endif
 
             #if !DEBUG
                 if (!block->available)
                 {
             #endif
-                ft_printf("0x%lX - 0x%lX : %u bytes\n",
+                printf("0x%lX - 0x%lX : %u bytes\n",
                         (unsigned long)(char *)block + sizeof(struct block_meta),
                         (unsigned long)(char *)block + sizeof(struct block_meta) + block->size,
                         block->size);
@@ -59,7 +59,7 @@ void EXPORT show_alloc_mem()
     }
 
 
-    ft_printf("Total : %lu\n", sum);
+    printf("Total : %lu\n", sum);
 
 }
 
@@ -74,17 +74,17 @@ void print_meta(struct block_meta *block, unsigned int *counter, unsigned char *
 	{
 		if (!len)
 		{
-			ft_printf("%s AV: %4d %s ", BGCYAN, block->available, BGDEFAULT);
+			printf("%s AV: %4d %s ", BGCYAN, block->available, BGDEFAULT);
 			cur_color = BGDEFAULT;
 		}
 		else
 		{
-			ft_printf("%s%10c ", BGCYAN, ' ');
+			printf("%s%10c ", BGCYAN, ' ');
 			cur_color = BGCYAN;
 		}
 		*counter += 1;
 		if (*counter % 10 == 0) {
-			ft_printf("%s\n%s", BGDEFAULT, cur_color);
+			printf("%s\n%s", BGDEFAULT, cur_color);
 		}
 	}
 }
@@ -151,9 +151,9 @@ void EXPORT show_alloc_mem_ex(void)
 
 	// text = (unsigned char *)block;
     // if (ft_isprint(*text))
-    //     ft_printf("%10c", *text);
+    //     printf("%10c", *text);
     // else
-    //     ft_printf("%10c", '?');
+    //     printf("%10c", '?');
     // text++;
 
 }
