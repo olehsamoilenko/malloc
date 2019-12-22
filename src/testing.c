@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+// TODO: get rid of file
+
 #include "malloc.h"
 
 void test_many_small()
@@ -25,7 +27,7 @@ void test_many_small()
 	myalloc(60);
 	myalloc(4000);
 	myalloc(8000);
-	myalloc(getpagesize());
+	// myalloc(getpagesize());
 }
 
 void test_unmap()

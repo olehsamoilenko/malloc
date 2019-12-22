@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "malloc.h"
+#include "block.h"
 
 void insert_zone_to_list(struct zone_meta *zone)
 {
