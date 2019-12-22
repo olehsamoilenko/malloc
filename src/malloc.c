@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "malloc.h"
+#include "block.h"
 
 struct zone_meta *first_zone = NULL;
 
@@ -18,7 +18,7 @@ struct zone_meta *first_zone = NULL;
 
 // TODO: If “ptr” is a NULL pointer, no operation is performed.
 
-void myfree(void *p)
+void EXPORT myfree(void *p)
 {
     struct block_meta *block = (struct block_meta *)((char *)p - sizeof(struct block_meta));
     block->available = true;
@@ -170,7 +170,10 @@ struct block_meta *get_suitable_block(unsigned long size)
 // - between 313 pages and 512 pages, the malloc works but the overhead is very important: 3
 // - between 273 pages and 312 pages, the malloc works but the overhead is important: 4
 // - between 255 and 272 pages, the malloc works and the overhead is reasonable: 5
-void *myalloc(unsigned long size)
+
+// TODO tests: https://github.com/Haradric/ft_malloc/tree/master/tests
+// TODO tests: https://github.com/mtupikov42/malloc/tree/master/test
+void EXPORT *myalloc(unsigned long size)
 {
 	// TODO: rename new and reduced blocks
 

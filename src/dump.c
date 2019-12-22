@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "malloc.h"
+#include "block.h"
 
 #define BGDEFAULT	"\e[97;49m"
 #define BGRED		"\e[97;41m"
@@ -20,7 +20,7 @@
 
 const char *labels[] = {"TINY", "SMALL", "LARGE"}; // TODO: to macro
 
-void show_alloc_mem()
+void EXPORT show_alloc_mem()
 {
     struct zone_meta *zone = first_zone;
 
@@ -110,7 +110,7 @@ void print_symbol(char sym, char *color)
 }
 
 // TODO: real data
-void show_alloc_mem_ex(void)
+void EXPORT show_alloc_mem_ex(void)
 {
 	struct zone_meta *zone = first_zone;
 	unsigned int i = 0;

@@ -20,7 +20,7 @@ HEADER =		./includes/malloc.h
 INC =			-I ./includes \
 				-I ./libft/includes
 LIB =			-lft -L ./libft
-FLAGS =			-fPIC #-Wall -Wextra -Werror
+FLAGS =			-fvisibility=hidden # -fPIC # TODO: -Wall -Wextra -Werror
 LIST =			malloc \
 				testing \
 				dump \
@@ -32,18 +32,14 @@ SRC =			$(addprefix src/, $(addsuffix .c, $(LIST)))
 OFF=\033[0m
 PURPLE=\033[0;35m
 PURPLEBOLD=\033[1;35m
-WHITE=\033[1;37m
+WHITEBOLD=\033[1;37m
 PURPLELIGHT=\033[38;2;102;102;255m
 
 ifeq ("$(DEBUG)", "1")
 	DEBUGFLAG="-D DEBUG"
 endif
 
-# TODO: $> export HOSTTYPE = Тестирование
-# ln -s libft_malloc_Testing.so libft_malloc.so
-# $> ls -l libft_malloc.so
-# libft_malloc.so -> libft_malloc_Testing.so
-
+# TODO:
 # cat run.sh #!/bin/sh export DYLD_LIBRARY_PATH=. export
 # DYLD_INSERT_LIBRARIES="libft_malloc.so" export DYLD_FORCE_FLAT_NAMESPACE=1 $@
 
@@ -58,14 +54,15 @@ endif
 # U _write
 # U dyld_stub_binder
 
-all: $(LINK_NAME)
+all: $(LINK_NAME) tests
 
 obj/%.o: src/%.c $(HEADER)
-	@clang $(FLAGS) -c $< -o $@ $(INC) $(DEBUGFLAG)
-	@echo "$(PURPLELIGHT)Compiling $(WHITE)$< $(PURPLELIGHT)done$(OFF)"
+	@gcc $(FLAGS) -c $< -o $@ $(INC) $(DEBUGFLAG)
+	@echo "$(PURPLELIGHT)Compiling $(WHITEBOLD)$< $(PURPLELIGHT)done$(OFF)"
 
 $(NAME): ./libft/libft.a obj $(OBJ)
-	@clang -shared -fPIC $(OBJ) -o $(NAME)
+	@gcc -shared $(FLAGS) $(OBJ) ./libft/libft.a -o $(NAME)
+	@strip -x $(NAME)
 	@echo "$(PURPLEBOLD)$(NAME)$(PURPLE) ready$(OFF)"
 
 $(LINK_NAME): $(NAME)
@@ -73,18 +70,20 @@ $(LINK_NAME): $(NAME)
 	@echo "$(PURPLEBOLD)$(LINK_NAME)$(PURPLE) linked$(OFF)"
 
 ./libft/libft.a:
-	# TODO: uncomment
-	# @make -C ./libft
+	@make -C ./libft # TODO: remove stdlib libft, check memalloc
 
 obj:
 	@mkdir obj
 
 clean:
-	@# @make -C ./libft clean TODO: uncomment
-	@rm -rf obj
+	@rm -rf obj # TODO: console log
 	
 fclean: clean
-	@# @make -C ./libft fclean TODO: uncomment
-	@rm -f $(NAME) $(LINK_NAME)
+	@rm -f $(NAME) $(LINK_NAME) test_0 # TODO: refactor
 
 re: fclean all
+
+tests: $(LINK_NAME) test_0 # TODO: console log
+
+test_0:
+	@gcc -lft_malloc -L . -I ./includes tests/test_0.c -o test_0
