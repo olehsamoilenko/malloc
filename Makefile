@@ -38,38 +38,23 @@ ifeq ("$(DEBUG)", "1")
 	DEBUGFLAG="-D DEBUG"
 endif
 
-# TODO:
-# cat run.sh #!/bin/sh export DYLD_LIBRARY_PATH=. export
-# DYLD_INSERT_LIBRARIES="libft_malloc.so" export DYLD_FORCE_FLAT_NAMESPACE=1 $@
-
-# TODO: $> nm libft_malloc.so
-# 0000000000000000 T _free
-# 0000000000000000 T _malloc
-# 0000000000000000 T _realloc
-# 0000000000000000 T _show_alloc_mem
-# U _mmap
-# U _munmap
-# U _getpagesize
-# U _write
-# U dyld_stub_binder
-
 all: $(LINK_NAME) tests
 
 obj/%.o: src/%.c $(HEADER)
 	@gcc $(FLAGS) -c $< -o $@ $(INC) $(DEBUGFLAG)
 	@echo "$(PURPLELIGHT)Compiling $(WHITEBOLD)$< $(PURPLELIGHT)done$(OFF)"
 
-$(NAME): ./libft/libft.a obj $(OBJ)
-	@gcc -shared $(FLAGS) $(OBJ) ./libft/libft.a -o $(NAME)
-	@strip -x $(NAME)
-	@echo "$(PURPLEBOLD)$(NAME)$(PURPLE) ready$(OFF)"
-
 $(LINK_NAME): $(NAME)
 	@ln -sf $(NAME) $(LINK_NAME)
 	@echo "$(PURPLEBOLD)$(LINK_NAME)$(PURPLE) linked$(OFF)"
 
+$(NAME): ./libft/libft.a obj $(OBJ) # TODO: move obj to obj/%.o
+	@gcc -shared $(FLAGS) $(OBJ) ./libft/libft.a -o $(NAME)
+	@strip -x $(NAME)
+	@echo "$(PURPLEBOLD)$(NAME)$(PURPLE) ready$(OFF)"
+
 ./libft/libft.a:
-	@make -C ./libft # TODO: remove stdlib libft, check memalloc
+	@make -C ./libft
 
 obj:
 	@mkdir obj
@@ -78,11 +63,26 @@ clean:
 	@rm -rf obj # TODO: console log
 	
 fclean: clean
-	@rm -f $(NAME) $(LINK_NAME) test_0 # TODO: refactor
+	@rm -f $(NAME) $(LINK_NAME) test0 test1 test2 # TODO: refactor $(TESTS)
 
 re: fclean all
 
 tests: $(LINK_NAME) test_0 # TODO: console log
 
 test_0:
-	@gcc $(INC) tests/test_0.c -o test_0 -lft -L libft -lft_malloc -L .
+	# To run tests:
+	@gcc -o test0 tests/test0.c
+	# ./run.sh && /usr/bin/time -l ./test0
+	@gcc -o test1 tests/test1.c
+	# ./run.sh && /usr/bin/time -l ./test1
+	@gcc -o test2 tests/test2.c
+	# ./run.sh && /usr/bin/time -l ./test2
+	@#gcc -o test3 tests/test3.c # TODO: uncomment when realloc is done
+	@# ./run.sh && ./test3
+	@#gcc -o test3b tests/test3b.c # TODO: uncomment when realloc is done
+	@# ./run.sh && ./test3b
+	@#gcc -o test4 tests/test4.c # TODO: uncomment when realloc is done
+	@# ./run.sh && ./test4
+	@gcc $(INC) tests/test9.c -o test9 -lft -L libft -lft_malloc -L .
+	@# TODO: test5
+	@# TODO: bonuses
