@@ -5,3 +5,5 @@ The first implementation was created accordingly to [this Stepik guide](https://
 Compile: ```make```<br>
 Compile debug version: ```make re DEBUG=1```<br>
 Again usual version: ```make re``` OR ```make re DEBUG=0```<br>
+
+To prepare tests, please type: ``` . run.sh```<br>
