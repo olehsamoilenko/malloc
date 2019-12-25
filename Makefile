@@ -20,13 +20,12 @@ HEADER =		./includes/malloc.h
 INC =			-I ./includes \
 				-I ./libft/includes
 LIB =			-lft -L ./libft
-FLAGS =			-fvisibility=hidden # -fPIC # TODO: -Wall -Wextra -Werror
+FLAGS =			-fvisibility=hidden -fPIC # TODO: -Wall -Wextra -Werror
 LIST =			malloc \
 				dump \
 				mmap
 OBJ =			$(addprefix obj/, $(addsuffix .o, $(LIST)))
 SRC =			$(addprefix src/, $(addsuffix .c, $(LIST)))
-
 
 OFF=\033[0m
 PURPLE=\033[0;35m
@@ -34,8 +33,14 @@ PURPLEBOLD=\033[1;35m
 WHITEBOLD=\033[1;37m
 PURPLELIGHT=\033[38;2;102;102;255m
 
-ifeq ("$(DEBUG)", "1")
+ifeq ("$(DEBUG)", "1") # TODO: quotes
 	DEBUGFLAG="-D DEBUG"
+endif
+
+ifeq ($(shell uname), Darwin)
+	TIME_FLAG=-l
+else
+	TIME_FLAG=--verbose
 endif
 
 all: $(LINK_NAME) tests
@@ -70,13 +75,13 @@ re: fclean all
 tests: $(LINK_NAME) test_0 # TODO: console log
 
 test_0:
-	# To run tests:
-	@gcc -o test0 tests/test0.c
-	# ./run.sh && /usr/bin/time -l ./test0
-	@gcc -o test1 tests/test1.c
-	# ./run.sh && /usr/bin/time -l ./test1
-	@gcc -o test2 tests/test2.c
-	# ./run.sh && /usr/bin/time -l ./test2
+	# To run tests: # TODO: move to script
+	gcc -o test0 tests/test0.c
+	# ./run.sh && /usr/bin/time $(TIME_FLAG) ./test0
+	gcc -flat_namespace -o test1 tests/test1.c
+	# ./run.sh && /usr/bin/time $(TIME_FLAG) ./test1
+	gcc -o test2 tests/test2.c
+	# ./run.sh && /usr/bin/time $(TIME_FLAG) ./test2
 	@#gcc -o test3 tests/test3.c # TODO: uncomment when realloc is done
 	@# ./run.sh && ./test3
 	@#gcc -o test3b tests/test3b.c # TODO: uncomment when realloc is done
