@@ -16,16 +16,16 @@ endif
 
 NAME =			libft_malloc_$(HOSTTYPE).so
 LINK_NAME =		libft_malloc.so
-HEADER =		./includes/malloc.h
+HEADER =		./includes/malloc.h \
+				./includes/block.h
 INC =			-I ./includes \
 				-I ./libft/includes
-LIB =			-lft -L ./libft
-FLAGS =			-fvisibility=hidden -fPIC # TODO: -Wall -Wextra -Werror
-LIST =			malloc \
+CC_FLAGS =		-fvisibility=hidden -fPIC # TODO: -Wall -Wextra -Werror
+TEST_CC_FLAGS =	-flat_namespace -I ./includes
+SRC_LIST =		malloc \
 				dump \
 				mmap
-OBJ =			$(addprefix obj/, $(addsuffix .o, $(LIST)))
-SRC =			$(addprefix src/, $(addsuffix .c, $(LIST)))
+OBJ =			$(addprefix obj/, $(addsuffix .o, $(SRC_LIST)))
 
 OFF=\033[0m
 PURPLE=\033[0;35m
@@ -33,20 +33,14 @@ PURPLEBOLD=\033[1;35m
 WHITEBOLD=\033[1;37m
 PURPLELIGHT=\033[38;2;102;102;255m
 
-ifeq ("$(DEBUG)", "1") # TODO: quotes
-	DEBUGFLAG="-D DEBUG"
-endif
-
-ifeq ($(shell uname), Darwin)
-	TIME_FLAG=-l
-else
-	TIME_FLAG=--verbose
+ifeq ($(DEBUG), 1)
+	DEBUGFLAG=-D DEBUG
 endif
 
 all: $(LINK_NAME) tests
 
 obj/%.o: src/%.c $(HEADER)
-	@gcc $(FLAGS) -c $< -o $@ $(INC) $(DEBUGFLAG)
+	@gcc $(CC_FLAGS) -c $< -o $@ $(INC) $(DEBUGFLAG)
 	@echo "$(PURPLELIGHT)Compiling $(WHITEBOLD)$< $(PURPLELIGHT)done$(OFF)"
 
 $(LINK_NAME): $(NAME)
@@ -54,7 +48,7 @@ $(LINK_NAME): $(NAME)
 	@echo "$(PURPLEBOLD)$(LINK_NAME)$(PURPLE) linked$(OFF)"
 
 $(NAME): ./libft/libft.a obj $(OBJ) # TODO: move obj to obj/%.o
-	@gcc -shared $(FLAGS) $(OBJ) ./libft/libft.a -o $(NAME)
+	@gcc -shared $(OBJ) ./libft/libft.a -o $(NAME)
 	@strip -x $(NAME)
 	@echo "$(PURPLEBOLD)$(NAME)$(PURPLE) ready$(OFF)"
 
@@ -75,19 +69,15 @@ re: fclean all
 tests: $(LINK_NAME) test_0 # TODO: console log
 
 test_0:
-	# To run tests: # TODO: move to script
-	gcc -o test0 tests/test0.c
-	# ./run.sh && /usr/bin/time $(TIME_FLAG) ./test0
-	gcc -flat_namespace -o test1 tests/test1.c
-	# ./run.sh && /usr/bin/time $(TIME_FLAG) ./test1
-	gcc -o test2 tests/test2.c
-	# ./run.sh && /usr/bin/time $(TIME_FLAG) ./test2
+	gcc $(TEST_CC_FLAGS) -o test0 tests/test0.c
+	gcc $(TEST_CC_FLAGS) -o test1 tests/test1.c
+	gcc $(TEST_CC_FLAGS) -o test2 tests/test2.c
 	@#gcc -o test3 tests/test3.c # TODO: uncomment when realloc is done
-	@# ./run.sh && ./test3
+	@# ./run.sh ./test3
 	@#gcc -o test3b tests/test3b.c # TODO: uncomment when realloc is done
-	@# ./run.sh && ./test3b
+	@# ./run.sh ./test3b
 	@#gcc -o test4 tests/test4.c # TODO: uncomment when realloc is done
-	@# ./run.sh && ./test4
-	@gcc $(INC) tests/test9.c -o test9 -lft -L libft -lft_malloc -L .
+	@# ./run.sh ./test4
+	@gcc $(INC) tests/test9.c -o test9 -lft -L ./libft -lft_malloc -L .
 	@# TODO: test5
 	@# TODO: bonuses

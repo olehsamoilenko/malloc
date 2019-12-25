@@ -166,8 +166,6 @@ struct block_meta *get_suitable_block(size_t size)
 // TODO tests: https://github.com/mtupikov42/malloc/tree/master/test
 void EXPORT *malloc(size_t size)
 {
-	printf("HELLO\n");
-
 	// TODO: scheme of new and reduced
 
     struct block_meta *new_block = get_suitable_block(size);
