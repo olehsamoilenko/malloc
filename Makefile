@@ -26,12 +26,21 @@ SRC_LIST =		malloc \
 				dump \
 				mmap
 OBJ =			$(addprefix obj/, $(addsuffix .o, $(SRC_LIST)))
+TESTS =			test0 \
+				test1 \
+				test2 \
+				test9
+#gcc -o test3 tests/test3.c # TODO: uncomment when realloc is done
+#gcc -o test3b tests/test3b.c # TODO: uncomment when realloc is done
+#gcc -o test4 tests/test4.c # TODO: uncomment when realloc is done
+# TODO: test5
+# TODO: bonuses
 
 OFF=\033[0m
-PURPLE=\033[0;35m
-PURPLEBOLD=\033[1;35m
+PURPLE=\033[0;38;2;102;102;255m
+PINK=\033[0;35m
+PINKBOLD=\033[1;35m
 WHITEBOLD=\033[1;37m
-PURPLELIGHT=\033[38;2;102;102;255m
 
 ifeq ($(DEBUG), 1)
 	DEBUGFLAG=-D DEBUG
@@ -41,16 +50,16 @@ all: $(LINK_NAME) tests
 
 obj/%.o: src/%.c $(HEADER)
 	@gcc $(CC_FLAGS) -c $< -o $@ $(INC) $(DEBUGFLAG)
-	@echo "$(PURPLELIGHT)Compiling $(WHITEBOLD)$< $(PURPLELIGHT)done$(OFF)"
+	@echo "$(PURPLE)Compiling $(WHITEBOLD)$*.c $(PURPLE)done$(OFF)"
 
 $(LINK_NAME): $(NAME)
 	@ln -sf $(NAME) $(LINK_NAME)
-	@echo "$(PURPLEBOLD)$(LINK_NAME)$(PURPLE) linked$(OFF)"
+	@echo "$(PINKBOLD)$(LINK_NAME)$(PINK) linked$(OFF)"
 
 $(NAME): ./libft/libft.a obj $(OBJ) # TODO: move obj to obj/%.o
 	@gcc -shared $(OBJ) ./libft/libft.a -o $(NAME)
 	@strip -x $(NAME)
-	@echo "$(PURPLEBOLD)$(NAME)$(PURPLE) ready$(OFF)"
+	@echo "$(PINKBOLD)$(NAME)$(PINK) ready$(OFF)"
 
 ./libft/libft.a:
 	@make -C ./libft
@@ -62,22 +71,16 @@ clean:
 	@rm -rf obj # TODO: console log
 	
 fclean: clean
-	@rm -f $(NAME) $(LINK_NAME) test0 test1 test2 # TODO: refactor $(TESTS)
+	@rm -f $(NAME) $(LINK_NAME) $(TESTS)
 
 re: fclean all
 
-tests: $(LINK_NAME) test_0 # TODO: console log
+%: tests/subject/%.c
+	@gcc $(TEST_CC_FLAGS) $< -o $@
+	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
-test_0:
-	gcc $(TEST_CC_FLAGS) -o test0 tests/test0.c
-	gcc $(TEST_CC_FLAGS) -o test1 tests/test1.c
-	gcc $(TEST_CC_FLAGS) -o test2 tests/test2.c
-	@#gcc -o test3 tests/test3.c # TODO: uncomment when realloc is done
-	@# ./run.sh ./test3
-	@#gcc -o test3b tests/test3b.c # TODO: uncomment when realloc is done
-	@# ./run.sh ./test3b
-	@#gcc -o test4 tests/test4.c # TODO: uncomment when realloc is done
-	@# ./run.sh ./test4
-	@gcc $(INC) tests/test9.c -o test9 -lft -L ./libft -lft_malloc -L .
-	@# TODO: test5
-	@# TODO: bonuses
+%: tests/my/%.c
+	@gcc $(INC) -lft -L ./libft -lft_malloc -L . $< -o $@
+	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
+
+tests: $(TESTS)

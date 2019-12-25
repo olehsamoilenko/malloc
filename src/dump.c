@@ -20,7 +20,7 @@
 
 const char *labels[] = {"TINY", "SMALL", "LARGE"}; // TODO: to macro
 
-void EXPORT show_alloc_mem()
+void EXPORT show_alloc_mem() // TODO: shit with debug
 {
     struct zone_meta *zone = first_zone;
 
@@ -57,7 +57,6 @@ void EXPORT show_alloc_mem()
 
         zone = zone->next;
     }
-
 
     printf("Total : %lu\n", sum);
 

@@ -66,7 +66,8 @@
 
 int main()
 {
-	void *test = ft_memalloc(4);
-	// void *test2 = malloc(3);
+	// void *test = malloc(4);
+	void *test2 = malloc(3);
 	show_alloc_mem();
+	show_alloc_mem_ex();
 }
