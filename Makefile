@@ -46,17 +46,13 @@ ifeq ($(DEBUG), 1)
 	DEBUGFLAG=-D DEBUG
 endif
 
-all: $(LINK_NAME) tests
-
-obj/%.o: src/%.c $(HEADER)
-	@gcc $(CC_FLAGS) -c $< -o $@ $(INC) $(DEBUGFLAG)
-	@echo "$(PURPLE)Compiling $(WHITEBOLD)$*.c $(PURPLE)done$(OFF)"
+all: $(LINK_NAME) # $(TESTS) TODO: compile tests ubuntu
 
 $(LINK_NAME): $(NAME)
 	@ln -sf $(NAME) $(LINK_NAME)
 	@echo "$(PINKBOLD)$(LINK_NAME)$(PINK) linked$(OFF)"
 
-$(NAME): ./libft/libft.a obj $(OBJ) # TODO: move obj to obj/%.o
+$(NAME): ./libft/libft.a obj $(OBJ)
 	@gcc -shared $(OBJ) ./libft/libft.a -o $(NAME)
 	@strip -x $(NAME)
 	@echo "$(PINKBOLD)$(NAME)$(PINK) ready$(OFF)"
@@ -67,13 +63,9 @@ $(NAME): ./libft/libft.a obj $(OBJ) # TODO: move obj to obj/%.o
 obj:
 	@mkdir obj
 
-clean:
-	@rm -rf obj # TODO: console log
-	
-fclean: clean
-	@rm -f $(NAME) $(LINK_NAME) $(TESTS)
-
-re: fclean all
+obj/%.o: src/%.c $(HEADER)
+	@gcc $(CC_FLAGS) -c $< -o $@ $(INC) $(DEBUGFLAG)
+	@echo "$(PURPLE)Compiling $(WHITEBOLD)$*.c $(PURPLE)done$(OFF)"
 
 %: tests/subject/%.c
 	@gcc $(TEST_CC_FLAGS) $< -o $@
@@ -83,4 +75,10 @@ re: fclean all
 	@gcc $(INC) -lft -L ./libft -lft_malloc -L . $< -o $@
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
-tests: $(TESTS)
+clean:
+	@rm -rf obj # TODO: console log
+
+fclean: clean
+	@rm -f $(NAME) $(LINK_NAME) $(TESTS)
+
+re: fclean all
