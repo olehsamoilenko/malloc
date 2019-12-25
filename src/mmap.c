@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "malloc.h"
+#include "block.h"
 
 void insert_zone_to_list(struct zone_meta *zone)
 {
@@ -46,7 +46,7 @@ struct zone_meta *mmap_zone(unsigned long size)
 	else {
 		bytes_to_request = LARGE_ZONE(size); // TODO: check overflowing, TODO: page + 1 ?
         #if DEBUG
-		    ft_printf("[PAGING] Bytes to request: %ld\n", bytes_to_request);
+		    printf("[PAGING] Bytes to request: %ld\n", bytes_to_request);
         #endif
 		zone_type = LARGE;
 	}
@@ -65,7 +65,7 @@ struct zone_meta *mmap_zone(unsigned long size)
 	first_block->prev = NULL;
 
 	#if DEBUG
-		ft_printf("[PAGING] Zone mapped, size = %lu, zone start = %p\n", bytes_to_request, zone); // TODO: type
+		printf("[PAGING] Zone mapped, size = %lu, zone start = %p\n", bytes_to_request, zone); // TODO: type
 	#endif
 
 	return (zone);

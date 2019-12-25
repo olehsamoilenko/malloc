@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "malloc.h"
+#include "block.h"
 
 #define BGDEFAULT	"\e[97;49m"
 #define BGRED		"\e[97;41m"
@@ -20,28 +20,28 @@
 
 const char *labels[] = {"TINY", "SMALL", "LARGE"}; // TODO: to macro
 
-void show_alloc_mem()
+void EXPORT show_alloc_mem() // TODO: shit with debug
 {
     struct zone_meta *zone = first_zone;
 
 	unsigned long sum = 0;
     while (zone)
     {
-        ft_printf("%s : 0x%lX\n", labels[zone->type], (unsigned long)zone); // TODO: check output
+        printf("%s : 0x%lX\n", labels[zone->type], (unsigned long)zone); // TODO: check output
         struct block_meta *block = FIRST_BLOCK(zone);
 
         while (block)
         {
             #if DEBUG // TODO: refactor
                 if (block->available)
-                    ft_printf("[AVAILABLE] ");
+                    printf("[AVAILABLE] ");
             #endif
 
             #if !DEBUG
                 if (!block->available)
                 {
             #endif
-                ft_printf("0x%lX - 0x%lX : %u bytes\n",
+                printf("0x%lX - 0x%lX : %u bytes\n",
                         (unsigned long)(char *)block + sizeof(struct block_meta),
                         (unsigned long)(char *)block + sizeof(struct block_meta) + block->size,
                         block->size);
@@ -58,8 +58,7 @@ void show_alloc_mem()
         zone = zone->next;
     }
 
-
-    ft_printf("Total : %lu\n", sum);
+    printf("Total : %lu\n", sum);
 
 }
 
@@ -74,17 +73,17 @@ void print_meta(struct block_meta *block, unsigned int *counter, unsigned char *
 	{
 		if (!len)
 		{
-			ft_printf("%s AV: %4d %s ", BGCYAN, block->available, BGDEFAULT);
+			printf("%s AV: %4d %s ", BGCYAN, block->available, BGDEFAULT);
 			cur_color = BGDEFAULT;
 		}
 		else
 		{
-			ft_printf("%s%10c ", BGCYAN, ' ');
+			printf("%s%10c ", BGCYAN, ' ');
 			cur_color = BGCYAN;
 		}
 		*counter += 1;
 		if (*counter % 10 == 0) {
-			ft_printf("%s\n%s", BGDEFAULT, cur_color);
+			printf("%s\n%s", BGDEFAULT, cur_color);
 		}
 	}
 }
@@ -110,7 +109,7 @@ void print_symbol(char sym, char *color)
 }
 
 // TODO: real data
-void show_alloc_mem_ex(void)
+void EXPORT show_alloc_mem_ex(void)
 {
 	struct zone_meta *zone = first_zone;
 	unsigned int i = 0;
@@ -151,9 +150,9 @@ void show_alloc_mem_ex(void)
 
 	// text = (unsigned char *)block;
     // if (ft_isprint(*text))
-    //     ft_printf("%10c", *text);
+    //     printf("%10c", *text);
     // else
-    //     ft_printf("%10c", '?');
+    //     printf("%10c", '?');
     // text++;
 
 }

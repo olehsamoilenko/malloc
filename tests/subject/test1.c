@@ -1,23 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   malloc.h                                           :+:      :+:    :+:   */
+/*   test1.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: osamoile <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/11/16 09:38:18 by osamoile          #+#    #+#             */
-/*   Updated: 2019/11/16 09:38:27 by osamoile         ###   ########.fr       */
+/*   Created: 2019/12/22 17:08:15 by osamoile          #+#    #+#             */
+/*   Updated: 2019/12/22 17:08:23 by osamoile         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MALLOC_H
-# define MALLOC_H
+#include "malloc.h"
 
-# include <stdlib.h>
+// TODO: between 255 and 272 pages
 
-void free(void *p);
-void *malloc(size_t size); // TODO check: unsigned long ?
-void show_alloc_mem(void);
-void show_alloc_mem_ex(void);
-
-#endif
+int main()
+{
+	int i;
+	char *addr;
+	i = 0;
+	while (i < 1024)
+	{
+		addr = (char*)malloc(1024);
+		addr[0] = 42;
+		i++;
+	}
+	return (0);
+}

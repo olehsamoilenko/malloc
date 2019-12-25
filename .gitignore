@@ -4,3 +4,4 @@ malloc
 *.o
 .DS_Store
 libft_malloc*.so
+/test[0-9]

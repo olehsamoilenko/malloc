@@ -16,75 +16,69 @@ endif
 
 NAME =			libft_malloc_$(HOSTTYPE).so
 LINK_NAME =		libft_malloc.so
-HEADER =		./includes/malloc.h
+HEADER =		./includes/malloc.h \
+				./includes/block.h
 INC =			-I ./includes \
 				-I ./libft/includes
-LIB =			-lft -L ./libft
-FLAGS =			-fPIC #-Wall -Wextra -Werror
-LIST =			malloc \
-				testing \
+CC_FLAGS =		-fvisibility=hidden -fPIC # TODO: -Wall -Wextra -Werror
+TEST_CC_FLAGS =	-flat_namespace -I ./includes
+SRC_LIST =		malloc \
 				dump \
 				mmap
-OBJ =			$(addprefix obj/, $(addsuffix .o, $(LIST)))
-SRC =			$(addprefix src/, $(addsuffix .c, $(LIST)))
-
+OBJ =			$(addprefix obj/, $(addsuffix .o, $(SRC_LIST)))
+TESTS =			test0 \
+				test1 \
+				test2 \
+				test9
+#gcc -o test3 tests/test3.c # TODO: uncomment when realloc is done
+#gcc -o test3b tests/test3b.c # TODO: uncomment when realloc is done
+#gcc -o test4 tests/test4.c # TODO: uncomment when realloc is done
+# TODO: test5
+# TODO: bonuses
 
 OFF=\033[0m
-PURPLE=\033[0;35m
-PURPLEBOLD=\033[1;35m
-WHITE=\033[1;37m
-PURPLELIGHT=\033[38;2;102;102;255m
+PURPLE=\033[0;38;2;102;102;255m
+PINK=\033[0;35m
+PINKBOLD=\033[1;35m
+WHITEBOLD=\033[1;37m
 
-ifeq ("$(DEBUG)", "1")
-	DEBUGFLAG="-D DEBUG"
+ifeq ($(DEBUG), 1)
+	DEBUGFLAG=-D DEBUG
 endif
 
-# TODO: $> export HOSTTYPE = Тестирование
-# ln -s libft_malloc_Testing.so libft_malloc.so
-# $> ls -l libft_malloc.so
-# libft_malloc.so -> libft_malloc_Testing.so
-
-# cat run.sh #!/bin/sh export DYLD_LIBRARY_PATH=. export
-# DYLD_INSERT_LIBRARIES="libft_malloc.so" export DYLD_FORCE_FLAT_NAMESPACE=1 $@
-
-# TODO: $> nm libft_malloc.so
-# 0000000000000000 T _free
-# 0000000000000000 T _malloc
-# 0000000000000000 T _realloc
-# 0000000000000000 T _show_alloc_mem
-# U _mmap
-# U _munmap
-# U _getpagesize
-# U _write
-# U dyld_stub_binder
-
-all: $(LINK_NAME)
-
-obj/%.o: src/%.c $(HEADER)
-	@clang $(FLAGS) -c $< -o $@ $(INC) $(DEBUGFLAG)
-	@echo "$(PURPLELIGHT)Compiling $(WHITE)$< $(PURPLELIGHT)done$(OFF)"
-
-$(NAME): ./libft/libft.a obj $(OBJ)
-	@clang -shared -fPIC $(OBJ) -o $(NAME)
-	@echo "$(PURPLEBOLD)$(NAME)$(PURPLE) ready$(OFF)"
+all: $(LINK_NAME) # $(TESTS) TODO: compile tests ubuntu
 
 $(LINK_NAME): $(NAME)
 	@ln -sf $(NAME) $(LINK_NAME)
-	@echo "$(PURPLEBOLD)$(LINK_NAME)$(PURPLE) linked$(OFF)"
+	@echo "$(PINKBOLD)$(LINK_NAME)$(PINK) linked$(OFF)"
+
+$(NAME): ./libft/libft.a obj $(OBJ)
+	@gcc -shared $(OBJ) ./libft/libft.a -o $(NAME)
+	@strip -x $(NAME)
+	@echo "$(PINKBOLD)$(NAME)$(PINK) ready$(OFF)"
 
 ./libft/libft.a:
-	# TODO: uncomment
-	# @make -C ./libft
+	@make -C ./libft
 
 obj:
 	@mkdir obj
 
+obj/%.o: src/%.c $(HEADER)
+	@gcc $(CC_FLAGS) -c $< -o $@ $(INC) $(DEBUGFLAG)
+	@echo "$(PURPLE)Compiling $(WHITEBOLD)$*.c $(PURPLE)done$(OFF)"
+
+%: tests/subject/%.c
+	@gcc $(TEST_CC_FLAGS) $< -o $@
+	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
+
+%: tests/my/%.c
+	@gcc $(INC) -lft -L ./libft -lft_malloc -L . $< -o $@
+	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
+
 clean:
-	@# @make -C ./libft clean TODO: uncomment
-	@rm -rf obj
-	
+	@rm -rf obj # TODO: console log
+
 fclean: clean
-	@# @make -C ./libft fclean TODO: uncomment
-	@rm -f $(NAME) $(LINK_NAME)
+	@rm -f $(NAME) $(LINK_NAME) $(TESTS)
 
 re: fclean all
