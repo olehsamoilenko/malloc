@@ -58,16 +58,10 @@
 //     show_alloc_mem_ex();
 // }
 
-// void testing(void)
-// {
-//     // test_paging();
-//     test_unmap();
-// }
 
 int main()
 {
-	// void *test = malloc(4);
-	void *test2 = malloc(3);
+	void *test = ft_memalloc(3);
 	show_alloc_mem();
 	show_alloc_mem_ex();
 }

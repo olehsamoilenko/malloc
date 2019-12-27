@@ -21,9 +21,8 @@ HEADER =		./includes/malloc.h \
 INC =			-I ./includes \
 				-I ./libft/includes
 CC_FLAGS =		-fvisibility=hidden -fPIC # TODO: -Wall -Wextra -Werror
-TEST_CC_FLAGS =	-I ./includes # TODO: refactor
 ifeq ($(shell uname), Darwin)
-	TEST_CC_FLAGS += -flat_namespace
+	TEST_CC_FLAGS = -flat_namespace
 endif
 SRC_LIST =		malloc \
 				dump \
@@ -75,7 +74,7 @@ obj/%.o: src/%.c $(HEADER)
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 %: tests/my/%.c # TODO: get rid of my
-	@gcc $< -o $@ $(INC) -lft_malloc -L .
+	@gcc $(TEST_CC_FLAGS) $< -o $@ $(INC) -lft -L ./libft -lft_malloc -L . # TODO: why libft_malloc ?
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 clean:
