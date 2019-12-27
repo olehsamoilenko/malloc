@@ -168,6 +168,8 @@ void EXPORT *malloc(size_t size)
 {
 	// TODO: scheme of new and reduced
 
+    printf("HELLO\n");
+
     struct block_meta *new_block = get_suitable_block(size);
 	if (!new_block)
 	{

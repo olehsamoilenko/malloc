@@ -21,7 +21,10 @@ HEADER =		./includes/malloc.h \
 INC =			-I ./includes \
 				-I ./libft/includes
 CC_FLAGS =		-fvisibility=hidden -fPIC # TODO: -Wall -Wextra -Werror
-TEST_CC_FLAGS =	-flat_namespace -I ./includes
+TEST_CC_FLAGS =	-I ./includes # TODO: refactor
+ifeq ($(shell uname), Darwin)
+	TEST_CC_FLAGS += -flat_namespace
+endif
 SRC_LIST =		malloc \
 				dump \
 				mmap
@@ -46,7 +49,7 @@ ifeq ($(DEBUG), 1)
 	DEBUGFLAG=-D DEBUG
 endif
 
-all: $(LINK_NAME) # $(TESTS) TODO: compile tests ubuntu
+all: $(LINK_NAME) $(TESTS)
 
 $(LINK_NAME): $(NAME)
 	@ln -sf $(NAME) $(LINK_NAME)
@@ -71,8 +74,8 @@ obj/%.o: src/%.c $(HEADER)
 	@gcc $(TEST_CC_FLAGS) $< -o $@
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
-%: tests/my/%.c
-	@gcc $(INC) -lft -L ./libft -lft_malloc -L . $< -o $@
+%: tests/my/%.c # TODO: get rid of my
+	@gcc $< -o $@ $(INC) -lft_malloc -L .
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 clean:
