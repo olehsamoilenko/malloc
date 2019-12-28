@@ -19,6 +19,10 @@ struct zone_meta *first_zone = NULL;
 // TODO: If “ptr” is a NULL pointer, no operation is performed.
 void EXPORT free(void *p)
 {
+	write(1, "free: ", 6);
+	ft_putnbr(p);
+	write(1, "\n", 1);
+
     struct block_meta *block = (struct block_meta *)((char *)p - sizeof(struct block_meta));
     block->available = true;
 
@@ -167,7 +171,7 @@ struct block_meta *get_suitable_block(size_t size)
 void EXPORT *malloc(size_t size)
 {
 	// TODO: scheme of new and reduced
-    ft_putstr("hello\n");
+    write(1, "malloc: ", 8);
     struct block_meta *new_block = get_suitable_block(size);
 	if (!new_block)
 	{
@@ -192,6 +196,8 @@ void EXPORT *malloc(size_t size)
 			printf("[ALLOC] New: %p %u; Reduced: %p %u\n", new_block, new_block->size, reduced_block, reduced_block->size);
 		#endif
 
+		ft_putnbr((char *)new_block + sizeof(struct block_meta));
+		write(1, "\n", 1);
         return ((char *)new_block + sizeof(struct block_meta));
     }
     else if (new_block && new_block->size >= size)

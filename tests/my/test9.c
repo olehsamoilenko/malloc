@@ -13,6 +13,13 @@
 #include "malloc.h"
 #include "libft.h"
 
+int main()
+{
+	// ft_memalloc(3);
+	show_alloc_mem();
+	show_alloc_mem_ex();
+}
+
 // void test_many_small()
 // {
 // 	for (int i = 0; i < 100; i++)
@@ -57,11 +64,3 @@
 //     show_alloc_mem();
 //     show_alloc_mem_ex();
 // }
-
-
-int main()
-{
-	void *test = ft_memalloc(3);
-	show_alloc_mem();
-	show_alloc_mem_ex();
-}

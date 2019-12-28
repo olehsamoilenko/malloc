@@ -70,11 +70,11 @@ obj/%.o: src/%.c $(HEADER)
 	@echo "$(PURPLE)Compiling $(WHITEBOLD)$*.c $(PURPLE)done$(OFF)"
 
 %: tests/subject/%.c
-	@gcc $(TEST_CC_FLAGS) $< -o $@
+	gcc -g $< -o $@
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 %: tests/my/%.c # TODO: get rid of my
-	@gcc $(TEST_CC_FLAGS) $< -o $@ $(INC) -lft -L ./libft -lft_malloc -L . # TODO: why libft_malloc ?
+	@gcc $(TEST_CC_FLAGS) $< -o $@ $(INC) -lft -L ./libft -lft_malloc -L .
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 clean:

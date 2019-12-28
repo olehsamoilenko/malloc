@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "malloc.h"
+#include "../../includes/malloc.h"
 
 // TODO: less pages than test1
 // TODO: pages = test0 + 3
