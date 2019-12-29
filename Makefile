@@ -31,6 +31,7 @@ OBJ =			$(addprefix obj/, $(addsuffix .o, $(SRC_LIST)))
 TESTS =			test0 \
 				test1 \
 				test2 \
+				test8 \
 				test9
 #gcc -o test3 tests/test3.c # TODO: uncomment when realloc is done
 #gcc -o test3b tests/test3b.c # TODO: uncomment when realloc is done
@@ -70,11 +71,11 @@ obj/%.o: src/%.c $(HEADER)
 	@echo "$(PURPLE)Compiling $(WHITEBOLD)$*.c $(PURPLE)done$(OFF)"
 
 %: tests/subject/%.c
-	gcc -g $< -o $@
+	gcc $< -o $@
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
-%: tests/my/%.c # TODO: get rid of my
-	@gcc $(TEST_CC_FLAGS) $< -o $@ $(INC) -lft -L ./libft -lft_malloc -L .
+%: tests/my/%.c
+	@gcc $< -o $@ $(INC) -lft -L ./libft
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 clean:

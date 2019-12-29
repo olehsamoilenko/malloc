@@ -5,3 +5,5 @@ malloc
 .DS_Store
 libft_malloc*.so
 /test[0-9]
+*.dSYM
+text

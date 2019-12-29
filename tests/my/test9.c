@@ -15,9 +15,9 @@
 
 int main()
 {
-	// ft_memalloc(3);
-	show_alloc_mem();
-	show_alloc_mem_ex();
+	ft_memalloc(3);
+	// show_alloc_mem();
+	// show_alloc_mem_ex();
 }
 
 // void test_many_small()
