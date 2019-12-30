@@ -76,7 +76,7 @@ obj/%.o: src/%.c $(HEADER)
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 %: tests/my/%.c
-	@gcc $< -o $@ $(INC) -lft -L ./libft
+	@gcc $< -o $@ $(INC) -lft -L ./libft -lft_malloc -L .
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 clean:

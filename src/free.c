@@ -23,7 +23,7 @@ void EXPORT free(void *p)
 
     #if DEBUG
         ft_putstr("[CALL] free: ");
-        ft_putnbr((long)p);
+        ft_print_hex((unsigned long)p);
         ft_putchar('\n');
     #endif
 

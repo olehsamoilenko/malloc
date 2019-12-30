@@ -102,17 +102,17 @@ void EXPORT *malloc(size_t size)
 
 		#if DEBUG
             ft_putstr("[ALLOC] New: ");
-            ft_putnbr((unsigned long)new_block);
+            ft_print_hex((unsigned long)new_block);
             ft_putchar(' ');
             ft_putnbr(new_block->size);
             ft_putstr("; Reduced: ");
-            ft_putnbr((unsigned long)reduced_block);
+            ft_print_hex((unsigned long)reduced_block);
             ft_putchar(' ');
             ft_putnbr(reduced_block->size);
             ft_putchar('\n');
 		#endif
 
-        return ((char *)new_block + sizeof(struct block_meta));
+        ret = (char *)new_block + sizeof(struct block_meta);
     }
     else if (new_block && new_block->size >= size)
     {
@@ -132,8 +132,8 @@ void EXPORT *malloc(size_t size)
     }
 
     #if DEBUG
-        ft_putstr("[CALL] ");
-        ft_putnbr((long)ret);
+        ft_putstr("[CALL] malloc: ");
+        ft_print_hex((unsigned long)ret);
         ft_putchar('\n');
     #endif
 

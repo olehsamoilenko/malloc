@@ -11,14 +11,12 @@
 /* ************************************************************************** */
 
 #include "libft.h"
+#include "malloc.h"
 
 int main()
 {
 	ft_putstr("TEST 8\n");
-	// void *caller = __builtin_return_address(0);
-	// ft_putnbr(caller);
-	// ft_putstr("\n");
-
 	void *tmp = malloc(1);
+    show_alloc_mem();
 	free(tmp);
 }

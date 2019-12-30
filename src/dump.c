@@ -28,8 +28,8 @@ void EXPORT show_alloc_mem() // TODO: shit with debug
     while (zone)
     {
         ft_putstr(labels[zone->type]);
-        ft_putstr(" : 0x");
-        ft_putnbr((unsigned long)zone);
+        ft_putstr(" : ");
+        ft_print_hex((unsigned long)zone);
         ft_putchar('\n');
 
         struct block_meta *block = FIRST_BLOCK(zone);
@@ -45,11 +45,9 @@ void EXPORT show_alloc_mem() // TODO: shit with debug
                 if (!block->available)
                 {
             #endif
-
-                ft_putstr("0x");
-                ft_putnbr((unsigned long)(char *)block + sizeof(struct block_meta));
-                ft_putstr(" - 0x");
-                ft_putnbr((unsigned long)(char *)block + sizeof(struct block_meta) + block->size);
+                ft_print_hex((unsigned long)(char *)block + sizeof(struct block_meta));
+                ft_putstr(" - ");
+                ft_print_hex((unsigned long)(char *)block + sizeof(struct block_meta) + block->size);
                 ft_putstr(" : ");
                 ft_putnbr(block->size);
                 ft_putstr(" bytes\n");
