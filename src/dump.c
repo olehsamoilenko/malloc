@@ -27,24 +27,32 @@ void EXPORT show_alloc_mem() // TODO: shit with debug
 	unsigned long sum = 0;
     while (zone)
     {
-        printf("%s : 0x%lX\n", labels[zone->type], (unsigned long)zone); // TODO: check output
+        ft_putstr(labels[zone->type]);
+        ft_putstr(" : 0x");
+        ft_putnbr((unsigned long)zone);
+        ft_putchar('\n');
+
         struct block_meta *block = FIRST_BLOCK(zone);
 
         while (block)
         {
             #if DEBUG // TODO: refactor
                 if (block->available)
-                    printf("[AVAILABLE] ");
+                    ft_putstr("[AVAILABLE] ");
             #endif
 
             #if !DEBUG
                 if (!block->available)
                 {
             #endif
-                printf("0x%lX - 0x%lX : %u bytes\n",
-                        (unsigned long)(char *)block + sizeof(struct block_meta),
-                        (unsigned long)(char *)block + sizeof(struct block_meta) + block->size,
-                        block->size);
+
+                ft_putstr("0x");
+                ft_putnbr((unsigned long)(char *)block + sizeof(struct block_meta));
+                ft_putstr(" - 0x");
+                ft_putnbr((unsigned long)(char *)block + sizeof(struct block_meta) + block->size);
+                ft_putstr(" : ");
+                ft_putnbr(block->size);
+                ft_putstr(" bytes\n");
             #if !DEBUG
                 }
             #endif
@@ -58,34 +66,9 @@ void EXPORT show_alloc_mem() // TODO: shit with debug
         zone = zone->next;
     }
 
-    printf("Total : %lu\n", sum);
-
-}
-
-void print_meta(struct block_meta *block, unsigned int *counter, unsigned char *text)
-{
-	unsigned int len;
-	
-	len = sizeof(struct block_meta);
-	char *cur_color;
-
-	while (len--)
-	{
-		if (!len)
-		{
-			printf("%s AV: %4d %s ", BGCYAN, block->available, BGDEFAULT);
-			cur_color = BGDEFAULT;
-		}
-		else
-		{
-			printf("%s%10c ", BGCYAN, ' ');
-			cur_color = BGCYAN;
-		}
-		*counter += 1;
-		if (*counter % 10 == 0) {
-			printf("%s\n%s", BGDEFAULT, cur_color);
-		}
-	}
+    ft_putstr("Total : ");
+    ft_putnbr(sum);
+    ft_putchar('\n');
 }
 
 void print_symbol(char sym, char *color)
@@ -108,7 +91,7 @@ void print_symbol(char sym, char *color)
     }
 }
 
-// TODO: real data
+// TODO: real data text = (unsigned char *)block;
 void EXPORT show_alloc_mem_ex(void)
 {
 	struct zone_meta *zone = first_zone;
@@ -147,12 +130,4 @@ void EXPORT show_alloc_mem_ex(void)
 
     ft_putstr(BGDEFAULT);
     ft_putchar('\n');
-
-	// text = (unsigned char *)block;
-    // if (ft_isprint(*text))
-    //     printf("%10c", *text);
-    // else
-    //     printf("%10c", '?');
-    // text++;
-
 }

@@ -26,7 +26,8 @@ ifeq ($(shell uname), Darwin)
 endif
 SRC_LIST =		malloc \
 				dump \
-				mmap
+				mmap \
+				free
 OBJ =			$(addprefix obj/, $(addsuffix .o, $(SRC_LIST)))
 TESTS =			test0 \
 				test1 \
@@ -71,7 +72,7 @@ obj/%.o: src/%.c $(HEADER)
 	@echo "$(PURPLE)Compiling $(WHITEBOLD)$*.c $(PURPLE)done$(OFF)"
 
 %: tests/subject/%.c
-	gcc $< -o $@
+	@gcc $< -o $@
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 %: tests/my/%.c

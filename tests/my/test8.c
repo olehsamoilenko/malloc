@@ -14,10 +14,10 @@
 
 int main()
 {
-	ft_putstr("TEST\n");
-	void *caller = __builtin_return_address(0);
-	ft_putnbr(caller);
-	ft_putstr("\n");
+	ft_putstr("TEST 8\n");
+	// void *caller = __builtin_return_address(0);
+	// ft_putnbr(caller);
+	// ft_putstr("\n");
 
 	void *tmp = malloc(1);
 	free(tmp);

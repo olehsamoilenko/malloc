@@ -46,7 +46,9 @@ struct zone_meta *mmap_zone(unsigned long size)
 	else {
 		bytes_to_request = LARGE_ZONE(size); // TODO: check overflowing, TODO: page + 1 ?
         #if DEBUG
-		    printf("[PAGING] Bytes to request: %ld\n", bytes_to_request);
+            ft_putstr("[PAGING] Bytes to request: ");
+            ft_putnbr(bytes_to_request);
+            ft_putchar('\n');
         #endif
 		zone_type = LARGE;
 	}
@@ -65,7 +67,12 @@ struct zone_meta *mmap_zone(unsigned long size)
 	first_block->prev = NULL;
 
 	#if DEBUG
-		printf("[PAGING] Zone mapped, size = %lu, zone start = %p\n", bytes_to_request, zone); // TODO: type
+        ft_putstr("[PAGING] Zone mapped, size = ");
+        ft_putnbr(bytes_to_request);
+        ft_putstr(", zone start = ");
+        ft_putnbr((unsigned long)zone); // TODO: itoa_base
+        ft_putchar('\n');
+        // TODO: type
 	#endif
 
 	return (zone);
