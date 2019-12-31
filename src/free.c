@@ -15,6 +15,8 @@
 // TODO: realloc
 
 // TODO: If “ptr” is a NULL pointer, no operation is performed.
+// TODO: refactor free, check all allocated blocks
+// TODO: throw abort
 void EXPORT free(void *p)
 {
 	// void *caller = __builtin_return_address(0);

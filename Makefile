@@ -32,13 +32,14 @@ OBJ =			$(addprefix obj/, $(addsuffix .o, $(SRC_LIST)))
 TESTS =			test0 \
 				test1 \
 				test2 \
+				test7 \
 				test8 \
 				test9
 #gcc -o test3 tests/test3.c # TODO: uncomment when realloc is done
 #gcc -o test3b tests/test3b.c # TODO: uncomment when realloc is done
 #gcc -o test4 tests/test4.c # TODO: uncomment when realloc is done
 # TODO: test5
-# TODO: bonuses
+# TODO: bonuses test
 
 OFF=\033[0m
 PURPLE=\033[0;38;2;102;102;255m

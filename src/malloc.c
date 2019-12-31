@@ -140,8 +140,6 @@ void EXPORT *malloc(size_t size)
     return (ret);
 }
 
-void testing(void);
-
 // BONUSES:
 // 2. DONE  Manage the malloc debug environment variables. You can imitate those from malloc
 //          system or invent your own.
@@ -156,8 +154,12 @@ void testing(void);
 //          concomitant in one
 
 //          • Manage the use of your malloc in a multi-threaded program (so to be “thread safe”
-//          using the pthread lib).
+//          using the pthread lib). TODO: mandatory ?
 
 //          - A function makes it possible to display a history of the memory allocations made
 
 //          own segfault
+
+//          calloc
+
+//          double free, abort

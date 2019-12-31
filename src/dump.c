@@ -17,10 +17,11 @@
 #define BGGREEN		"\e[30;42m"
 #define BGCYAN		"\e[97;44m"
 // TODO: new color for zone_meta
+// TODO: check vmmap
 
 const char *labels[] = {"TINY", "SMALL", "LARGE"}; // TODO: to macro
 
-void EXPORT show_alloc_mem() // TODO: shit with debug
+void EXPORT show_alloc_mem()
 {
     struct zone_meta *zone = first_zone;
 

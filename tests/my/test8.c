@@ -15,8 +15,8 @@
 
 int main()
 {
-	ft_putstr("TEST 8\n");
 	void *tmp = malloc(1);
     show_alloc_mem();
+    show_alloc_mem_ex();
 	free(tmp);
 }

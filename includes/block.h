@@ -16,7 +16,7 @@
 # define BLOCK_H
 
 # include <sys/mman.h>
-# include <stdio.h> // TODO: remove
+
 // # TODO: $> nm libft_malloc.so
 // # 0000000000000000 T _free
 // # 0000000000000000 T _malloc
@@ -59,7 +59,6 @@ struct block_meta
 
 struct zone_meta
 {
-	// TODOMB :busy_blocks : int
 	enum zone_type type; // TODO: 2 bits
     unsigned int size;
 	struct zone_meta *prev;
@@ -68,7 +67,7 @@ struct zone_meta
 
 extern struct zone_meta *first_zone;
 
-// TODO: remove
+// TODO: need it ?
 struct zone_meta *mmap_zone(unsigned long size);
 void insert_zone_to_list(struct zone_meta *zone);
 

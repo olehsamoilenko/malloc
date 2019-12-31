@@ -1,6 +1,6 @@
 # malloc
 This project is about implementing a dynamic memory allocation mechanism<br>
-The first implementation was created accordingly to [this Stepik guide](https://stepik.org/lesson/44328/step/1?unit=22140).
+The first implementation was created accordingly to [stepik guide](https://stepik.org/lesson/44328/step/1?unit=22140).
 
 Compile library
 ===
@@ -20,6 +20,7 @@ Use library
 Usage 1.<br>
 ```gcc -flat_namespace program.c```<br>
 ```./run.sh ./a.out```
+# TODO: check usages
 
 Usage 2.<br>
 ```gcc -lft_malloc -L . program.c```<br>
