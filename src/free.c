@@ -152,7 +152,7 @@ void EXPORT free(void *p)
 	else
 	{
 		#if DEBUG
-			ft_putstr("[FREE] Block isn't allocated, ABORT\n");
+			ft_putstr("[FREE] Block wasn't allocated, ABORT\n");
 		#endif
 		// TODO: throw abort
 	}

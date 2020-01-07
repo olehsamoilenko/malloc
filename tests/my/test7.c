@@ -12,6 +12,8 @@
 
 #include "libft.h"
 
+// dyld
+
 int main()
 {
     ft_putstr("TEST 8\n");

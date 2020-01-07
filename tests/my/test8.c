@@ -13,10 +13,16 @@
 #include "libft.h"
 #include "malloc.h"
 
+// large block
+
 int main()
 {
-	void *tmp = malloc(1);
+	void *m1 = malloc(1);
+	void *m2 = malloc(100);
+	void *m3 = malloc(10);
+	void *m22 = malloc(100);
     show_alloc_mem();
-    show_alloc_mem_ex();
-	free(tmp);
+
+	free(m2);
+	show_alloc_mem();
 }

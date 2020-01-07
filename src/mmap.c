@@ -44,14 +44,15 @@ struct zone_meta *mmap_zone(unsigned long size)
 		zone_type = SMALL;
 	}
 	else {
-		bytes_to_request = LARGE_ZONE(size); // TODO: check overflowing, TODO: page + 1 ?
-        #if DEBUG
-            ft_putstr("[PAGING] Bytes to request: ");
-            ft_putnbr(bytes_to_request);
-            ft_putchar('\n');
-        #endif
+		bytes_to_request = LARGE_ZONE(size);
 		zone_type = LARGE;
 	}
+
+	#if DEBUG
+		ft_putstr("[PAGING] Bytes to request: ");
+		ft_putnbr(bytes_to_request);
+		ft_putchar('\n');
+	#endif
 
 	void *page = mmap(NULL, bytes_to_request, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 	struct zone_meta *zone = (struct zone_meta *)page;

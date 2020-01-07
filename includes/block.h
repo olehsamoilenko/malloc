@@ -34,12 +34,7 @@
 # define MAX_SMALL_SIZE 10
 # define TINY_ZONE (getpagesize()) /* in subject: N */
 # define SMALL_ZONE (getpagesize()) /* in subject: M */
-# define LARGE_ZONE(n) ({							\
-	unsigned long res = getpagesize();				\
-	while (res < n + sizeof(struct block_meta))		\
-		res += getpagesize();						\
-	res;											\
-}) // TODO: check macros // TODO: need it? refactor
+# define LARGE_ZONE(n) (n + sizeof(struct block_meta) + sizeof(struct zone_meta))
 # define EXPORT __attribute__((visibility("default")))
 
 enum zone_type
