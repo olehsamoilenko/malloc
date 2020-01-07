@@ -12,8 +12,6 @@
 
 #include "block.h"
 
-// TODO: realloc
-
 // TODO: If “ptr” is a NULL pointer, no operation is performed.
 void free_allocated_block(struct block_meta *block)
 {

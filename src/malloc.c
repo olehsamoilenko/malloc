@@ -74,10 +74,6 @@ void EXPORT *malloc(size_t size)
 {
     void *ret;
 
-	// void *caller = __builtin_return_address(0);
-	// ft_putnbr(caller);
-	// ft_putstr(" ");
-
 	// TODO: scheme of new and reduced
 
     struct block_meta *new_block = get_suitable_block(size);
