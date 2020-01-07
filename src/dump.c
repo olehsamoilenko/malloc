@@ -70,10 +70,11 @@ void EXPORT show_alloc_mem()
     ft_putchar('\n');
 }
 
-void print_symbol(char sym, char *color)
+t_bool print_symbol(char sym, char *color)
 {
     static int counter = 0;
     static char *g_color = BGDEFAULT;
+	t_bool line_completed = true;
 
     if (!ft_strequ(color, g_color))
     {
@@ -81,13 +82,17 @@ void print_symbol(char sym, char *color)
         ft_putstr(color);
     }
     ft_putchar(sym);
+	line_completed = false;
     counter++;
     if (counter % 100 == 0)
     {
         ft_putstr(BGDEFAULT);
         ft_putchar('\n');
         ft_putstr(g_color);
+		line_completed = true;
     }
+
+	return (line_completed);
 }
 
 // TODO: real data text = (unsigned char *)block;
@@ -95,13 +100,14 @@ void EXPORT show_alloc_mem_ex(void)
 {
 	struct zone_meta *zone = first_zone;
 	unsigned int i = 0;
+	t_bool line_completed = true;
 
     while (zone)
     {
         // zone meta
         i = -1;
         while (++i < sizeof(struct zone_meta))
-            print_symbol('Z', BGCYAN);
+            line_completed = print_symbol('Z', BGCYAN);
 
         struct block_meta *block = FIRST_BLOCK(zone);
         while (block)
@@ -109,16 +115,16 @@ void EXPORT show_alloc_mem_ex(void)
             // block meta
             i = -1;
             while (++i < sizeof(struct block_meta))
-                print_symbol('B', BGCYAN);
+                line_completed = print_symbol('B', BGCYAN);
 
             // block data
             i = -1;
             while (++i < block->size)
             {
                 if (block->available)
-                    print_symbol('.', BGGREEN);
+                    line_completed = print_symbol('.', BGGREEN);
                 else
-                    print_symbol('x', BGRED);
+                    line_completed = print_symbol('x', BGRED);
             }
 
             block = block->next;
@@ -127,6 +133,6 @@ void EXPORT show_alloc_mem_ex(void)
         zone = zone->next;
     }
 
-    ft_putstr(BGDEFAULT);
-    ft_putchar('\n');
+	while (!line_completed)
+		line_completed = print_symbol(' ', BGDEFAULT);
 }

@@ -32,6 +32,7 @@ OBJ =			$(addprefix obj/, $(addsuffix .o, $(SRC_LIST)))
 TESTS =			test0 \
 				test1 \
 				test2 \
+				test6 \
 				test7 \
 				test8 \
 				test9

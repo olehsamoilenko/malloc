@@ -15,21 +15,8 @@
 // TODO: realloc
 
 // TODO: If “ptr” is a NULL pointer, no operation is performed.
-// TODO: refactor free, check all allocated blocks
-// TODO: throw abort
-void EXPORT free(void *p)
+void free_allocated_block(struct block_meta *block)
 {
-	// void *caller = __builtin_return_address(0);
-	// ft_putnbr(caller);
-	// ft_putstr(" ");
-
-    #if DEBUG
-        ft_putstr("[CALL] free: ");
-        ft_print_hex((unsigned long)p);
-        ft_putchar('\n');
-    #endif
-
-    struct block_meta *block = (struct block_meta *)((char *)p - sizeof(struct block_meta));
     block->available = true;
 
     struct block_meta *next = block->next;
@@ -65,7 +52,7 @@ void EXPORT free(void *p)
 
     // searching for zone meta
     while (block->prev)
-        block = block->prev;
+        block = block->prev; // TODO: duplication
     // block is first block now
     struct zone_meta *cur_zone = (struct zone_meta *)((char *)block - sizeof(struct zone_meta));
     t_bool all_available = true;
@@ -79,7 +66,7 @@ void EXPORT free(void *p)
         block = block->next;
     }
 
-    if (all_available)
+    if (all_available) // TODO: refactor to zone->av_blocks
     {
         #if DEBUG
             ft_putstr("[UNMAP] Zone available\n");
@@ -121,4 +108,53 @@ void EXPORT free(void *p)
             ft_putchar('\n');
         #endif
     }
+}
+
+t_bool block_is_allocated(struct block_meta *block)
+{
+	struct zone_meta *zone = first_zone;
+
+	while (zone)
+    {
+        struct block_meta *tmp = FIRST_BLOCK(zone);
+
+        while (tmp)
+        {
+			if (tmp == block)
+				return (true);
+			
+            tmp = tmp->next;
+        }
+
+        zone = zone->next;
+    }
+	
+	return (false);
+}
+
+void EXPORT free(void *p)
+{
+	#if DEBUG
+        ft_putstr("[CALL] free: ");
+        ft_print_hex((unsigned long)p);
+        ft_putchar('\n');
+    #endif
+
+	struct block_meta *block = (struct block_meta *)((char *)p - sizeof(struct block_meta));
+    
+	if (block_is_allocated(block))
+	{
+		#if DEBUG
+			ft_putstr("[FREE] Block is allocated\n"); // TODO: zone info
+		#endif
+		free_allocated_block(block);
+	}
+	else
+	{
+		#if DEBUG
+			ft_putstr("[FREE] Block isn't allocated, ABORT\n");
+		#endif
+		// TODO: throw abort
+	}
+
 }
