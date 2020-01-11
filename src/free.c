@@ -12,7 +12,6 @@
 
 #include "block.h"
 
-// TODO: If “ptr” is a NULL pointer, no operation is performed.
 void free_allocated_block(struct block_meta *block)
 {
     block->available = true;
@@ -130,6 +129,7 @@ t_bool block_is_allocated(struct block_meta *block)
 	return (false);
 }
 
+// TODO: If “ptr” is a NULL pointer, no operation is performed.
 void EXPORT free(void *p)
 {
 	#if DEBUG

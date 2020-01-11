@@ -12,6 +12,9 @@
 
 #include "block.h"
 
+// TODO: If size is 0, then malloc() returns either NULL, or a unique pointer value that can later be successfully passed to free().
+// TODO: NULL may also be returned by a successful call to malloc() with a size of zero
+
 struct zone_meta *first_zone = NULL;
 
 struct block_meta *get_suitable_block(size_t size)
