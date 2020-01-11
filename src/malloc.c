@@ -17,12 +17,10 @@
 
 struct zone_meta *first_zone = NULL;
 
-struct block_meta *get_suitable_block(size_t size)
+enum zone_type define_zone_type(size_t size)
 {
-    if (!size)
-        return (NULL);
-
 	enum zone_type type;
+
 	if (size <= MAX_TINY_SIZE) {
 		type = TINY;
 		#if DEBUG // TODO: refactor
@@ -41,6 +39,16 @@ struct block_meta *get_suitable_block(size_t size)
 			ft_putstr("[BLOCK] Block type: LARGE\n");
 		#endif
 	}
+
+	return (type);
+}
+
+struct block_meta *get_suitable_block(size_t size)
+{
+    if (!size) // TODO: refactor, 1 return
+        return (NULL);
+
+	enum zone_type type = define_zone_type(size);
 
     struct zone_meta *zone = first_zone;
     while (zone)
@@ -71,13 +79,41 @@ struct block_meta *get_suitable_block(size_t size)
     return (NULL);
 }
 
+void *alloc_on_block(struct block_meta *new_block, size_t size) // TODO: refactor, no return
+{
+	// TODO: scheme of new and reduced
+
+	struct block_meta *reduced_block = (struct block_meta *)((char *)new_block + sizeof(struct block_meta) + size);
+	reduced_block->available = true;
+	reduced_block->size = new_block->size - sizeof(struct block_meta) - size;
+
+	reduced_block->next = new_block->next;
+	reduced_block->prev = new_block;
+	new_block->next = reduced_block;
+
+	new_block->available = false;
+	new_block->size = size;
+
+	#if DEBUG
+		ft_putstr("[ALLOC] New: ");
+		ft_print_hex((unsigned long)new_block);
+		ft_putchar(' ');
+		ft_putnbr(new_block->size);
+		ft_putstr("; Reduced: ");
+		ft_print_hex((unsigned long)reduced_block);
+		ft_putchar(' ');
+		ft_putnbr(reduced_block->size);
+		ft_putchar('\n');
+	#endif
+
+	return (new_block);
+}
+
 // TODO tests: https://github.com/Haradric/ft_malloc/tree/master/tests
 // TODO tests: https://github.com/mtupikov42/malloc/tree/master/test
 void EXPORT *malloc(size_t size)
 {
     void *ret;
-
-	// TODO: scheme of new and reduced
 
     struct block_meta *new_block = get_suitable_block(size);
 	if (!new_block)
@@ -88,30 +124,7 @@ void EXPORT *malloc(size_t size)
 
     if (new_block && new_block->size >= size + sizeof(struct block_meta))
     {
-        struct block_meta *reduced_block = (struct block_meta *)((char *)new_block + sizeof(struct block_meta) + size);
-        reduced_block->available = true;
-        reduced_block->size = new_block->size - sizeof(struct block_meta) - size;
-
-		reduced_block->next = new_block->next;
-		reduced_block->prev = new_block;
-		new_block->next = reduced_block;
-	
-        new_block->available = false;
-        new_block->size = size;
-
-		#if DEBUG
-            ft_putstr("[ALLOC] New: ");
-            ft_print_hex((unsigned long)new_block);
-            ft_putchar(' ');
-            ft_putnbr(new_block->size);
-            ft_putstr("; Reduced: ");
-            ft_print_hex((unsigned long)reduced_block);
-            ft_putchar(' ');
-            ft_putnbr(reduced_block->size);
-            ft_putchar('\n');
-		#endif
-
-        ret = (char *)new_block + sizeof(struct block_meta);
+        ret = (char *)alloc_on_block(new_block, size) + sizeof(struct block_meta);
     }
     else if (new_block && new_block->size >= size)
     {

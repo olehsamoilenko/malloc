@@ -17,19 +17,12 @@
 
 # include <sys/mman.h>
 
-// # TODO: $> nm libft_malloc.so
-// # 0000000000000000 T _free
-// # 0000000000000000 T _malloc
-// # 0000000000000000 T _realloc
-// # 0000000000000000 T _show_alloc_mem
-// # U _mmap
-// # U _munmap
-// # U _getpagesize
-// # U _write
-// # U dyld_stub_binder
+// TODO: $> nm libft_malloc.so
+
 # include "libft.h"
 
-# define FIRST_BLOCK(zone) ((struct block_meta *)((char *)zone + sizeof(struct zone_meta)))
+# define FIRST_BLOCK(zone) ((struct block_meta *)((char *)zone + sizeof(struct zone_meta))) // TODO: need it?
+# define START_OF_BLOCK(block) ((struct block_meta *)((char *)block - sizeof(struct block_meta))) // TODO: need it?
 # define MAX_TINY_SIZE 5 /* TODO: at least 100 allocations */
 # define MAX_SMALL_SIZE 10
 # define TINY_ZONE (getpagesize()) /* in subject: N */
@@ -52,7 +45,7 @@ struct block_meta
 	struct block_meta *next;
 };
 
-struct zone_meta
+struct zone_meta // TODO: zone.h
 {
 	enum zone_type type; // TODO: 2 bits
     unsigned int size;
@@ -65,5 +58,9 @@ extern struct zone_meta *first_zone;
 // TODO: need it ?
 struct zone_meta *mmap_zone(unsigned long size);
 void insert_zone_to_list(struct zone_meta *zone);
+enum zone_type define_zone_type(size_t size);
+struct zone_meta *get_my_zone_meta(struct block_meta *block);
+
+void *alloc_on_block(struct block_meta *new_block, size_t size);
 
 #endif

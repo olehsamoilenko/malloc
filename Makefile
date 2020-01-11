@@ -27,7 +27,8 @@ endif
 SRC_LIST =		malloc \
 				dump \
 				mmap \
-				free
+				free \
+				realloc
 OBJ =			$(addprefix obj/, $(addsuffix .o, $(SRC_LIST)))
 TESTS =			test0 \
 				test1 \
@@ -35,7 +36,8 @@ TESTS =			test0 \
 				test6 \
 				test7 \
 				test8 \
-				test9
+				test9 \
+				test10
 #gcc -o test3 tests/test3.c # TODO: uncomment when realloc is done
 #gcc -o test3b tests/test3b.c # TODO: uncomment when realloc is done
 #gcc -o test4 tests/test4.c # TODO: uncomment when realloc is done
@@ -77,6 +79,7 @@ obj/%.o: src/%.c $(HEADER)
 	@gcc $< -o $@
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
+# TODO: obj rule for tests
 %: tests/my/%.c
 	@gcc $< -o $@ $(INC) -lft -L ./libft -lft_malloc -L .
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
