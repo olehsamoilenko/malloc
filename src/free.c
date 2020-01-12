@@ -58,7 +58,7 @@ void free_allocated_block(struct block_meta *block)
     }
 
     struct zone_meta *cur_zone = get_my_zone_meta(block);
-	block = FIRST_BLOCK(cur_zone);
+	block = ZONE_TO_BLOCK(cur_zone);
 
     t_bool all_available = true;
     while (block)
@@ -121,19 +121,35 @@ t_bool block_is_allocated(struct block_meta *block)
 
 	while (zone)
     {
-        struct block_meta *tmp = FIRST_BLOCK(zone);
+        struct block_meta *tmp = ZONE_TO_BLOCK(zone);
 
         while (tmp)
         {
 			if (tmp == block)
+			{
+				#if DEBUG
+					ft_putstr("[BLOCK] Block is allocated [Meta: "); // TODO: zone info
+					ft_print_hex((unsigned long)block);
+					ft_putstr(", data: ");
+					ft_print_hex((unsigned long)DATA_TO_META(block));
+					ft_putendl("]");
+				#endif
 				return (true);
-			
+			}
+
             tmp = tmp->next;
         }
 
         zone = zone->next;
     }
 	
+	#if DEBUG
+		ft_putstr("[BLOCK] Block was NOT allocated [Meta: ");
+		ft_print_hex((unsigned long)block);
+		ft_putstr(", data: ");
+		ft_print_hex((unsigned long)DATA_TO_META(block));
+		ft_putendl("]");
+	#endif
 	return (false);
 }
 
@@ -146,19 +162,14 @@ void EXPORT free(void *p)
         ft_putchar('\n');
     #endif
 
-	struct block_meta *block = START_OF_BLOCK(p);
+	struct block_meta *block = DATA_TO_META(p);
     
 	if (block_is_allocated(block))
 	{
-		#if DEBUG
-			ft_putstr("[FREE] Checking... Block is allocated\n"); // TODO: zone info
-		#endif
 		free_allocated_block(block);
 	}
 	else
 	{
-		#if DEBUG
-			ft_putstr("[FREE] Checking... Block was NOT allocated\n");
-		#endif
+		// abort
 	}
 }

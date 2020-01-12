@@ -33,7 +33,7 @@ void EXPORT show_alloc_mem()
         ft_print_hex((unsigned long)zone);
         ft_putchar('\n');
 
-        struct block_meta *block = FIRST_BLOCK(zone);
+        struct block_meta *block = ZONE_TO_BLOCK(zone);
 
         while (block)
         {
@@ -109,7 +109,7 @@ void EXPORT show_alloc_mem_ex(void)
         while (++i < sizeof(struct zone_meta))
             line_completed = print_symbol('Z', BGCYAN);
 
-        struct block_meta *block = FIRST_BLOCK(zone);
+        struct block_meta *block = ZONE_TO_BLOCK(zone);
         while (block)
         {
             // block meta

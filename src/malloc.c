@@ -55,7 +55,7 @@ struct block_meta *get_suitable_block(size_t size)
     {
         if (zone->type == type)
         {
-            struct block_meta *block = FIRST_BLOCK(zone);
+            struct block_meta *block = ZONE_TO_BLOCK(zone);
 
             while (block)
             {

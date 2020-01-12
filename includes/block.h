@@ -21,8 +21,9 @@
 
 # include "libft.h"
 
-# define FIRST_BLOCK(zone) ((struct block_meta *)((char *)zone + sizeof(struct zone_meta))) // TODO: need it?
-# define START_OF_BLOCK(block) ((struct block_meta *)((char *)block - sizeof(struct block_meta))) // TODO: need it?
+# define ZONE_TO_BLOCK(zone) ((struct block_meta *)((char *)zone + sizeof(struct zone_meta))) // TODO: need it?
+# define DATA_TO_META(block) ((struct block_meta *)((char *)block - sizeof(struct block_meta))) // TODO: need it?
+# define META_TO_DATA(block) ((struct block_meta *)((char *)block + sizeof(struct block_meta))) // TODO: need it?
 # define MAX_TINY_SIZE 5 /* TODO: at least 100 allocations */
 # define MAX_SMALL_SIZE 10
 # define TINY_ZONE (getpagesize()) /* in subject: N */
@@ -62,5 +63,6 @@ enum zone_type define_zone_type(size_t size);
 struct zone_meta *get_my_zone_meta(struct block_meta *block);
 
 void *alloc_on_block(struct block_meta *new_block, size_t size);
+t_bool block_is_allocated(struct block_meta *block);
 
 #endif

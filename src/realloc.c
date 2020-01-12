@@ -28,40 +28,46 @@ void EXPORT *realloc(void *ptr, size_t size)
 
 	void *ret = NULL;
 
-	struct block_meta *b = START_OF_BLOCK(ptr);
-	// TODO: check if block is allocated
-
-	// define zone type
-	enum zone_type new_type = define_zone_type(size);
-
-	// define zone of my position
-	struct zone_meta *my_zone = get_my_zone_meta(b);
-
-	free(ptr); // TODO test 10 SF // TODO: may eat prev // TODO: may unmap zone
-
-	// check if block is suitable
-	if (b->size >= size && my_zone->type == new_type)
+	struct block_meta *b = DATA_TO_META(ptr);
+	if (block_is_allocated(b))
 	{
-		#if DEBUG
-			ft_putendl("[REALLOC] Checking... Block is suitable");
-		#endif
-	
-		// TODO: check with old size > new size
-		alloc_on_block(b, size);
-		ret = b;
+
+		// define zone type
+		enum zone_type new_type = define_zone_type(size);
+
+		// define zone of my position
+		struct zone_meta *my_zone = get_my_zone_meta(b);
+
+		free(ptr); // TODO: may eat prev // TODO: may unmap zone
+
+		// check if block is suitable
+		if (b->size >= size && my_zone->type == new_type)
+		{
+			#if DEBUG
+				ft_putendl("[REALLOC] Checking... Block is suitable");
+			#endif
+		
+			// TODO: check with old size > new size
+			alloc_on_block(b, size);
+			ret = META_TO_DATA(b);
+		}
+		else
+		{
+			#if DEBUG
+				ft_putstr("[REALLOC] Checking... Block is not suitable: ");
+				if (b->size < size)
+					ft_putendl("size is too large");
+				else if (my_zone->type != new_type)
+					ft_putendl("zone type doesn't match");
+			#endif
+			
+			ret = malloc(size);
+			// TODO: cpy data
+		}
 	}
 	else
 	{
-		#if DEBUG
-			ft_putstr("[REALLOC] Checking... Block is not suitable: ");
-			if (b->size < size)
-				ft_putendl("size is too large");
-			else if (my_zone->type != new_type)
-				ft_putendl("zone type doesn't match");
-		#endif
-		
-		ret = malloc(size);
-		// TODO: cpy data
+		// TODO: check man
 	}
 
 	return (ret);
