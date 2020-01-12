@@ -23,6 +23,10 @@ const char *labels[] = {"TINY", "SMALL", "LARGE"}; // TODO: to macro
 
 void EXPORT show_alloc_mem()
 {
+	#if DEBUG
+		ft_putchar('\n');
+	#endif
+
     struct zone_meta *zone = first_zone;
 
 	unsigned long sum = 0;
@@ -68,6 +72,10 @@ void EXPORT show_alloc_mem()
     ft_putstr("Total : ");
     ft_putnbr(sum);
     ft_putchar('\n');
+
+	#if DEBUG
+		ft_putchar('\n');
+	#endif
 }
 
 t_bool print_symbol(char sym, char *color)

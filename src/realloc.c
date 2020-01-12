@@ -12,9 +12,7 @@
 
 #include "block.h"
 
-// TODO: If ptr is NULL, then the call is equivalent to malloc(size)
 // TODO: if size is equal to zero, and ptr is not NULL, then the call is equivalent to free(ptr)
-// TODO: If the area pointed to was moved, a free(ptr) is done.
 // TODO: The UNIX 98 standard requires malloc(), calloc(), and realloc() to set errno to ENOMEM upon failure
 // TODO: If realloc() fails the original block is left untouched; it is not freed or moved.
 
@@ -31,16 +29,11 @@ void EXPORT *realloc(void *ptr, size_t size)
 	struct block_meta *b = DATA_TO_META(ptr);
 	if (block_is_allocated(b))
 	{
-
-		// define zone type
 		enum zone_type new_type = define_zone_type(size);
-
-		// define zone of my position
 		struct zone_meta *my_zone = get_my_zone_meta(b);
 
-		free(ptr); // TODO: may eat prev // TODO: may unmap zone
+		free_allocated_block(b, true, false, false);
 
-		// check if block is suitable
 		if (b->size >= size && my_zone->type == new_type)
 		{
 			#if DEBUG
@@ -61,9 +54,14 @@ void EXPORT *realloc(void *ptr, size_t size)
 					ft_putendl("zone type doesn't match");
 			#endif
 			
-			ret = malloc(size);
 			// TODO: cpy data
+			free_allocated_block(b, false, true, true);
+			ret = malloc(size);
 		}
+	}
+	else if (ptr == NULL)
+	{
+		ret = malloc(size);
 	}
 	else
 	{

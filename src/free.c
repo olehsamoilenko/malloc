@@ -22,40 +22,45 @@ struct zone_meta *get_my_zone_meta(struct block_meta *block)
 	return (cur_zone);
 }
 
-void free_allocated_block(struct block_meta *block)
+void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool try_eat_prev, t_bool try_unmap)
 {
     block->available = true;
 
-    struct block_meta *next = block->next;
-	if (next && next->available) {
+	if (try_eat_next) // TODO: check
+	{
+		struct block_meta *next = block->next;
+		if (next && next->available) {
 
-        #if DEBUG
-            ft_putstr("[FREE] Eating next block\n");
-        #endif
+			#if DEBUG
+				ft_putstr("[FREE] Eating next block\n");
+			#endif
 
-		block->size += next->size + sizeof(struct block_meta);
-		block->next = next->next;
+			block->size += next->size + sizeof(struct block_meta);
+			block->next = next->next;
 
-        struct block_meta *nextnext = next->next;
-        if (nextnext) // TODO: find test for check
-            nextnext->prev = block;
+			struct block_meta *nextnext = next->next;
+			if (nextnext) // TODO: find test for check
+				nextnext->prev = block;
 
+		}
 	}
 
-	struct block_meta *prev = block->prev;
-	if (prev && prev->available) {
+	if (try_eat_prev)
+	{
+		struct block_meta *prev = block->prev;
+		if (prev && prev->available) {
 
-        #if DEBUG
-            ft_putstr("[FREE] Eating previous block\n");
-        #endif
+			#if DEBUG
+				ft_putstr("[FREE] Eating previous block\n");
+			#endif
 
-        prev->size += block->size + sizeof(struct block_meta);
-        prev->next = block->next;
-        struct block_meta *next = block->next;
-        if (next)
-            next->prev = prev;
-
-    }
+			prev->size += block->size + sizeof(struct block_meta);
+			prev->next = block->next;
+			struct block_meta *next = block->next;
+			if (next)
+				next->prev = prev;
+		}
+	}
 
     struct zone_meta *cur_zone = get_my_zone_meta(block);
 	block = ZONE_TO_BLOCK(cur_zone);
@@ -71,7 +76,7 @@ void free_allocated_block(struct block_meta *block)
         block = block->next;
     }
 
-    if (all_available) // TODO: refactor to zone->av_blocks
+    if (try_unmap && all_available) // TODO: refactor to zone->av_blocks
     {
         #if DEBUG
             ft_putstr("[UNMAP] Zone available\n");
@@ -125,7 +130,7 @@ t_bool block_is_allocated(struct block_meta *block)
 
         while (tmp)
         {
-			if (tmp == block)
+			if (tmp == block) // TODO: avail ?
 			{
 				#if DEBUG
 					ft_putstr("[BLOCK] Block is allocated [Meta: "); // TODO: zone info
@@ -166,7 +171,7 @@ void EXPORT free(void *p)
     
 	if (block_is_allocated(block))
 	{
-		free_allocated_block(block);
+		free_allocated_block(block, true, true, true);
 	}
 	else
 	{

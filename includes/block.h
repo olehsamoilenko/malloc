@@ -65,4 +65,6 @@ struct zone_meta *get_my_zone_meta(struct block_meta *block);
 void *alloc_on_block(struct block_meta *new_block, size_t size);
 t_bool block_is_allocated(struct block_meta *block);
 
+void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool try_eat_prev, t_bool try_unmap);
+
 #endif
