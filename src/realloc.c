@@ -24,7 +24,7 @@ void EXPORT *realloc(void *ptr, size_t size)
         ft_putchar('\n');
     #endif
 
-	void *ret = NULL;
+	void *ret;
 
 	struct block_meta *b = DATA_TO_META(ptr);
 	if (block_is_allocated(b))
@@ -65,6 +65,7 @@ void EXPORT *realloc(void *ptr, size_t size)
 	}
 	else
 	{
+		ret = NULL;
 		// TODO: check man
 	}
 

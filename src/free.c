@@ -158,7 +158,6 @@ t_bool block_is_allocated(struct block_meta *block)
 	return (false);
 }
 
-// TODO: If “ptr” is a NULL pointer, no operation is performed.
 void EXPORT free(void *p)
 {
 	#if DEBUG
@@ -169,7 +168,7 @@ void EXPORT free(void *p)
 
 	struct block_meta *block = DATA_TO_META(p);
     
-	if (block_is_allocated(block))
+	if (p && block_is_allocated(block))
 	{
 		free_allocated_block(block, true, true, true);
 	}

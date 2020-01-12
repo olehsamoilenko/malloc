@@ -1,30 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test4.c                                            :+:      :+:    :+:   */
+/*   test5.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: osamoile <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/12/22 17:39:49 by osamoile          #+#    #+#             */
-/*   Updated: 2019/12/22 17:39:52 by osamoile         ###   ########.fr       */
+/*   Created: 2020/01/12 14:14:54 by osamoile          #+#    #+#             */
+/*   Updated: 2020/01/12 14:14:57 by osamoile         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// #include
-// #include
-// #include
+#include "malloc.h"
 
-// void print(char *s)
-// {
-// write(1, s, strlen(s));
-// }
+// TODO: check zones
 
-// int main()
-// {
-// 	char *addr;
-// 	addr = malloc(16);
-// 	free(NULL);
-// 	free((void *)addr + 5);
-// 	if (realloc((void *)addr + 5, 10) == NULL)
-// 	print("Bonjours\n");
-// }
+int main()
+{
+	void *ptr;
+	ptr = malloc(1024);
+	ptr = malloc(1024 * 32);
+	ptr = malloc(1024 * 1024);
+	ptr = malloc(1024 * 1024 * 16);
+	ptr = malloc(1024 * 1024 * 128);
+	show_alloc_mem();
+	return (0);
+}
