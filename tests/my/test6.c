@@ -1,4 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   test6.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: osamoile <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/01/12 14:50:22 by osamoile          #+#    #+#             */
+/*   Updated: 2020/01/12 14:50:24 by osamoile         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "malloc.h"
+#include "libft.h"
 
 int main(void)
 {
@@ -7,9 +20,11 @@ int main(void)
 
 	// large block
     void *n3 = malloc(50);
+	ft_strcpy(n3, "hello");
 
 	void *n4 = malloc(4);
-    show_alloc_mem();
+    show_alloc_mem_ex();
+	show_alloc_mem_ex();
     free(n4);
     free(n3);
     free(n2);
@@ -18,5 +33,5 @@ int main(void)
     free(n);
 	free(n);
 
-	show_alloc_mem();
+	show_alloc_mem_ex();
 }

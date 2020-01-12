@@ -15,8 +15,8 @@
 #define BGDEFAULT	"\e[97;49m"
 #define BGRED		"\e[97;41m"
 #define BGGREEN		"\e[30;42m"
+#define BGYELLOW	"\e[30;43m"
 #define BGCYAN		"\e[97;44m"
-// TODO: new color for zone_meta
 // TODO: check vmmap
 
 const char *labels[] = {"TINY", "SMALL", "LARGE"}; // TODO: to macro
@@ -34,7 +34,7 @@ void EXPORT show_alloc_mem()
     {
         ft_putstr(labels[zone->type]);
         ft_putstr(" : ");
-        ft_print_hex((unsigned long)zone);
+        ft_print_hex((unsigned long)zone, true);
         ft_putchar('\n');
 
         struct block_meta *block = ZONE_TO_BLOCK(zone);
@@ -50,9 +50,9 @@ void EXPORT show_alloc_mem()
                 if (!block->available)
                 {
             #endif
-                ft_print_hex((unsigned long)(char *)block + sizeof(struct block_meta));
+                ft_print_hex((unsigned long)(char *)block + sizeof(struct block_meta), true);
                 ft_putstr(" - ");
-                ft_print_hex((unsigned long)(char *)block + sizeof(struct block_meta) + block->size);
+                ft_print_hex((unsigned long)(char *)block + sizeof(struct block_meta) + block->size, true);
                 ft_putstr(" : ");
                 ft_putnbr(block->size);
                 ft_putstr(" bytes\n");
@@ -78,7 +78,7 @@ void EXPORT show_alloc_mem()
 	#endif
 }
 
-t_bool print_symbol(char sym, char *color)
+t_bool print_symbol(unsigned char sym, t_bool in_hex, char *color)
 {
     static int counter = 0;
     static char *g_color = BGDEFAULT;
@@ -89,50 +89,68 @@ t_bool print_symbol(char sym, char *color)
         g_color = color;
         ft_putstr(color);
     }
-    ft_putchar(sym);
+
+	if (in_hex)
+	{
+		if (sym <= 0x0f)
+			ft_putchar(' ');
+		ft_print_hex(sym, false);
+	}
+	else
+	{
+		ft_putchar(' ');
+		if (ft_isprint(sym))
+			ft_putchar(sym);
+		else
+			ft_putchar('.');
+	}
+	ft_putchar(' ');
+    counter += 3;
+
 	line_completed = false;
-    counter++;
-    if (counter % 100 == 0)
+    if (counter % 99 == 0)
     {
         ft_putstr(BGDEFAULT);
         ft_putchar('\n');
         ft_putstr(g_color);
 		line_completed = true;
+		counter = 0;
     }
 
 	return (line_completed);
 }
 
-// TODO: real data text = (unsigned char *)block;
 void EXPORT show_alloc_mem_ex(void)
 {
 	struct zone_meta *zone = first_zone;
-	unsigned int i = 0;
+	unsigned int i;
 	t_bool line_completed = true;
+	unsigned char *data;
 
     while (zone)
     {
-        // zone meta
         i = -1;
+		data = (unsigned char *)zone;
         while (++i < sizeof(struct zone_meta))
-            line_completed = print_symbol('Z', BGCYAN);
+            line_completed = print_symbol(data[i], true, BGYELLOW);
 
         struct block_meta *block = ZONE_TO_BLOCK(zone);
         while (block)
         {
-            // block meta
+			data = (unsigned char *)block;
+
             i = -1;
             while (++i < sizeof(struct block_meta))
-                line_completed = print_symbol('B', BGCYAN);
+                line_completed = print_symbol(data[i], true, BGCYAN);
 
-            // block data
             i = -1;
+			data = (unsigned char *)META_TO_DATA(block);
             while (++i < block->size)
             {
                 if (block->available)
-                    line_completed = print_symbol('.', BGGREEN);
+                    line_completed = print_symbol(data[i], false, BGGREEN);
                 else
-                    line_completed = print_symbol('x', BGRED);
+                    line_completed = print_symbol(data[i], false, BGRED);
             }
 
             block = block->next;
@@ -142,5 +160,5 @@ void EXPORT show_alloc_mem_ex(void)
     }
 
 	while (!line_completed)
-		line_completed = print_symbol(' ', BGDEFAULT);
+		line_completed = print_symbol(' ', false, BGDEFAULT);
 }

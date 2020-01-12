@@ -20,7 +20,7 @@ void EXPORT *realloc(void *ptr, size_t size)
 {
 	#if DEBUG
         ft_putstr("[CALL] realloc: ");
-        ft_print_hex((unsigned long)ptr);
+        ft_print_hex((unsigned long)ptr, true);
         ft_putchar('\n');
     #endif
 

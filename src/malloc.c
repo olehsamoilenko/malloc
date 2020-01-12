@@ -99,11 +99,11 @@ void *alloc_on_block(struct block_meta *new_block, size_t size) // TODO: refacto
 
 	#if DEBUG
 		ft_putstr("[ALLOC] New: ");
-		ft_print_hex((unsigned long)new_block);
+		ft_print_hex((unsigned long)new_block, true);
 		ft_putchar(' ');
 		ft_putnbr(new_block->size);
 		ft_putstr("; Reduced: ");
-		ft_print_hex((unsigned long)reduced_block);
+		ft_print_hex((unsigned long)reduced_block, true);
 		ft_putchar(' ');
 		ft_putnbr(reduced_block->size);
 		ft_putchar('\n');
@@ -148,7 +148,7 @@ void EXPORT *malloc(size_t size)
 
     #if DEBUG
         ft_putstr("[CALL] malloc: ");
-        ft_print_hex((unsigned long)ret);
+        ft_print_hex((unsigned long)ret, true);
         ft_putchar('\n');
     #endif
 

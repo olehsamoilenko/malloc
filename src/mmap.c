@@ -71,7 +71,7 @@ struct zone_meta *mmap_zone(unsigned long size)
         ft_putstr("[PAGING] Zone mapped, size = ");
         ft_putnbr(bytes_to_request);
         ft_putstr(", zone start = ");
-        ft_print_hex((unsigned long)zone);
+        ft_print_hex((unsigned long)zone, true);
         ft_putchar('\n');
         // TODO: type
 	#endif

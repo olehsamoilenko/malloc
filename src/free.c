@@ -134,9 +134,9 @@ t_bool block_is_allocated(struct block_meta *block)
 			{
 				#if DEBUG
 					ft_putstr("[BLOCK] Block is allocated [Meta: "); // TODO: zone info
-					ft_print_hex((unsigned long)block);
+					ft_print_hex((unsigned long)block, true);
 					ft_putstr(", data: ");
-					ft_print_hex((unsigned long)DATA_TO_META(block));
+					ft_print_hex((unsigned long)DATA_TO_META(block), true);
 					ft_putendl("]");
 				#endif
 				return (true);
@@ -150,9 +150,9 @@ t_bool block_is_allocated(struct block_meta *block)
 	
 	#if DEBUG
 		ft_putstr("[BLOCK] Block was NOT allocated [Meta: ");
-		ft_print_hex((unsigned long)block);
+		ft_print_hex((unsigned long)block, true);
 		ft_putstr(", data: ");
-		ft_print_hex((unsigned long)DATA_TO_META(block));
+		ft_print_hex((unsigned long)DATA_TO_META(block), true);
 		ft_putendl("]");
 	#endif
 	return (false);
@@ -162,7 +162,7 @@ void EXPORT free(void *p)
 {
 	#if DEBUG
         ft_putstr("[CALL] free: ");
-        ft_print_hex((unsigned long)p);
+        ft_print_hex((unsigned long)p, true);
         ft_putchar('\n');
     #endif
 
