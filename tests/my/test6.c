@@ -24,7 +24,7 @@ int main(void)
 
 	void *n4 = malloc(4);
     show_alloc_mem_ex();
-	show_alloc_mem_ex();
+
     free(n4);
     free(n3);
     free(n2);

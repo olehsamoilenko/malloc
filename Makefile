@@ -42,7 +42,6 @@ TESTS =			test0 \
 				test9 \
 				test10
 
-# TODO: test5
 # TODO: bonuses test
 
 OFF=\033[0m
@@ -55,7 +54,7 @@ ifeq ($(DEBUG), 1)
 	DEBUGFLAG=-D DEBUG
 endif
 
-all: $(LINK_NAME) $(TESTS)
+all: $(LINK_NAME) tests
 
 $(LINK_NAME): $(NAME)
 	@ln -sf $(NAME) $(LINK_NAME)
@@ -76,13 +75,14 @@ obj/%.o: src/%.c $(HEADER)
 	@gcc $(CC_FLAGS) -c $< -o $@ $(INC) $(DEBUGFLAG)
 	@echo "$(PURPLE)Compiling $(WHITEBOLD)$*.c $(PURPLE)done$(OFF)"
 
-%: tests/subject/%.c
-	@gcc $< -o $@
-	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
+tests: $(TESTS)
 
-# TODO: obj rule for tests
 %: tests/my/%.c
 	@gcc $< -o $@ $(INC) -lft -L ./libft -lft_malloc -L .
+	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
+
+%: tests/subject/%.c
+	@gcc $< -o $@
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 clean:
