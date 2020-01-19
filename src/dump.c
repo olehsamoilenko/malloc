@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "block.h"
+#include "zone.h"
 
 #define BGDEFAULT	"\e[97;49m"
 #define BGRED		"\e[97;41m"

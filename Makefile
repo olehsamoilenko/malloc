@@ -53,6 +53,7 @@ WHITEBOLD=\033[1;37m
 ifeq ($(DEBUG), 1)
 	DEBUGFLAG=-D DEBUG
 endif
+# TODO: work with DEBUG
 
 all: $(LINK_NAME) tests
 
@@ -82,7 +83,7 @@ tests: $(TESTS)
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 %: tests/subject/%.c
-	@gcc $< -o $@
+	@gcc $< -o $@           $(INC) -lft -L ./libft -lft_malloc -L . # TODO: remove
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 clean:

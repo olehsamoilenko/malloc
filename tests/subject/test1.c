@@ -13,6 +13,7 @@
 #include "../../includes/malloc.h"
 
 // TODO: between 255 and 272 pages
+// res: 266
 
 int main()
 {
@@ -25,5 +26,6 @@ int main()
 		addr[0] = 42;
 		i++;
 	}
+	show_alloc_mem();
 	return (0);
 }

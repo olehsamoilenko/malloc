@@ -14,6 +14,7 @@
 
 // TODO: less pages than test1
 // TODO: pages = test0 + 3
+// diff: 1
 
 int main()
 {

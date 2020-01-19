@@ -11,12 +11,10 @@
 /* ************************************************************************** */
 
 #include "block.h"
+#include "zone.h"
 
 // TODO: If size is 0, then malloc() returns either NULL, or a unique pointer value that can later be successfully passed to free().
 // TODO: NULL may also be returned by a successful call to malloc() with a size of zero
-
-// TODO: Manage the use of your malloc in a multi-threaded program (so to be “thread safe”
-// using the pthread lib).
 
 struct zone_meta *first_zone = NULL;
 
@@ -24,13 +22,13 @@ enum zone_type define_zone_type(size_t size)
 {
 	enum zone_type type;
 
-	if (size <= MAX_TINY_SIZE) {
+	if (size <= MAX_TINY_BLOCK_SIZE) {
 		type = TINY;
 		#if DEBUG // TODO: refactor
 			ft_putstr("[BLOCK] Block type: TINY\n");
 		#endif
 	}
-	else if (size <= MAX_SMALL_SIZE) {
+	else if (size <= MAX_SMALL_BLOCK_SIZE) {
 		type = SMALL;
 		#if DEBUG
 			ft_putstr("[BLOCK] Block type: SMALL\n");
@@ -167,6 +165,8 @@ void EXPORT *malloc(size_t size)
 // 1. DONE  • “Defragment” the freed memory.
 //          - During free, the project "defragments" free memory by grouping free blocks
 //          concomitant in one
+
+//          multi thread
 
 //          own segfault
 

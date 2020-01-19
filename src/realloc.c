@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "block.h"
+#include "zone.h"
 
 // TODO: if size is equal to zero, and ptr is not NULL, then the call is equivalent to free(ptr)
 // TODO: The UNIX 98 standard requires malloc(), calloc(), and realloc() to set errno to ENOMEM upon failure

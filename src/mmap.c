@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "block.h"
+#include "zone.h"
 
 void insert_zone_to_list(struct zone_meta *zone)
 {
@@ -32,26 +33,33 @@ void insert_zone_to_list(struct zone_meta *zone)
 
 struct zone_meta *mmap_zone(unsigned long size)
 {
-	unsigned long bytes_to_request;
+	unsigned long bytes_need;
 	enum zone_type zone_type;
 
-	if (size <= MAX_TINY_SIZE) {
-		bytes_to_request = TINY_ZONE;
+	if (size <= MAX_TINY_BLOCK_SIZE) {
+		bytes_need = BLOCKS_IN_ZONE * (MAX_TINY_BLOCK_SIZE + sizeof(struct block_meta)) + sizeof(struct zone_meta);
 		zone_type = TINY;
 	}
-	else if (size <= MAX_SMALL_SIZE) {
-		bytes_to_request = SMALL_ZONE;
+	else if (size <= MAX_SMALL_BLOCK_SIZE) {
+		bytes_need = BLOCKS_IN_ZONE * (MAX_SMALL_BLOCK_SIZE + sizeof(struct block_meta)) + sizeof(struct zone_meta);
 		zone_type = SMALL;
 	}
 	else {
-		bytes_to_request = LARGE_ZONE(size);
+		bytes_need = size + sizeof(struct block_meta) + sizeof(struct zone_meta);
 		zone_type = LARGE;
 	}
 
+	unsigned int pages = (bytes_need - 1) / getpagesize() + 1;
+	unsigned long bytes_to_request = pages * getpagesize();
+
 	#if DEBUG
-		ft_putstr("[PAGING] Bytes to request: ");
+		ft_putstr("[PAGING] Bytes need: ");
+		ft_putnbr(bytes_need);
+		ft_putstr(", bytes to request: ");
 		ft_putnbr(bytes_to_request);
-		ft_putchar('\n');
+		ft_putstr(" (");
+		ft_putnbr(pages);
+		ft_putendl(" pages)");
 	#endif
 
 	void *page = mmap(NULL, bytes_to_request, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
