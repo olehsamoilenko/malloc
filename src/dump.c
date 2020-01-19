@@ -100,10 +100,12 @@ t_bool print_symbol(unsigned char sym, t_bool in_hex, char *color)
 	else
 	{
 		ft_putchar(' ');
-		if (ft_isprint(sym))
+		if (sym == 0)
+			ft_putchar('.');
+		else if (ft_isprint(sym))
 			ft_putchar(sym);
 		else
-			ft_putchar('.');
+			ft_putchar('?');
 	}
 	ft_putchar(' ');
     counter += 3;

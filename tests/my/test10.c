@@ -65,15 +65,36 @@ void unmap(void)
 
 void malloc_free_prev(void)
 {
+	/* data may be corrupted
+	when prev block is eaten
+	and new is allocated on
+	his place */
 	void *m = malloc(6);
 	void *m2 = malloc(6);
+	ft_strcpy(m2, "hello");
+	void *m3 = malloc(6);
 	free(m);
-	void *r = realloc(m2, 30);
 	show_alloc_mem();
+	void *r = realloc(m2, 11);
+	show_alloc_mem_ex();
+}
 
-	// LARGE : 0x10e942000
-	// 0x10e942030 - 0x10e94204e : 30 bytes
-	// Total : 30
+void cpy_to_tiny(void)
+{
+	/* copying to small block */
+	void *m = malloc(200); // small
+	ft_strcpy(m, "hellohellohello");
+	void *r = realloc(m, 5); // tiny
+	show_alloc_mem_ex();
+}
+
+void cpy_to_large(void)
+{
+	/* copying to large block */
+	void *m = malloc(5); // tiny
+	ft_strcpy(m, "hell");
+	void *r = realloc(m, 200); // large
+	show_alloc_mem_ex();
 }
 
 void null(void)
@@ -94,9 +115,22 @@ void zero(void) // TODO
 	show_alloc_mem();
 }
 
+void check_cpy(void)
+{
+	void *m1 = malloc(10);
+	ft_strcpy(m1, "hello");
+	void *m2 = malloc(5);
+	void *r = realloc(m1, 20);
+	show_alloc_mem_ex();
+}
+
 int main()
 {
 	// change_zone();
+	// malloc_free_prev();
 	// null();
-	zero();
+	// zero();
+	// check_cpy();
+	cpy_to_tiny();
+	// cpy_to_large();
 }

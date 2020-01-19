@@ -98,13 +98,13 @@ void *alloc_on_block(struct block_meta *new_block, size_t size) // TODO: refacto
 	#if DEBUG
 		ft_putstr("[ALLOC] New: ");
 		ft_print_hex((unsigned long)new_block, true);
-		ft_putchar(' ');
+		ft_putstr(" (");
 		ft_putnbr(new_block->size);
-		ft_putstr("; Reduced: ");
+		ft_putstr(" bytes), reduced: ");
 		ft_print_hex((unsigned long)reduced_block, true);
-		ft_putchar(' ');
+		ft_putstr(" (");
 		ft_putnbr(reduced_block->size);
-		ft_putchar('\n');
+		ft_putendl(" bytes)");
 	#endif
 
 	return (new_block);
@@ -168,6 +168,8 @@ void EXPORT *malloc(size_t size)
 
 //          multi thread
 
-//          own segfault
+//          own signal when metadata corrupted
 
 //          calloc
+
+//          The UNIX 98 standard requires malloc(), calloc(), and realloc() to set errno to ENOMEM upon failure
