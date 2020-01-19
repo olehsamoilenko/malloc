@@ -12,8 +12,6 @@
 
 #include "malloc.h"
 
-// TODO: check zones
-
 int main()
 {
 	void *ptr;

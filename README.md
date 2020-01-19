@@ -5,22 +5,21 @@ The first implementation was created accordingly to [stepik guide](https://stepi
 Compile library
 ===
 Compile: ```make```<br>
-Compile debug version: ```make re DEBUG=1```<br>
-Again usual version: ```make re``` or ```make re DEBUG=0```<br>
+Compile debug version: ```make debug```<br>
+Again usual version: ```make re```<br>
 
 Run tests
 ===
-To run tests please use: ```./run.sh test```<br>
+To run tests please use: ```./run.sh ./test```<br>
 To show malloc performance please use:<br>
-```./run.sh /usr/bin/time -l test``` on Mac or<br>
-```./run.sh /usr/bin/time --verbose test``` on Linux<br>
+```./run.sh /usr/bin/time -l ./test``` on Mac or<br>
+```./run.sh /usr/bin/time --verbose ./test``` on Linux<br>
 
 Use library
 ===
 Usage 1.<br>
-```gcc -flat_namespace program.c```<br>
+```gcc program.c```<br>
 ```./run.sh ./a.out```
-# TODO: check usages
 
 Usage 2.<br>
 ```gcc -lft_malloc -L . program.c```<br>

@@ -21,9 +21,7 @@ HEADER =		./includes/malloc.h \
 INC =			-I ./includes \
 				-I ./libft/includes
 CC_FLAGS =		-fvisibility=hidden -fPIC # TODO: -Wall -Wextra -Werror
-ifeq ($(shell uname), Darwin)
-	TEST_CC_FLAGS = -flat_namespace
-endif
+
 SRC_LIST =		malloc \
 				dump \
 				mmap \
@@ -50,11 +48,6 @@ PINK=\033[0;35m
 PINKBOLD=\033[1;35m
 WHITEBOLD=\033[1;37m
 
-ifeq ($(DEBUG), 1)
-	DEBUGFLAG=-D DEBUG
-endif
-# TODO: work with DEBUG
-
 all: $(LINK_NAME) tests
 
 $(LINK_NAME): $(NAME)
@@ -73,10 +66,10 @@ obj:
 	@mkdir obj
 
 obj/%.o: src/%.c $(HEADER)
-	@gcc $(CC_FLAGS) -c $< -o $@ $(INC) $(DEBUGFLAG)
+	@gcc $(CC_FLAGS) -c $< -o $@ $(INC)
 	@echo "$(PURPLE)Compiling $(WHITEBOLD)$*.c $(PURPLE)done$(OFF)"
 
-tests: $(TESTS)
+tests: $(LINK_NAME) $(TESTS)
 
 %: tests/my/%.c
 	@gcc $< -o $@ $(INC) -lft -L ./libft -lft_malloc -L .
@@ -93,3 +86,6 @@ fclean: clean
 	@rm -f $(NAME) $(LINK_NAME) $(TESTS)
 
 re: fclean all
+
+debug: CC_FLAGS += -D DEBUG
+debug: re
