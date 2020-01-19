@@ -13,7 +13,8 @@
 #ifndef ZONE_H
 # define ZONE_H
 
-# define ZONE_TO_BLOCK(zone) ((struct block_meta *)((char *)zone + sizeof(struct zone_meta))) // TODO: need it?
+// TODO: need it?
+# define ZONE_TO_BLOCK(zone) ((struct block_meta *)((char *)zone + sizeof(struct zone_meta)))
 # define BLOCKS_IN_ZONE 100
 
 # include <stdlib.h>
@@ -25,17 +26,17 @@ enum zone_type
 	LARGE
 };
 
-struct zone_meta // TODO: zone.h
+struct zone_meta
 {
 	enum zone_type type; // TODO: 2 bits
     unsigned int size;
-	struct zone_meta *prev;
+	struct zone_meta *prev; // TODO: remove
 	struct zone_meta *next;
 };
 
 extern struct zone_meta *first_zone;
 
-// TODO: need it ?
+// TDCHECK: need it ?
 struct zone_meta *mmap_zone(unsigned long size);
 void insert_zone_to_list(struct zone_meta *zone);
 enum zone_type define_zone_type(size_t size);

@@ -13,7 +13,6 @@
 #include "block.h"
 #include "zone.h"
 
-// TODO: if size is equal to zero, and ptr is not NULL, then the call is equivalent to free(ptr)
 // TODO: If realloc() fails the original block is left untouched; it is not freed or moved.
 
 void EXPORT *realloc(void *ptr, size_t size)
@@ -35,7 +34,13 @@ void EXPORT *realloc(void *ptr, size_t size)
 		int old_size = b->size;
 		free_allocated_block(b, true, false, false);
 
-		if (b->size >= size && my_zone->type == new_type)
+		if (size == 0)
+		{
+			/* MAN: if size is equal to zero, and ptr is not NULL,
+			then the call is equivalent to free(ptr) */
+			free(ptr);
+		}
+		else if (b->size >= size && my_zone->type == new_type)
 		{
 			#if DEBUG
 				ft_putendl("[REALLOC] Block is suitable");
@@ -74,8 +79,13 @@ void EXPORT *realloc(void *ptr, size_t size)
 	else
 	{
 		ret = NULL;
-		// TODO: check man
 	}
+
+	#if DEBUG
+        ft_putstr("[RETURN] realloc: ");
+        ft_print_hex((unsigned long)ret, true);
+        ft_putchar('\n');
+    #endif
 
 	return (ret);
 }

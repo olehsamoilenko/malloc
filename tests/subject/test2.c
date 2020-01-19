@@ -12,8 +12,8 @@
 
 #include "../../includes/malloc.h"
 
-// TODO: less pages than test1
-// TODO: pages = test0 + 3
+// less pages than test1
+// TDCHECK: pages = test0 + 3
 // diff: 1
 
 int main()

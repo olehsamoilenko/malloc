@@ -81,7 +81,7 @@ struct zone_meta *mmap_zone(unsigned long size)
         ft_putstr(", zone start = ");
         ft_print_hex((unsigned long)zone, true);
         ft_putchar('\n');
-        // TODO: type
+        // TD: type
 	#endif
 
 	return (zone);

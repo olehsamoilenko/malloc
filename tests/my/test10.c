@@ -108,10 +108,17 @@ void null(void)
 	// Total : 5
 }
 
-void zero(void) // TODO
+void zero(void)
 {
+	/* MAN: if size is equal to zero, and ptr is not NULL,
+	then the call is equivalent to free(ptr) */
 	void *m = malloc(5);
 	void *r = realloc(m, 0);
+	show_alloc_mem();
+
+	/* MAN: If size is 0, then malloc() returns either NULL, or a unique
+	pointer value that can later be successfully passed to free() */
+	void *r2 = realloc(NULL, 0);
 	show_alloc_mem();
 }
 
@@ -129,8 +136,8 @@ int main()
 	// change_zone();
 	// malloc_free_prev();
 	// null();
-	// zero();
+	zero();
 	// check_cpy();
-	cpy_to_tiny();
+	// cpy_to_tiny();
 	// cpy_to_large();
 }

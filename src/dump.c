@@ -18,9 +18,9 @@
 #define BGGREEN		"\e[30;42m"
 #define BGYELLOW	"\e[30;43m"
 #define BGCYAN		"\e[97;44m"
-// TODO: check vmmap
+// TD: check vmmap
 
-const char *labels[] = {"TINY", "SMALL", "LARGE"}; // TODO: to macro
+const char *labels[] = {"TINY", "SMALL", "LARGE"}; // TD: to macro
 
 void EXPORT show_alloc_mem()
 {
@@ -42,7 +42,7 @@ void EXPORT show_alloc_mem()
 
         while (block)
         {
-            #if DEBUG // TODO: refactor
+            #if DEBUG // TD: refactor
                 if (block->available)
                     ft_putstr("[AVAILABLE] ");
             #endif

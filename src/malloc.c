@@ -13,9 +13,6 @@
 #include "block.h"
 #include "zone.h"
 
-// TODO: If size is 0, then malloc() returns either NULL, or a unique pointer value that can later be successfully passed to free().
-// TODO: NULL may also be returned by a successful call to malloc() with a size of zero
-
 struct zone_meta *first_zone = NULL;
 
 enum zone_type define_zone_type(size_t size)
@@ -24,7 +21,7 @@ enum zone_type define_zone_type(size_t size)
 
 	if (size <= MAX_TINY_BLOCK_SIZE) {
 		type = TINY;
-		#if DEBUG // TODO: refactor
+		#if DEBUG // TD: refactor
 			ft_putstr("[BLOCK] Block type: TINY\n");
 		#endif
 	}
@@ -46,9 +43,6 @@ enum zone_type define_zone_type(size_t size)
 
 struct block_meta *get_suitable_block(size_t size)
 {
-    if (!size) // TODO: refactor, 1 return
-        return (NULL);
-
 	enum zone_type type = define_zone_type(size);
 
     struct zone_meta *zone = first_zone;
@@ -74,15 +68,15 @@ struct block_meta *get_suitable_block(size_t size)
         ft_putstr("[BLOCK] No suitable space: size = ");
         ft_putnbr(size);
         ft_putchar('\n');
-        // TODO: type
+        // TD: type
 	#endif
 
     return (NULL);
 }
 
-void *alloc_on_block(struct block_meta *new_block, size_t size) // TODO: refactor, no return
+void *alloc_on_block(struct block_meta *new_block, size_t size) // TD: refactor, no return
 {
-	// TODO: scheme of new and reduced
+	// TD: scheme of new and reduced
 
 	struct block_meta *reduced_block = (struct block_meta *)((char *)new_block + sizeof(struct block_meta) + size);
 	reduced_block->available = true;
@@ -145,7 +139,7 @@ void EXPORT *malloc(size_t size)
     }
 
     #if DEBUG
-        ft_putstr("[CALL] malloc: ");
+        ft_putstr("[RETURN] malloc: ");
         ft_print_hex((unsigned long)ret, true);
         ft_putchar('\n');
     #endif

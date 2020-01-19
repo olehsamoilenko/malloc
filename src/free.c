@@ -27,7 +27,7 @@ void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool 
 {
     block->available = true;
 
-	if (try_eat_next) // TODO: check
+	if (try_eat_next)
 	{
 		struct block_meta *next = block->next;
 		if (next && next->available) {
@@ -40,7 +40,7 @@ void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool 
 			block->next = next->next;
 
 			struct block_meta *nextnext = next->next;
-			if (nextnext) // TODO: find test for check
+			if (nextnext)
 				nextnext->prev = block;
 
 		}
@@ -77,7 +77,7 @@ void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool 
         block = block->next;
     }
 
-    if (try_unmap && all_available) // TODO: refactor to zone->av_blocks
+    if (try_unmap && all_available) // TD: refactor to zone->av_blocks
     {
         #if DEBUG
             ft_putstr("[UNMAP] Zone available\n");
@@ -111,7 +111,6 @@ void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool 
             Ubuntu: /usr/bin/time --verbose ./test
         */
 
-        // TODO: test unmap with LARGE blocks
         int res = munmap(cur_zone, cur_zone->size);
         #if DEBUG
             ft_putstr("[UNMAP] munmap result: ");
@@ -131,10 +130,10 @@ t_bool block_is_allocated(struct block_meta *block)
 
         while (tmp)
         {
-			if (tmp == block) // TODO: avail ?
+			if (tmp == block)
 			{
 				#if DEBUG
-					ft_putstr("[BLOCK] Block is allocated [Meta: "); // TODO: zone info
+					ft_putstr("[BLOCK] Block is allocated [Meta: "); // TD: zone info
 					ft_print_hex((unsigned long)block, true);
 					ft_putstr(", data: ");
 					ft_print_hex((unsigned long)DATA_TO_META(block), true);

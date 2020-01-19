@@ -12,7 +12,7 @@
 
 #include "../../includes/malloc.h"
 
-// TODO: between 255 and 272 pages
+// TDCHECK: between 255 and 272 pages
 // res: 266
 
 int main()

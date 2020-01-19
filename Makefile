@@ -20,7 +20,7 @@ HEADER =		./includes/malloc.h \
 				./includes/block.h
 INC =			-I ./includes \
 				-I ./libft/includes
-CC_FLAGS =		-fvisibility=hidden -fPIC # TODO: -Wall -Wextra -Werror
+CC_FLAGS =		-fvisibility=hidden -fPIC # TDCHECK: -Wall -Wextra -Werror
 
 SRC_LIST =		malloc \
 				dump \
@@ -76,7 +76,7 @@ tests: $(LINK_NAME) $(TESTS)
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 %: tests/subject/%.c
-	@gcc $< -o $@           $(INC) -lft -L ./libft -lft_malloc -L . # TODO: remove
+	@gcc $< -o $@           $(INC) -lft -L ./libft -lft_malloc -L . # TDCHECK: remove
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 clean:

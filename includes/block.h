@@ -16,13 +16,14 @@
 # include <sys/mman.h>
 # include "libft.h"
 
-// TODO: $> nm libft_malloc.so
+// TDCHECK: $> nm libft_malloc.so
 
-# define MAX_TINY_BLOCK_SIZE 128 // TODO: 100 allocations
+# define MAX_TINY_BLOCK_SIZE 128
 # define MAX_SMALL_BLOCK_SIZE 1024
 
-# define DATA_TO_META(block) ((struct block_meta *)((char *)block - sizeof(struct block_meta))) // TODO: need it?
-# define META_TO_DATA(block) ((struct block_meta *)((char *)block + sizeof(struct block_meta))) // TODO: need it?
+// TD: need it?
+# define DATA_TO_META(block) ((struct block_meta *)((char *)block - sizeof(struct block_meta)))
+# define META_TO_DATA(block) ((struct block_meta *)((char *)block + sizeof(struct block_meta)))
 
 # define EXPORT __attribute__((visibility("default")))
 
@@ -30,11 +31,11 @@ struct block_meta
 {
     unsigned int available; // TODO: 1 bit
     unsigned int size;
-	struct block_meta *prev;
+	struct block_meta *prev; // TODO: zone
 	struct block_meta *next;
 };
 
-// TODO: need it ?
+// TD: need it ?
 void *alloc_on_block(struct block_meta *new_block, size_t size);
 t_bool block_is_allocated(struct block_meta *block);
 
