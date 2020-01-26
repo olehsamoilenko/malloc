@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "block.h"
 #include "zone.h"
 
 struct zone_meta *first_zone = NULL;

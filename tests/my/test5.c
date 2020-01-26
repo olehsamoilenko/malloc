@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "malloc.h"
+#include "test.h"
 
 int main()
 {
@@ -20,6 +21,18 @@ int main()
 	ptr = malloc(1024 * 1024);
 	ptr = malloc(1024 * 1024 * 16);
 	ptr = malloc(1024 * 1024 * 128);
-	show_alloc_mem();
+	CHECK(
+		getZonesNumber() == 5
+		&& getZoneTh(1)->type == SMALL
+		&& getBlocksNumber(getZoneTh(1)) == 1
+		&& getZoneTh(2)->type == LARGE
+		&& getBlocksNumber(getZoneTh(1)) == 1
+		&& getZoneTh(3)->type == LARGE
+		&& getBlocksNumber(getZoneTh(1)) == 1
+		&& getZoneTh(4)->type == LARGE
+		&& getBlocksNumber(getZoneTh(1)) == 1
+		&& getZoneTh(5)->type == LARGE
+		&& getBlocksNumber(getZoneTh(1)) == 1
+	);
 	return (0);
 }

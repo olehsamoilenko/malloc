@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "block.h"
 #include "zone.h"
 
 struct zone_meta *get_my_zone_meta(struct block_meta *block)

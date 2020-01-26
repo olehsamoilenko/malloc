@@ -10,8 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "block.h"
 #include "zone.h"
+
+#if DEBUG
+struct zone_meta EXPORT *get_first_zone() 
+{
+	return (first_zone);
+}
+#endif
 
 void insert_zone_to_list(struct zone_meta *zone)
 {

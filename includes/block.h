@@ -29,8 +29,8 @@
 
 struct block_meta
 {
-    unsigned int available; // TODO: 1 bit
-    unsigned int size;
+	unsigned int available; // TODO: 1 bit
+	unsigned int size;
 	struct block_meta *prev; // TODO: zone
 	struct block_meta *next;
 };

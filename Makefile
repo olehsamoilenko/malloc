@@ -20,7 +20,8 @@ HEADER =		./includes/malloc.h \
 				./includes/block.h
 INC =			-I ./includes \
 				-I ./libft/includes
-CC_FLAGS =		-fvisibility=hidden -fPIC # TDCHECK: -Wall -Wextra -Werror
+CC_FLAGS =		# TDCHECK: -Wall -Wextra -Werror
+SH_LIB_FLAGS =	-fvisibility=hidden -fPIC $(CC_FLAGS)
 
 SRC_LIST =		malloc \
 				dump \
@@ -35,10 +36,7 @@ TESTS =			test0 \
 				test4 \
 				test5 \
 				test6 \
-				test7 \
-				test8 \
-				test9 \
-				test10
+				test7
 
 # TODO: bonuses test
 
@@ -47,6 +45,8 @@ PURPLE=\033[0;38;2;102;102;255m
 PINK=\033[0;35m
 PINKBOLD=\033[1;35m
 WHITEBOLD=\033[1;37m
+RED=\033[0;31m
+REDBOLD=\033[1;31m
 
 all: $(LINK_NAME) tests
 
@@ -66,26 +66,33 @@ obj:
 	@mkdir obj
 
 obj/%.o: src/%.c $(HEADER)
-	@gcc $(CC_FLAGS) -c $< -o $@ $(INC)
+	@gcc $(SH_LIB_FLAGS) -c $< -o $@ $(INC)
 	@echo "$(PURPLE)Compiling $(WHITEBOLD)$*.c $(PURPLE)done$(OFF)"
 
 tests: $(LINK_NAME) $(TESTS)
 
 %: tests/my/%.c
-	@gcc $< -o $@ $(INC) -lft -L ./libft -lft_malloc -L .
+	@gcc $(CC_FLAGS) $< -o $@ $(INC) -lft -L ./libft -lft_malloc -L .
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 %: tests/subject/%.c
-	@gcc $< -o $@           $(INC) -lft -L ./libft -lft_malloc -L . # TDCHECK: remove
+	@gcc $(CC_FLAGS) $< -o $@           $(INC) -lft -L ./libft -lft_malloc -L . # TDCHECK: remove
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 clean:
 	@rm -rf obj # TODO: console log
+	@echo "$(RED)Directory $(REDBOLD)obj$(RED) removed$(OFF)"
 
 fclean: clean
-	@rm -f $(NAME) $(LINK_NAME) $(TESTS)
+	@rm -f $(LINK_NAME)
+	@echo "$(RED)Link $(REDBOLD)$(LINK_NAME)$(RED) removed$(OFF)"
+	@rm -f $(NAME)
+	@echo "$(RED)Library $(REDBOLD)$(NAME)$(RED) removed$(OFF)"
+	@rm -f $(TESTS)
+	@echo "$(RED)Tests $(REDBOLD)$(TESTS)$(RED) removed$(OFF)"
 
 re: fclean all
 
 debug: CC_FLAGS += -D DEBUG
 debug: re
+# debug: tests

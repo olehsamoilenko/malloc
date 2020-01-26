@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "block.h"
 #include "zone.h"
 
 // TODO: If realloc() fails the original block is left untouched; it is not freed or moved.
