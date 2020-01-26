@@ -30,7 +30,6 @@ struct zone_meta
 {
 	enum zone_type type; // TODO: 2 bits
 	unsigned int size;
-	struct zone_meta *prev; // TODO: remove
 	struct zone_meta *next;
 };
 

@@ -29,7 +29,6 @@ void insert_zone_to_list(struct zone_meta *zone)
     if (lst)
     {
         lst->next = zone;
-        zone->prev = lst;
     }
     else
     {
@@ -72,14 +71,12 @@ struct zone_meta *mmap_zone(unsigned long size)
 	struct zone_meta *zone = (struct zone_meta *)page;
     zone->type = zone_type;
     zone->size = bytes_to_request;
-	zone->prev = NULL;
 	zone->next = NULL;
 
 	struct block_meta *first_block = (struct block_meta *)(page + sizeof(struct zone_meta));
 	first_block->available = true;
 	first_block->size = bytes_to_request - sizeof(struct zone_meta) - sizeof(struct block_meta);
 	first_block->next = NULL;
-	first_block->prev = NULL;
 
 	#if DEBUG
         ft_putstr("[PAGING] Zone mapped, size = ");

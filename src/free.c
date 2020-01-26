@@ -81,19 +81,6 @@ void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool 
         #if DEBUG
             ft_putstr("[UNMAP] Zone available\n");
         #endif
-        // remove zone from list
-        struct zone_meta *next = cur_zone->next;
-        struct zone_meta *prev = cur_zone->prev;
-
-        if (prev)
-        {
-            prev->next = next;
-        }
-
-        if (next)
-        {
-            next->prev = prev;
-        }
 
         if (cur_zone == first_zone)
         {
@@ -101,8 +88,21 @@ void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool 
                 ft_putstr("[UNMAP] First zone changed\n");
             #endif
 
-            first_zone = next;
+            first_zone = cur_zone->next;
         }
+		else
+		{
+			struct zone_meta *tmp = first_zone;
+
+			while (tmp && tmp->next)
+			{
+				if (tmp->next == cur_zone)
+				{
+					tmp->next = cur_zone->next;
+					break ;
+				}
+			}
+		}
 
         /*
             To check page reclaims:

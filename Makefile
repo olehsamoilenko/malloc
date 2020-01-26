@@ -37,8 +37,7 @@ TESTS =			test0 \
 				test5 \
 				test6 \
 				test7
-
-# TODO: bonuses test
+				# TODO: bonuses test
 
 OFF=\033[0m
 PURPLE=\033[0;38;2;102;102;255m
@@ -80,7 +79,7 @@ tests: $(LINK_NAME) $(TESTS)
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 clean:
-	@rm -rf obj # TODO: console log
+	@rm -rf obj
 	@echo "$(RED)Directory $(REDBOLD)obj$(RED) removed$(OFF)"
 
 fclean: clean

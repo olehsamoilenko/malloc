@@ -12,8 +12,6 @@
 
 #include "zone.h"
 
-// TODO: If realloc() fails the original block is left untouched; it is not freed or moved.
-
 void EXPORT *realloc(void *ptr, size_t size)
 {
 	#if DEBUG
