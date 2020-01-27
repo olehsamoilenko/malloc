@@ -75,7 +75,7 @@ tests: $(LINK_NAME) $(TESTS)
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 %: tests/subject/%.c
-	@gcc $(CC_FLAGS) $< -o $@           $(INC) -lft -L ./libft -lft_malloc -L . # TDCHECK: remove
+	@gcc $(CC_FLAGS) $< -o $@
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 clean:

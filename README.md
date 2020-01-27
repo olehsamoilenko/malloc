@@ -17,10 +17,5 @@ To show malloc performance please use:<br>
 
 Use library
 ===
-Usage 1.<br>
 ```gcc program.c```<br>
 ```./run.sh ./a.out```
-
-Usage 2.<br>
-```gcc -lft_malloc -L . program.c```<br>
-```./a.out```

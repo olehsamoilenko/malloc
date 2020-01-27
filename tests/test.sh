@@ -1,7 +1,7 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    run.sh                                             :+:      :+:    :+:    #
+#    test.sh                                            :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: osamoile <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
@@ -12,14 +12,15 @@
 
 #!/bin/sh
 
+cd $(dirname $0)/..
 if [ $(uname -s) = Darwin ]
 then
-    export DYLD_LIBRARY_PATH=.
-    export DYLD_INSERT_LIBRARIES="libft_malloc.so"
-    export DYLD_FORCE_FLAT_NAMESPACE=1
-    $@
+    ./test5
+    ./test6
+    ./test7
 else
-    export LD_LIBRARY_PATH=.
-    export LD_PRELOAD=./libft_malloc.so
-    $@
+    echo 
+    sh run.sh ./test5
+    sh run.sh ./test6
+    sh run.sh ./test7
 fi
