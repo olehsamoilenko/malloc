@@ -101,6 +101,7 @@ void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool 
 					tmp->next = cur_zone->next;
 					break ;
 				}
+                tmp = tmp->next;
 			}
 		}
 
