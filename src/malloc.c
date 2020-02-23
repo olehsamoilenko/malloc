@@ -157,19 +157,6 @@ void EXPORT *malloc(size_t size)
     return (ret);
 }
 
-// BONUSES:
-// 2. DONE  Manage the malloc debug environment variables. You can imitate those from malloc
-//          system or invent your own.
-//          - Malloc has debug environment variables
-
-// 3. DONE  • Create a show_alloc_mem_ex() function that displays more details, for example,
-//          a history of allocations, or an hexa dump of the allocated zones.
-//          - A function allows to dump hexa allocated zones
-
-// 1. DONE  • “Defragment” the freed memory.
-//          - During free, the project "defragments" free memory by grouping free blocks
-//          concomitant in one
-
 //          multi thread
 
 //          own signal when metadata corrupted

@@ -20,7 +20,7 @@ HEADER =		./includes/malloc.h \
 				./includes/block.h
 INC =			-I ./includes \
 				-I ./libft/includes
-CC_FLAGS =		# TDCHECK: -Wall -Wextra -Werror
+CC_FLAGS =		-Wall -Wextra -Werror
 SH_LIB_FLAGS =	-fvisibility=hidden -fPIC $(CC_FLAGS)
 
 SRC_LIST =		malloc \

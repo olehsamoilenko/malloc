@@ -19,3 +19,10 @@ Use library
 ===
 ```gcc program.c```<br>
 ```./run.sh ./a.out```
+
+Features
+===
+* memory defragmentation
+* unmap-ing unused pages
+* memory hexdump with show_alloc_mem_ex()
+* debug enviroment variable DEBUG

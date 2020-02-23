@@ -106,12 +106,7 @@ void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool 
 			}
 		}
 
-        int res = munmap(cur_zone, cur_zone->size);
-        #if DEBUG
-            ft_putstr("[UNMAP] munmap result: ");
-            ft_putnbr(res);
-            ft_putchar('\n');
-        #endif
+        munmap(cur_zone, cur_zone->size);
     }
 }
 

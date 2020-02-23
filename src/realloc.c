@@ -20,7 +20,7 @@ void EXPORT *realloc(void *ptr, size_t size)
         ft_putchar('\n');
     #endif
 
-	void *ret;
+	void *ret = NULL;
 
 	struct block_meta *b = DATA_TO_META(ptr);
 	if (block_is_allocated(b))
@@ -28,7 +28,7 @@ void EXPORT *realloc(void *ptr, size_t size)
 		enum zone_type new_type = define_zone_type(size);
 		struct zone_meta *my_zone = get_my_zone_meta(b);
 
-		int old_size = b->size;
+		size_t old_size = b->size;
 		free_allocated_block(b, true, false, false);
 
 		if (size == 0)
@@ -55,11 +55,9 @@ void EXPORT *realloc(void *ptr, size_t size)
 				else if (my_zone->type != new_type)
 					ft_putendl("zone type doesn't match");
 			#endif
-			
-			void *data = ptr;
 
 			ret = malloc(size);
-			int cpy_size = old_size < size ? old_size : size;
+			size_t cpy_size = old_size < size ? old_size : size;
 			#if DEBUG
 				ft_putstr("[REALLOC] Copying ");
 				ft_putnbr(cpy_size);
@@ -72,10 +70,6 @@ void EXPORT *realloc(void *ptr, size_t size)
 	else if (ptr == NULL)
 	{
 		ret = malloc(size);
-	}
-	else
-	{
-		ret = NULL;
 	}
 
 	#if DEBUG
