@@ -77,6 +77,7 @@ struct zone_meta *mmap_zone(unsigned long size)
 	first_block->available = true;
 	first_block->size = bytes_to_request - sizeof(struct zone_meta) - sizeof(struct block_meta);
 	first_block->next = NULL;
+	first_block->prev = NULL;
 
 	#if DEBUG
         ft_putstr("[PAGING] Zone mapped, size = ");

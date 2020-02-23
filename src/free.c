@@ -14,38 +14,36 @@
 
 struct zone_meta *get_my_zone_meta(struct block_meta *block)
 {
-	while (block->prev)
-        block = block->prev;
-
-	struct zone_meta *cur_zone = (struct zone_meta *)((char *)block - sizeof(struct zone_meta));
-
+	struct block_meta *first = block;
+	while (first && first->prev)
+	{
+        first = first->prev;
+	}
+	struct zone_meta *cur_zone = (struct zone_meta *)((char *)first - sizeof(struct zone_meta));
 	return (cur_zone);
 }
 
 void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool try_eat_prev, t_bool try_unmap)
 {
-    block->available = true;
-
 	if (try_eat_next)
 	{
 		struct block_meta *next = block->next;
-		if (next && next->available) {
-
+		if (next && next->available == true) {
 			#if DEBUG
 				ft_putstr("[FREE] Eating next block\n");
 			#endif
-
-			block->size += next->size + sizeof(struct block_meta);
-			block->next = next->next;
-
+			next->available = false;
 			struct block_meta *nextnext = next->next;
 			if (nextnext)
+			{
 				nextnext->prev = block;
-
+			}
+			block->next = nextnext;
+			block->size += next->size + sizeof(struct block_meta);
 		}
 	}
 
-	if (try_eat_prev)
+	if (try_eat_prev == true)
 	{
 		struct block_meta *prev = block->prev;
 		if (prev && prev->available) {
@@ -59,24 +57,26 @@ void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool 
 			struct block_meta *next = block->next;
 			if (next)
 				next->prev = prev;
+			block = prev;
 		}
 	}
 
-    struct zone_meta *cur_zone = get_my_zone_meta(block);
-	block = ZONE_TO_BLOCK(cur_zone);
+	block->available = true;
 
+    struct zone_meta *cur_zone = get_my_zone_meta(block);
+	struct block_meta *tmp = ZONE_TO_BLOCK(cur_zone);
     t_bool all_available = true;
-    while (block)
+    while (tmp)
     {
-        if (!block->available)
+        if (tmp->available == false)
         {
             all_available = false;
             break ;
         }
-        block = block->next;
+        tmp = tmp->next;
     }
 
-    if (try_unmap && all_available) // TD: refactor to zone->av_blocks
+    if (try_unmap == true && all_available == true)
     {
         #if DEBUG
             ft_putstr("[UNMAP] Zone available\n");
@@ -92,6 +92,7 @@ void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool 
         }
 		else
 		{
+			// delete zone from list
 			struct zone_meta *tmp = first_zone;
 
 			while (tmp && tmp->next)
@@ -104,12 +105,6 @@ void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool 
                 tmp = tmp->next;
 			}
 		}
-
-        /*
-            To check page reclaims:
-            Mac:    /usr/bin/time -l ./test
-            Ubuntu: /usr/bin/time --verbose ./test
-        */
 
         int res = munmap(cur_zone, cur_zone->size);
         #if DEBUG
@@ -171,9 +166,5 @@ void EXPORT free(void *p)
 	if (p && block_is_allocated(block))
 	{
 		free_allocated_block(block, true, true, true);
-	}
-	else
-	{
-		// abort
 	}
 }

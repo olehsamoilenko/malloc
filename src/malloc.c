@@ -77,28 +77,42 @@ void *alloc_on_block(struct block_meta *new_block, size_t size) // TD: refactor,
 {
 	// TD: scheme of new and reduced
 
-	struct block_meta *reduced_block = (struct block_meta *)((char *)new_block + sizeof(struct block_meta) + size);
-	reduced_block->available = true;
-	reduced_block->size = new_block->size - sizeof(struct block_meta) - size;
+	if (new_block && new_block->size >= size + sizeof(struct block_meta))
+	{
+		struct block_meta *reduced_block = (struct block_meta *)((char *)new_block + sizeof(struct block_meta) + size);
+		reduced_block->available = true;
+		reduced_block->size = new_block->size - sizeof(struct block_meta) - size;
+		reduced_block->next = new_block->next;
+		reduced_block->prev = new_block;
 
-	reduced_block->next = new_block->next;
-	reduced_block->prev = new_block;
-	new_block->next = reduced_block;
+		struct block_meta *nextnext = reduced_block->next;
+		if (nextnext)
+			nextnext->prev = reduced_block;
 
-	new_block->available = false;
-	new_block->size = size;
+		new_block->available = false;
+		new_block->size = size;
+		new_block->next = reduced_block;
 
-	#if DEBUG
-		ft_putstr("[ALLOC] New: ");
-		ft_print_hex((unsigned long)new_block, true);
-		ft_putstr(" (");
-		ft_putnbr(new_block->size);
-		ft_putstr(" bytes), reduced: ");
-		ft_print_hex((unsigned long)reduced_block, true);
-		ft_putstr(" (");
-		ft_putnbr(reduced_block->size);
-		ft_putendl(" bytes)");
-	#endif
+		#if DEBUG
+			ft_putstr("[ALLOC] New: ");
+			ft_print_hex((unsigned long)new_block, true);
+			ft_putstr(" (");
+			ft_putnbr(new_block->size);
+			ft_putstr(" bytes), reduced: ");
+			ft_print_hex((unsigned long)reduced_block, true);
+			ft_putstr(" (");
+			ft_putnbr(reduced_block->size);
+			ft_putendl(" bytes)");
+		#endif
+
+	}
+	else if (new_block && new_block->size >= size)
+	{
+		#if DEBUG
+			ft_putstr("[ALLOC] Take last block in zone\n");
+		#endif
+		new_block->available = false; /* not filled fully, but doesn't matter */
+	}
 
 	return (new_block);
 }
@@ -107,6 +121,12 @@ void *alloc_on_block(struct block_meta *new_block, size_t size) // TD: refactor,
 // TODO tests: https://github.com/mtupikov42/malloc/tree/master/test
 void EXPORT *malloc(size_t size)
 {
+	#if DEBUG
+		ft_putstr("[CALL] malloc: ");
+		ft_putnbr(size);
+		ft_putchar('\n');
+	#endif
+
     void *ret;
 
     struct block_meta *new_block = get_suitable_block(size);
@@ -116,23 +136,14 @@ void EXPORT *malloc(size_t size)
 		new_block = get_suitable_block(size);
 	}
 
-    if (new_block && new_block->size >= size + sizeof(struct block_meta))
+    if (new_block && new_block->size >= size)
     {
         ret = (char *)alloc_on_block(new_block, size) + sizeof(struct block_meta);
-    }
-    else if (new_block && new_block->size >= size)
-    {
-		#if DEBUG
-        	ft_putstr("[ALLOC] Take last block in zone\n");
-		#endif
-        new_block->available = false; /* not filled fully, but doesn't matter */
-
-        ret = (char *)new_block + sizeof(struct block_meta);
     }
     else
     {
         #if DEBUG
-        	ft_putstr("[ALLOC] No suitable block\n");
+        	ft_putstr("[FAIL] No suitable block\n");
 		#endif
         ret = NULL;
     }
