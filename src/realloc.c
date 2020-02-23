@@ -14,6 +14,8 @@
 
 void EXPORT *realloc(void *ptr, size_t size)
 {
+	pthread_mutex_lock(&g_mutex);
+
 	#if DEBUG
         ft_putstr("[CALL] realloc: ");
         ft_print_hex((unsigned long)ptr, true);
@@ -77,6 +79,8 @@ void EXPORT *realloc(void *ptr, size_t size)
         ft_print_hex((unsigned long)ret, true);
         ft_putchar('\n');
     #endif
+
+	pthread_mutex_unlock(&g_mutex);
 
 	return (ret);
 }

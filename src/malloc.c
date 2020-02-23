@@ -13,6 +13,7 @@
 #include "zone.h"
 
 struct zone_meta *first_zone = NULL;
+pthread_mutex_t	g_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
 
 enum zone_type define_zone_type(size_t size)
 {
@@ -121,6 +122,7 @@ void *alloc_on_block(struct block_meta *new_block, size_t size) // TD: refactor,
 // TODO tests: https://github.com/mtupikov42/malloc/tree/master/test
 void EXPORT *malloc(size_t size)
 {
+	pthread_mutex_lock(&g_mutex);
 	#if DEBUG
 		ft_putstr("[CALL] malloc: ");
 		ft_putnbr(size);
@@ -153,6 +155,8 @@ void EXPORT *malloc(size_t size)
         ft_print_hex((unsigned long)ret, true);
         ft_putchar('\n');
     #endif
+
+	pthread_mutex_unlock(&g_mutex);
 
     return (ret);
 }

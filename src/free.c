@@ -150,6 +150,7 @@ t_bool block_is_allocated(struct block_meta *block)
 
 void EXPORT free(void *p)
 {
+	pthread_mutex_lock(&g_mutex);
 	#if DEBUG
         ft_putstr("[CALL] free: ");
         ft_print_hex((unsigned long)p, true);
@@ -162,4 +163,5 @@ void EXPORT free(void *p)
 	{
 		free_allocated_block(block, true, true, true);
 	}
+	pthread_mutex_unlock(&g_mutex);
 }

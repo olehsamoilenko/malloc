@@ -23,6 +23,8 @@ const char *labels[] = {"TINY", "SMALL", "LARGE"}; // TD: to macro
 
 void EXPORT show_alloc_mem()
 {
+	pthread_mutex_lock(&g_mutex);
+
 	#if DEBUG
 		ft_putchar('\n');
 	#endif
@@ -76,6 +78,8 @@ void EXPORT show_alloc_mem()
 	#if DEBUG
 		ft_putchar('\n');
 	#endif
+
+	pthread_mutex_unlock(&g_mutex);
 }
 
 t_bool print_symbol(unsigned char sym, t_bool in_hex, char *color)

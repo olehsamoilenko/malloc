@@ -36,7 +36,8 @@ TESTS =			test0 \
 				test4 \
 				test5 \
 				test6 \
-				test7
+				test7 \
+				test_thread
 				# TODO: bonuses test
 
 OFF=\033[0m
@@ -94,4 +95,4 @@ re: fclean all
 
 debug: CC_FLAGS += -D DEBUG
 debug: re
-# debug: tests
+debug: tests

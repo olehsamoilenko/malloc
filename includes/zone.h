@@ -35,6 +35,9 @@ struct zone_meta
 
 extern struct zone_meta *first_zone;
 
+# include <pthread.h>
+extern pthread_mutex_t g_mutex;
+
 // TDCHECK: need it ?
 struct zone_meta *mmap_zone(unsigned long size);
 void insert_zone_to_list(struct zone_meta *zone);
