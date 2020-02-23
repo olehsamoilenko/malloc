@@ -17,83 +17,73 @@
 #define BGGREEN		"\e[30;42m"
 #define BGYELLOW	"\e[30;43m"
 #define BGCYAN		"\e[97;44m"
-// TD: check vmmap
 
-const char *labels[] = {"TINY", "SMALL", "LARGE"}; // TD: to macro
-
-void EXPORT show_alloc_mem()
+static size_t	print_block_info(struct s_block_meta *block)
 {
+	size_t res;
+
+	res = 0;
+	if (block->available == false)
+	{
+		ft_print_hex((size_t)(char *)block
+							+ sizeof(struct s_block_meta), true);
+		ft_putstr(" - ");
+		ft_print_hex((size_t)(char *)block
+							+ sizeof(struct s_block_meta) + block->size, true);
+		ft_putstr(" : ");
+		ft_putnbr(block->size);
+		ft_putstr(" bytes\n");
+		res = block->size;
+	}
+	return (res);
+}
+
+static void		print_zone_info(struct s_zone_meta *zone)
+{
+	char *label;
+
+	if (zone->type == TINY)
+		label = "TINY";
+	else if (zone->type == SMALL)
+		label = "SMALL";
+	else
+		label = "LARGE";
+	ft_putstr(label);
+	ft_putstr(" : ");
+	ft_print_hex((unsigned long)zone, true);
+	ft_putchar('\n');
+}
+
+EXPORT_VOID		show_alloc_mem(void)
+{
+	struct s_zone_meta	*zone;
+	unsigned long		sum;
+	struct s_block_meta	*block;
+
 	pthread_mutex_lock(&g_mutex);
-
-	#if DEBUG
+	zone = first_zone;
+	sum = 0;
+	while (zone)
+	{
+		print_zone_info(zone);
+		block = ZONE_TO_BLOCK(zone);
+		while (block)
+		{
+			sum += print_block_info(block);
+			block = block->next;
+		}
+		zone = zone->next;
+	}
+	ft_putstr("Total : ");
+	ft_putnbr(sum);
+	ft_putchar('\n');
+	if (DEBUG)
 		ft_putchar('\n');
-	#endif
-
-    struct zone_meta *zone = first_zone;
-
-	unsigned long sum = 0;
-    while (zone)
-    {
-        ft_putstr(labels[zone->type]);
-        ft_putstr(" : ");
-        ft_print_hex((unsigned long)zone, true);
-        ft_putchar('\n');
-
-        struct block_meta *block = ZONE_TO_BLOCK(zone);
-
-        while (block)
-        {
-            #if DEBUG // TD: refactor
-                if (block->available)
-                    ft_putstr("[AVAILABLE] ");
-            #endif
-
-            #if !DEBUG
-                if (!block->available)
-                {
-            #endif
-                ft_print_hex((unsigned long)(char *)block + sizeof(struct block_meta), true);
-                ft_putstr(" - ");
-                ft_print_hex((unsigned long)(char *)block + sizeof(struct block_meta) + block->size, true);
-                ft_putstr(" : ");
-                ft_putnbr(block->size);
-                ft_putstr(" bytes\n");
-            #if !DEBUG
-                }
-            #endif
-
-            if (!block->available)
-                sum += block->size;
-
-            block = block->next;
-        }
-
-        zone = zone->next;
-    }
-
-    ft_putstr("Total : ");
-    ft_putnbr(sum);
-    ft_putchar('\n');
-
-	#if DEBUG
-		ft_putchar('\n');
-	#endif
-
 	pthread_mutex_unlock(&g_mutex);
 }
 
-t_bool print_symbol(unsigned char sym, t_bool in_hex, char *color)
+static void		print_symbol_impl(unsigned char sym, t_bool in_hex)
 {
-    static int counter = 0;
-    static char *g_color = BGDEFAULT;
-	t_bool line_completed = true;
-
-    if (!ft_strequ(color, g_color))
-    {
-        g_color = color;
-        ft_putstr(color);
-    }
-
 	if (in_hex)
 	{
 		if (sym <= 0x0f)
@@ -110,61 +100,81 @@ t_bool print_symbol(unsigned char sym, t_bool in_hex, char *color)
 		else
 			ft_putchar('?');
 	}
-	ft_putchar(' ');
-    counter += 3;
+}
 
+static t_bool	print_symbol(unsigned char sym, t_bool in_hex, char *color)
+{
+	static int	counter = 0;
+	static char	*g_color = BGDEFAULT;
+	t_bool		line_completed;
+
+	line_completed = true;
+	if (!ft_strequ(color, g_color))
+	{
+		g_color = color;
+		ft_putstr(color);
+	}
+	print_symbol_impl(sym, in_hex);
+	ft_putchar(' ');
+	counter += 3;
 	line_completed = false;
-    if (counter % 99 == 0)
-    {
-        ft_putstr(BGDEFAULT);
-        ft_putchar('\n');
-        ft_putstr(g_color);
+	if (counter % 99 == 0)
+	{
+		ft_putstr(BGDEFAULT);
+		ft_putchar('\n');
+		ft_putstr(g_color);
 		line_completed = true;
 		counter = 0;
-    }
-
+	}
 	return (line_completed);
 }
 
-void EXPORT show_alloc_mem_ex(void)
+static t_bool	print_block(struct s_block_meta *block)
 {
-	struct zone_meta *zone = first_zone;
-	unsigned int i;
-	t_bool line_completed = true;
-	unsigned char *data;
+	unsigned char		*data;
+	unsigned int		i;
+	t_bool				line_completed;
 
-    while (zone)
-    {
-        i = -1;
+	data = (unsigned char *)block;
+	i = -1;
+	while (++i < sizeof(struct s_block_meta))
+		line_completed = print_symbol(data[i], true, BGCYAN);
+	i = -1;
+	data = (unsigned char *)META_TO_DATA(block);
+	while (++i < block->size)
+	{
+		if (block->available)
+			line_completed = print_symbol(data[i], false, BGGREEN);
+		else
+			line_completed = print_symbol(data[i], false, BGRED);
+	}
+	return (line_completed);
+}
+
+EXPORT_VOID		show_alloc_mem_ex(void)
+{
+	struct s_zone_meta	*zone;
+	unsigned int		i;
+	t_bool				line_completed;
+	unsigned char		*data;
+	struct s_block_meta *block;
+
+	line_completed = true;
+	zone = first_zone;
+	while (zone)
+	{
+		i = -1;
 		data = (unsigned char *)zone;
-        while (++i < sizeof(struct zone_meta))
-            line_completed = print_symbol(data[i], true, BGYELLOW);
-
-        struct block_meta *block = ZONE_TO_BLOCK(zone);
-        while (block)
-        {
-			data = (unsigned char *)block;
-
-            i = -1;
-            while (++i < sizeof(struct block_meta))
-                line_completed = print_symbol(data[i], true, BGCYAN);
-
-            i = -1;
-			data = (unsigned char *)META_TO_DATA(block);
-            while (++i < block->size)
-            {
-                if (block->available)
-                    line_completed = print_symbol(data[i], false, BGGREEN);
-                else
-                    line_completed = print_symbol(data[i], false, BGRED);
-            }
-
-            block = block->next;
-        }
-
-        zone = zone->next;
-    }
-
-	while (!line_completed)
+		while (++i < sizeof(struct s_zone_meta))
+			line_completed = print_symbol(data[i], true, BGYELLOW);
+		block = ZONE_TO_BLOCK(zone);
+		while (block)
+		{
+			line_completed = print_block(block);
+			block = block->next;
+		}
+		zone = zone->next;
+	}
+	while (line_completed == false)
 		line_completed = print_symbol(' ', false, BGDEFAULT);
 }

@@ -42,10 +42,10 @@
 
 # define TEAR_DOWN() ({\
 	CHECK(get_first_zone() == NULL); \
-	struct zone_meta *zone;\
+	struct s_zone_meta *zone;\
 	while ((zone = get_first_zone()))\
 	{\
-		struct block_meta *block = ZONE_TO_BLOCK(zone);\
+		struct s_block_meta *block = ZONE_TO_BLOCK(zone);\
 		while (block)\
 		{\
 			if (!block->available)\
@@ -62,7 +62,7 @@ int getZonesNumber(void)
 {
 	int cnt = 0;
 
-	struct zone_meta *zone = get_first_zone();
+	struct s_zone_meta *zone = get_first_zone();
 	
 	while (zone)
 	{
@@ -73,10 +73,10 @@ int getZonesNumber(void)
 	return cnt;
 }
 
-struct zone_meta *getZoneTh(int th)
+struct s_zone_meta *getZoneTh(int th)
 {
-	struct zone_meta *tmp = get_first_zone();
-	struct zone_meta *res = NULL;
+	struct s_zone_meta *tmp = get_first_zone();
+	struct s_zone_meta *res = NULL;
 
 	if (getZonesNumber() >= th)
 	{
@@ -91,9 +91,9 @@ struct zone_meta *getZoneTh(int th)
 	return res;
 }
 
-int getBlocksNumber(struct zone_meta *zone)
+int getBlocksNumber(struct s_zone_meta *zone)
 {
-	struct block_meta *block = ZONE_TO_BLOCK(zone);
+	struct s_block_meta *block = ZONE_TO_BLOCK(zone);
 	int cnt = 0;
 
 	while (block)
@@ -113,7 +113,7 @@ int getBlocksNumber(struct zone_meta *zone)
 
 t_bool cmpContent(void *content, const char *data)
 {
-	struct block_meta *block = DATA_TO_META(content);
+	struct s_block_meta *block = DATA_TO_META(content);
 	int len = block->size < ft_strlen(data) ? block->size : ft_strlen(data);
 	if (ft_strnequ(content, data, len))
 		return true;

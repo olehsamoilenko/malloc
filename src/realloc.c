@@ -12,23 +12,23 @@
 
 #include "zone.h"
 
-void EXPORT *realloc(void *ptr, size_t size)
+EXPORT_VOID *realloc(void *ptr, size_t size)
 {
 	pthread_mutex_lock(&g_mutex);
 
 	#if DEBUG
-        ft_putstr("[CALL] realloc: ");
-        ft_print_hex((unsigned long)ptr, true);
-        ft_putchar('\n');
-    #endif
+		ft_putstr("[CALL] realloc: ");
+		ft_print_hex((unsigned long)ptr, true);
+		ft_putchar('\n');
+	#endif
 
 	void *ret = NULL;
 
-	struct block_meta *b = DATA_TO_META(ptr);
+	struct s_block_meta *b = DATA_TO_META(ptr);
 	if (block_is_allocated(b))
 	{
-		enum zone_type new_type = define_zone_type(size);
-		struct zone_meta *my_zone = get_my_zone_meta(b);
+		enum e_zone_type new_type = define_zone_type(size);
+		struct s_zone_meta *my_zone = get_my_zone_meta(b);
 
 		size_t old_size = b->size;
 		free_allocated_block(b, true, false, false);
@@ -75,12 +75,11 @@ void EXPORT *realloc(void *ptr, size_t size)
 	}
 
 	#if DEBUG
-        ft_putstr("[RETURN] realloc: ");
-        ft_print_hex((unsigned long)ret, true);
-        ft_putchar('\n');
-    #endif
+		ft_putstr("[RETURN] realloc: ");
+		ft_print_hex((unsigned long)ret, true);
+		ft_putchar('\n');
+	#endif
 
 	pthread_mutex_unlock(&g_mutex);
-
 	return (ret);
 }

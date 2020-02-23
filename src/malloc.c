@@ -12,12 +12,12 @@
 
 #include "zone.h"
 
-struct zone_meta *first_zone = NULL;
+struct s_zone_meta *first_zone = NULL;
 pthread_mutex_t	g_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
 
-enum zone_type define_zone_type(size_t size)
+enum e_zone_type define_zone_type(size_t size)
 {
-	enum zone_type type;
+	enum e_zone_type type;
 
 	if (size <= MAX_TINY_BLOCK_SIZE) {
 		type = TINY;
@@ -41,16 +41,16 @@ enum zone_type define_zone_type(size_t size)
 	return (type);
 }
 
-struct block_meta *get_suitable_block(size_t size)
+struct s_block_meta *get_suitable_block(size_t size)
 {
-	enum zone_type type = define_zone_type(size);
+	enum e_zone_type type = define_zone_type(size);
 
-    struct zone_meta *zone = first_zone;
+    struct s_zone_meta *zone = first_zone;
     while (zone)
     {
         if (zone->type == type)
         {
-            struct block_meta *block = ZONE_TO_BLOCK(zone);
+            struct s_block_meta *block = ZONE_TO_BLOCK(zone);
 
             while (block)
             {
@@ -64,29 +64,30 @@ struct block_meta *get_suitable_block(size_t size)
         zone = zone->next;
     }
 
-	#if DEBUG
+	if (DEBUG)
+	{
         ft_putstr("[BLOCK] No suitable space: size = ");
         ft_putnbr(size);
         ft_putchar('\n');
         // TD: type
-	#endif
+	}
 
     return (NULL);
 }
 
-void *alloc_on_block(struct block_meta *new_block, size_t size) // TD: refactor, no return
+void *alloc_on_block(struct s_block_meta *new_block, size_t size) // TD: refactor, no return
 {
 	// TD: scheme of new and reduced
 
-	if (new_block && new_block->size >= size + sizeof(struct block_meta))
+	if (new_block && new_block->size >= size + sizeof(struct s_block_meta))
 	{
-		struct block_meta *reduced_block = (struct block_meta *)((char *)new_block + sizeof(struct block_meta) + size);
+		struct s_block_meta *reduced_block = (struct s_block_meta *)((char *)new_block + sizeof(struct s_block_meta) + size);
 		reduced_block->available = true;
-		reduced_block->size = new_block->size - sizeof(struct block_meta) - size;
+		reduced_block->size = new_block->size - sizeof(struct s_block_meta) - size;
 		reduced_block->next = new_block->next;
 		reduced_block->prev = new_block;
 
-		struct block_meta *nextnext = reduced_block->next;
+		struct s_block_meta *nextnext = reduced_block->next;
 		if (nextnext)
 			nextnext->prev = reduced_block;
 
@@ -118,9 +119,11 @@ void *alloc_on_block(struct block_meta *new_block, size_t size) // TD: refactor,
 	return (new_block);
 }
 
+
+
 // TODO tests: https://github.com/Haradric/ft_malloc/tree/master/tests
 // TODO tests: https://github.com/mtupikov42/malloc/tree/master/test
-void EXPORT *malloc(size_t size)
+EXPORT_VOID *malloc(size_t size)
 {
 	pthread_mutex_lock(&g_mutex);
 	#if DEBUG
@@ -131,7 +134,7 @@ void EXPORT *malloc(size_t size)
 
     void *ret;
 
-    struct block_meta *new_block = get_suitable_block(size);
+    struct s_block_meta *new_block = get_suitable_block(size);
 	if (!new_block)
 	{
 		insert_zone_to_list(mmap_zone(size));
@@ -140,7 +143,7 @@ void EXPORT *malloc(size_t size)
 
     if (new_block && new_block->size >= size)
     {
-        ret = (char *)alloc_on_block(new_block, size) + sizeof(struct block_meta);
+        ret = (char *)alloc_on_block(new_block, size) + sizeof(struct s_block_meta);
     }
     else
     {

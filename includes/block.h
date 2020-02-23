@@ -14,31 +14,30 @@
 # define BLOCK_H
 
 # include <sys/mman.h>
+# include "utils.h"
 # include "libft.h"
-
-// TDCHECK: $> nm libft_malloc.so
 
 # define MAX_TINY_BLOCK_SIZE 128
 # define MAX_SMALL_BLOCK_SIZE 1024
+# define EXPORT_VOID void __attribute__((visibility("default")))
 
-// TD: need it?
-# define DATA_TO_META(block) ((struct block_meta *)((char *)block - sizeof(struct block_meta)))
-# define META_TO_DATA(block) ((struct block_meta *)((char *)block + sizeof(struct block_meta)))
+// TDCHECK: static functions
 
-# define EXPORT __attribute__((visibility("default")))
-
-struct block_meta
+struct	s_block_meta
 {
-	unsigned int available;
-	unsigned int size;
-	struct block_meta *prev;
-	struct block_meta *next;
+	unsigned int		available;
+	unsigned int		size;
+	struct s_block_meta	*prev;
+	struct s_block_meta	*next;
 };
 
-// TD: need it ?
-void *alloc_on_block(struct block_meta *new_block, size_t size);
-t_bool block_is_allocated(struct block_meta *block);
+typedef struct s_block_meta	t_block;
+# define DATA_TO_META(block) ((t_block *)((void *)block - sizeof(t_block)))
+# define META_TO_DATA(block) ((t_block *)((void *)block + sizeof(t_block)))
 
-void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool try_eat_prev, t_bool try_unmap);
+void	*alloc_on_block(struct s_block_meta *new_block, size_t size);
+t_bool	block_is_allocated(struct s_block_meta *block);
+void	free_allocated_block(struct s_block_meta *block, t_bool try_eat_next,
+		t_bool try_eat_prev, t_bool try_unmap);
 
 #endif

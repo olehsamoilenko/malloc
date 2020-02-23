@@ -12,49 +12,53 @@
 
 #include "zone.h"
 
-struct zone_meta *get_my_zone_meta(struct block_meta *block)
+struct s_zone_meta *get_my_zone_meta(struct s_block_meta *block)
 {
-	struct block_meta *first = block;
+	struct s_block_meta *first;
+
+	first = block;
 	while (first && first->prev)
 	{
-        first = first->prev;
+		first = first->prev;
 	}
-	struct zone_meta *cur_zone = (struct zone_meta *)((char *)first - sizeof(struct zone_meta));
-	return (cur_zone);
+	return (BLOCK_TO_ZONE(first));
 }
 
-void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool try_eat_prev, t_bool try_unmap)
+void free_allocated_block(struct s_block_meta *block,
+						  t_bool try_eat_next,
+						  t_bool try_eat_prev,
+						  t_bool try_unmap)
 {
 	if (try_eat_next)
 	{
-		struct block_meta *next = block->next;
+		struct s_block_meta *next = block->next;
 		if (next && next->available == true) {
 			#if DEBUG
 				ft_putstr("[FREE] Eating next block\n");
 			#endif
 			next->available = false;
-			struct block_meta *nextnext = next->next;
+			struct s_block_meta *nextnext = next->next;
 			if (nextnext)
 			{
 				nextnext->prev = block;
 			}
 			block->next = nextnext;
-			block->size += next->size + sizeof(struct block_meta);
+			block->size += next->size + sizeof(struct s_block_meta);
 		}
 	}
 
 	if (try_eat_prev == true)
 	{
-		struct block_meta *prev = block->prev;
+		struct s_block_meta *prev = block->prev;
 		if (prev && prev->available) {
 
 			#if DEBUG
 				ft_putstr("[FREE] Eating previous block\n");
 			#endif
 
-			prev->size += block->size + sizeof(struct block_meta);
+			prev->size += block->size + sizeof(struct s_block_meta);
 			prev->next = block->next;
-			struct block_meta *next = block->next;
+			struct s_block_meta *next = block->next;
 			if (next)
 				next->prev = prev;
 			block = prev;
@@ -63,37 +67,37 @@ void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool 
 
 	block->available = true;
 
-    struct zone_meta *cur_zone = get_my_zone_meta(block);
-	struct block_meta *tmp = ZONE_TO_BLOCK(cur_zone);
-    t_bool all_available = true;
-    while (tmp)
-    {
-        if (tmp->available == false)
-        {
-            all_available = false;
-            break ;
-        }
-        tmp = tmp->next;
-    }
+	struct s_zone_meta *cur_zone = get_my_zone_meta(block);
+	struct s_block_meta *tmp = ZONE_TO_BLOCK(cur_zone);
+	t_bool all_available = true;
+	while (tmp)
+	{
+		if (tmp->available == false)
+		{
+			all_available = false;
+			break ;
+		}
+		tmp = tmp->next;
+	}
 
-    if (try_unmap == true && all_available == true)
-    {
-        #if DEBUG
-            ft_putstr("[UNMAP] Zone available\n");
-        #endif
+	if (try_unmap == true && all_available == true)
+	{
+		#if DEBUG
+			ft_putstr("[UNMAP] Zone available\n");
+		#endif
 
-        if (cur_zone == first_zone)
-        {
-            #if DEBUG
-                ft_putstr("[UNMAP] First zone changed\n");
-            #endif
+		if (cur_zone == first_zone)
+		{
+			#if DEBUG
+				ft_putstr("[UNMAP] First zone changed\n");
+			#endif
 
-            first_zone = cur_zone->next;
-        }
+			first_zone = cur_zone->next;
+		}
 		else
 		{
 			// delete zone from list
-			struct zone_meta *tmp = first_zone;
+			struct s_zone_meta *tmp = first_zone;
 
 			while (tmp && tmp->next)
 			{
@@ -102,24 +106,24 @@ void free_allocated_block(struct block_meta *block, t_bool try_eat_next, t_bool 
 					tmp->next = cur_zone->next;
 					break ;
 				}
-                tmp = tmp->next;
+				tmp = tmp->next;
 			}
 		}
 
-        munmap(cur_zone, cur_zone->size);
-    }
+		munmap(cur_zone, cur_zone->size);
+	}
 }
 
-t_bool block_is_allocated(struct block_meta *block)
+t_bool block_is_allocated(struct s_block_meta *block)
 {
-	struct zone_meta *zone = first_zone;
+	struct s_zone_meta *zone = first_zone;
 
 	while (zone)
-    {
-        struct block_meta *tmp = ZONE_TO_BLOCK(zone);
+	{
+		struct s_block_meta *tmp = ZONE_TO_BLOCK(zone);
 
-        while (tmp)
-        {
+		while (tmp)
+		{
 			if (tmp == block)
 			{
 				#if DEBUG
@@ -132,12 +136,12 @@ t_bool block_is_allocated(struct block_meta *block)
 				return (true);
 			}
 
-            tmp = tmp->next;
-        }
+			tmp = tmp->next;
+		}
 
-        zone = zone->next;
-    }
-	
+		zone = zone->next;
+	}
+
 	#if DEBUG
 		ft_putstr("[BLOCK] Block was NOT allocated [Meta: ");
 		ft_print_hex((unsigned long)block, true);
@@ -148,17 +152,16 @@ t_bool block_is_allocated(struct block_meta *block)
 	return (false);
 }
 
-void EXPORT free(void *p)
+EXPORT_VOID free(void *p)
 {
 	pthread_mutex_lock(&g_mutex);
 	#if DEBUG
-        ft_putstr("[CALL] free: ");
-        ft_print_hex((unsigned long)p, true);
-        ft_putchar('\n');
-    #endif
+		ft_putstr("[CALL] free: ");
+		ft_print_hex((unsigned long)p, true);
+		ft_putchar('\n');
+	#endif
 
-	struct block_meta *block = DATA_TO_META(p);
-    
+	struct s_block_meta *block = DATA_TO_META(p);
 	if (p && block_is_allocated(block))
 	{
 		free_allocated_block(block, true, true, true);
