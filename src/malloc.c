@@ -12,164 +12,100 @@
 
 #include "zone.h"
 
-struct s_zone_meta *first_zone = NULL;
-pthread_mutex_t	g_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
+struct s_zone_meta	*g_first_zone = NULL;
+pthread_mutex_t		g_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
 
-enum e_zone_type define_zone_type(size_t size)
+struct s_block_meta		*get_suitable_block(size_t size);
+
+enum e_zone_type		define_zone_type(size_t size)
 {
 	enum e_zone_type type;
 
-	if (size <= MAX_TINY_BLOCK_SIZE) {
+	if (size <= MAX_TINY_BLOCK_SIZE)
+	{
 		type = TINY;
-		#if DEBUG // TD: refactor
+		if (DEBUG)
 			ft_putstr("[BLOCK] Block type: TINY\n");
-		#endif
 	}
-	else if (size <= MAX_SMALL_BLOCK_SIZE) {
+	else if (size <= MAX_SMALL_BLOCK_SIZE)
+	{
 		type = SMALL;
-		#if DEBUG
+		if (DEBUG)
 			ft_putstr("[BLOCK] Block type: SMALL\n");
-		#endif
 	}
-	else {
+	else
+	{
 		type = LARGE;
-		#if DEBUG
+		if (DEBUG)
 			ft_putstr("[BLOCK] Block type: LARGE\n");
-		#endif
 	}
-
 	return (type);
 }
 
-struct s_block_meta *get_suitable_block(size_t size)
+static void				drop_info(struct s_block_meta *nb, struct s_block_meta *rb)
 {
-	enum e_zone_type type = define_zone_type(size);
-
-    struct s_zone_meta *zone = first_zone;
-    while (zone)
-    {
-        if (zone->type == type)
-        {
-            struct s_block_meta *block = ZONE_TO_BLOCK(zone);
-
-            while (block)
-            {
-                if (block->available && block->size >= size)
-                    return (block);
-
-                block = block->next;
-            }
-        }
-        
-        zone = zone->next;
-    }
-
 	if (DEBUG)
 	{
-        ft_putstr("[BLOCK] No suitable space: size = ");
-        ft_putnbr(size);
-        ft_putchar('\n');
-        // TD: type
+		ft_putstr("[ALLOC] New: ");
+		ft_print_hex((unsigned long)nb, true);
+		ft_putstr(" (");
+		ft_putnbr(nb->size);
+		ft_putstr(" bytes), reduced: ");
+		ft_print_hex((unsigned long)rb, true);
+		ft_putstr(" (");
+		ft_putnbr(rb->size);
+		ft_putendl(" bytes)");
 	}
-
-    return (NULL);
 }
 
-void *alloc_on_block(struct s_block_meta *new_block, size_t size) // TD: refactor, no return
+void alloc_on_block(struct s_block_meta *new_blk, size_t size)
 {
-	// TD: scheme of new and reduced
+	struct s_block_meta *reduced_blk;
+	struct s_block_meta *nextnext;
 
-	if (new_block && new_block->size >= size + sizeof(struct s_block_meta))
+	if (new_blk && new_blk->size >= size + sizeof(struct s_block_meta))
 	{
-		struct s_block_meta *reduced_block = (struct s_block_meta *)((char *)new_block + sizeof(struct s_block_meta) + size);
-		reduced_block->available = true;
-		reduced_block->size = new_block->size - sizeof(struct s_block_meta) - size;
-		reduced_block->next = new_block->next;
-		reduced_block->prev = new_block;
-
-		struct s_block_meta *nextnext = reduced_block->next;
+		reduced_blk = (void *)new_blk + sizeof(struct s_block_meta) + size;
+		reduced_blk->available = true;
+		reduced_blk->size = new_blk->size - sizeof(struct s_block_meta) - size;
+		reduced_blk->next = new_blk->next;
+		reduced_blk->prev = new_blk;
+		nextnext = reduced_blk->next;
 		if (nextnext)
-			nextnext->prev = reduced_block;
-
-		new_block->available = false;
-		new_block->size = size;
-		new_block->next = reduced_block;
-
-		#if DEBUG
-			ft_putstr("[ALLOC] New: ");
-			ft_print_hex((unsigned long)new_block, true);
-			ft_putstr(" (");
-			ft_putnbr(new_block->size);
-			ft_putstr(" bytes), reduced: ");
-			ft_print_hex((unsigned long)reduced_block, true);
-			ft_putstr(" (");
-			ft_putnbr(reduced_block->size);
-			ft_putendl(" bytes)");
-		#endif
-
+			nextnext->prev = reduced_blk;
+		new_blk->available = false;
+		new_blk->size = size;
+		new_blk->next = reduced_blk;
+		drop_info(new_blk, reduced_blk);
 	}
-	else if (new_block && new_block->size >= size)
+	else if (new_blk && new_blk->size >= size)
 	{
-		#if DEBUG
+		if (DEBUG)
 			ft_putstr("[ALLOC] Take last block in zone\n");
-		#endif
-		new_block->available = false; /* not filled fully, but doesn't matter */
+		new_blk->available = false;
 	}
-
-	return (new_block);
 }
 
-
-
-// TODO tests: https://github.com/Haradric/ft_malloc/tree/master/tests
-// TODO tests: https://github.com/mtupikov42/malloc/tree/master/test
-EXPORT_VOID *malloc(size_t size)
+EXPORT_VOID	*malloc(size_t size)
 {
+	void				*ret;
+	struct s_block_meta	*new_block;
+
 	pthread_mutex_lock(&g_mutex);
-	#if DEBUG
-		ft_putstr("[CALL] malloc: ");
-		ft_putnbr(size);
-		ft_putchar('\n');
-	#endif
-
-    void *ret;
-
-    struct s_block_meta *new_block = get_suitable_block(size);
-	if (!new_block)
+	print_decimal_value("[CALL] malloc: ", size);
+	new_block = get_suitable_block(size);
+	if (new_block && new_block->size >= size)
 	{
-		void *new_zone = mmap_zone(size);
-		if (new_zone)
-			insert_zone_to_list(new_zone);
-		new_block = get_suitable_block(size);
+		alloc_on_block(new_block, size);
+		ret = META_TO_DATA(new_block);
 	}
-
-    if (new_block && new_block->size >= size)
-    {
-        ret = (char *)alloc_on_block(new_block, size) + sizeof(struct s_block_meta);
-    }
-    else
-    {
-        #if DEBUG
-        	ft_putstr("[FAIL] No suitable block\n");
-		#endif
-        ret = NULL;
-    }
-
-    #if DEBUG
-        ft_putstr("[RETURN] malloc: ");
-        ft_print_hex((unsigned long)ret, true);
-        ft_putchar('\n');
-    #endif
-
+	else
+	{
+		if (DEBUG)
+			ft_putstr("[FAIL] No suitable block\n");
+		ret = NULL;
+	}
+	print_hex_value("[RETURN] malloc: ", (unsigned long)ret);
 	pthread_mutex_unlock(&g_mutex);
-
-    return (ret);
+	return (ret);
 }
-
-//          multi thread
-
-//          own signal when metadata corrupted
-
-//          calloc
-
-//          The UNIX 98 standard requires malloc(), calloc(), and realloc() to set errno to ENOMEM upon failure

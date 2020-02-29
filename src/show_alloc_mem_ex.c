@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   dump.c                                             :+:      :+:    :+:   */
+/*   show_alloc_mem_ex.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: osamoile <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -17,70 +17,6 @@
 #define BGGREEN		"\e[30;42m"
 #define BGYELLOW	"\e[30;43m"
 #define BGCYAN		"\e[97;44m"
-
-static size_t	print_block_info(struct s_block_meta *block)
-{
-	size_t res;
-
-	res = 0;
-	if (block->available == false)
-	{
-		ft_print_hex((size_t)(char *)block
-							+ sizeof(struct s_block_meta), true);
-		ft_putstr(" - ");
-		ft_print_hex((size_t)(char *)block
-							+ sizeof(struct s_block_meta) + block->size, true);
-		ft_putstr(" : ");
-		ft_putnbr(block->size);
-		ft_putstr(" bytes\n");
-		res = block->size;
-	}
-	return (res);
-}
-
-static void		print_zone_info(struct s_zone_meta *zone)
-{
-	char *label;
-
-	if (zone->type == TINY)
-		label = "TINY";
-	else if (zone->type == SMALL)
-		label = "SMALL";
-	else
-		label = "LARGE";
-	ft_putstr(label);
-	ft_putstr(" : ");
-	ft_print_hex((unsigned long)zone, true);
-	ft_putchar('\n');
-}
-
-EXPORT_VOID		show_alloc_mem(void)
-{
-	struct s_zone_meta	*zone;
-	size_t				sum;
-	struct s_block_meta	*block;
-
-	pthread_mutex_lock(&g_mutex);
-	zone = first_zone;
-	sum = 0;
-	while (zone)
-	{
-		print_zone_info(zone);
-		block = ZONE_TO_BLOCK(zone);
-		while (block)
-		{
-			sum += print_block_info(block);
-			block = block->next;
-		}
-		zone = zone->next;
-	}
-	ft_putstr("Total : ");
-	ft_putnbr(sum);
-	ft_putchar('\n');
-	if (DEBUG)
-		ft_putchar('\n');
-	pthread_mutex_unlock(&g_mutex);
-}
 
 static void		print_symbol_impl(unsigned char sym, t_bool in_hex)
 {
@@ -160,7 +96,7 @@ EXPORT_VOID		show_alloc_mem_ex(void)
 	struct s_block_meta *block;
 
 	line_completed = true;
-	zone = first_zone;
+	zone = g_first_zone;
 	while (zone)
 	{
 		i = -1;

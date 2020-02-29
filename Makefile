@@ -24,10 +24,13 @@ CC_FLAGS =		-Wall -Wextra -Werror
 SH_LIB_FLAGS =	-fvisibility=hidden -fPIC $(CC_FLAGS)
 
 SRC_LIST =		malloc \
-				dump \
+				get_suitable_block \
 				mmap \
+				unmap \
 				free \
-				realloc
+				realloc \
+				show_alloc_mem \
+				show_alloc_mem_ex
 OBJ =			$(addprefix obj/, $(addsuffix .o, $(SRC_LIST)))
 TESTS =			test0 \
 				test1 \
@@ -72,11 +75,11 @@ obj/%.o: src/%.c $(HEADER)
 tests: $(LINK_NAME) $(TESTS)
 
 %: tests/my/%.c
-	@gcc $< -o $@ $(INC) -lft -L ./libft -lft_malloc -L .
+	@gcc $(CC_FLAGS) $< -o $@ $(INC) -lft -L ./libft -lft_malloc -L .
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 %: tests/subject/%.c
-	@gcc $< -o $@
+	@gcc $(CC_FLAGS) $< -o $@
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 clean:

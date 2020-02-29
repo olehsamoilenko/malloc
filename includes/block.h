@@ -32,12 +32,12 @@ struct	s_block_meta
 };
 
 typedef struct s_block_meta	t_block;
-# define DATA_TO_META(block) ((t_block *)((void *)block - sizeof(t_block)))
-# define META_TO_DATA(block) ((t_block *)((void *)block + sizeof(t_block)))
+# define DATA_TO_META(block) ((void *)block - sizeof(struct s_block_meta))
+# define META_TO_DATA(block) ((void *)block + sizeof(struct s_block_meta))
 
-void	*alloc_on_block(struct s_block_meta *new_block, size_t size);
-t_bool	block_is_allocated(struct s_block_meta *block);
-void	free_allocated_block(struct s_block_meta *block, t_bool try_eat_next,
-		t_bool try_eat_prev, t_bool try_unmap);
+
+t_bool				block_is_allocated(struct s_block_meta *block);
+void				free_allocated_block(struct s_block_meta *block, t_bool try_eat_next,
+					t_bool try_eat_prev, t_bool try_unmap);
 
 #endif

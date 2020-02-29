@@ -17,6 +17,6 @@
 #  define DEBUG 1
 # else
 #  define DEBUG 0
-# endif 
+# endif
 
 #endif
