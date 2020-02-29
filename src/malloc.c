@@ -137,7 +137,9 @@ EXPORT_VOID *malloc(size_t size)
     struct s_block_meta *new_block = get_suitable_block(size);
 	if (!new_block)
 	{
-		insert_zone_to_list(mmap_zone(size));
+		void *new_zone = mmap_zone(size);
+		if (new_zone)
+			insert_zone_to_list(new_zone);
 		new_block = get_suitable_block(size);
 	}
 

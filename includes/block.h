@@ -26,7 +26,7 @@
 struct	s_block_meta
 {
 	unsigned int		available;
-	unsigned int		size;
+	size_t				size;
 	struct s_block_meta	*prev;
 	struct s_block_meta	*next;
 };

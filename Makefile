@@ -6,7 +6,7 @@
 #    By: osamoile <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/08/01 15:53:40 by osamoile          #+#    #+#              #
-#    Updated: 2019/11/09 16:15:32 by osamoile         ###   ########.fr        #
+#    Updated: 2020/02/29 12:54:02 by osamoile         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -72,11 +72,11 @@ obj/%.o: src/%.c $(HEADER)
 tests: $(LINK_NAME) $(TESTS)
 
 %: tests/my/%.c
-	@gcc $(CC_FLAGS) $< -o $@ $(INC) -lft -L ./libft -lft_malloc -L .
+	@gcc $< -o $@ $(INC) -lft -L ./libft -lft_malloc -L .
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 %: tests/subject/%.c
-	@gcc $(CC_FLAGS) $< -o $@
+	@gcc $< -o $@
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 clean:

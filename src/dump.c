@@ -57,7 +57,7 @@ static void		print_zone_info(struct s_zone_meta *zone)
 EXPORT_VOID		show_alloc_mem(void)
 {
 	struct s_zone_meta	*zone;
-	unsigned long		sum;
+	size_t				sum;
 	struct s_block_meta	*block;
 
 	pthread_mutex_lock(&g_mutex);

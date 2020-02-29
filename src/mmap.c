@@ -38,9 +38,9 @@ void insert_zone_to_list(struct s_zone_meta *zone)
 	}
 }
 
-struct s_zone_meta *mmap_zone(unsigned long size)
+struct s_zone_meta *mmap_zone(size_t size)
 {
-	unsigned long bytes_need;
+	size_t bytes_need;
 	enum e_zone_type zone_type;
 
 	if (size <= MAX_TINY_BLOCK_SIZE) {
@@ -56,8 +56,8 @@ struct s_zone_meta *mmap_zone(unsigned long size)
 		zone_type = LARGE;
 	}
 
-	unsigned int pages = (bytes_need - 1) / getpagesize() + 1;
-	unsigned long bytes_to_request = pages * getpagesize();
+	size_t pages = (bytes_need - 1) / getpagesize() + 1;
+	size_t bytes_to_request = pages * getpagesize();
 
 	#if DEBUG
 		ft_putstr("[PAGING] Bytes need: ");
@@ -70,6 +70,13 @@ struct s_zone_meta *mmap_zone(unsigned long size)
 	#endif
 
 	void *page = mmap(NULL, bytes_to_request, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+	if (page == MAP_FAILED)
+	{
+		#if DEBUG
+			ft_putendl("[PAGING] mmap failed");
+		#endif
+		return (NULL);
+	}
 	struct s_zone_meta *zone = (struct s_zone_meta *)page;
 	zone->type = zone_type;
 	zone->size = bytes_to_request;
