@@ -12,8 +12,11 @@
 
 #include "../../includes/malloc.h"
 
-// TDCHECK: between 255 and 272 pages
-// res: 266
+/*
+ * ./run.sh /usr/bin/time -l ./test1
+ * check diff between test0 and test1
+ * should be between 255 and 272 pages
+ */
 
 int main()
 {

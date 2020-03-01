@@ -12,8 +12,6 @@
 
 #include "zone.h"
 
-void						unmap(struct s_block_meta *block);
-
 static struct s_block_meta	*eat_prev(struct s_block_meta *block)
 {
 	void				*res;
@@ -67,46 +65,6 @@ void						free_allocated_block(struct s_block_meta *block,
 	block->available = true;
 	if (try_unmap == true)
 		unmap(block);
-}
-
-static void					dump_info(t_bool allocated,
-							struct s_block_meta *block)
-{
-	if (DEBUG)
-	{
-		if (allocated)
-			ft_putstr("[BLOCK] Block is allocated [Meta: ");
-		else
-			ft_putstr("[BLOCK] Block was NOT allocated [Meta: ");
-		ft_print_hex((unsigned long)block, true);
-		ft_putstr(", data: ");
-		ft_print_hex((unsigned long)DATA_TO_META(block), true);
-		ft_putendl("]");
-	}
-}
-
-t_bool						block_is_allocated(struct s_block_meta *block)
-{
-	struct s_zone_meta	*zone;
-	struct s_block_meta	*tmp;
-
-	zone = g_first_zone;
-	while (zone)
-	{
-		tmp = ZONE_TO_BLOCK(zone);
-		while (tmp)
-		{
-			if (tmp == block)
-			{
-				dump_info(true, block);
-				return (true);
-			}
-			tmp = tmp->next;
-		}
-		zone = zone->next;
-	}
-	dump_info(false, block);
-	return (false);
 }
 
 EXPORT_VOID					free(void *p)

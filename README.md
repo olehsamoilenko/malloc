@@ -26,3 +26,6 @@ Features
 * unmap-ing unused pages
 * memory hexdump with show_alloc_mem_ex()
 * debug enviroment variable DEBUG
+* test framework: make debug && sh tests/run_tests.sh
+* integrated with ls: ./run.sh 'ls -lRa /'
+* nm cleared of redundant functions

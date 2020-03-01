@@ -21,9 +21,7 @@
 # define MAX_SMALL_BLOCK_SIZE 1024
 # define EXPORT_VOID void __attribute__((visibility("default")))
 
-// TDCHECK: static functions
-
-struct	s_block_meta
+struct				s_block_meta
 {
 	unsigned int		available;
 	size_t				size;
@@ -31,13 +29,13 @@ struct	s_block_meta
 	struct s_block_meta	*next;
 };
 
-typedef struct s_block_meta	t_block;
 # define DATA_TO_META(block) ((void *)block - sizeof(struct s_block_meta))
 # define META_TO_DATA(block) ((void *)block + sizeof(struct s_block_meta))
 
-
+struct s_block_meta	*get_suitable_block(size_t size);
 t_bool				block_is_allocated(struct s_block_meta *block);
-void				free_allocated_block(struct s_block_meta *block, t_bool try_eat_next,
-					t_bool try_eat_prev, t_bool try_unmap);
+void				free_allocated_block(struct s_block_meta *block,
+					t_bool try_eat_next, t_bool try_eat_prev, t_bool try_unmap);
+void				alloc_on_block(struct s_block_meta *new_block, size_t size);
 
 #endif

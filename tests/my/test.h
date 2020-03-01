@@ -15,47 +15,47 @@
 
 # if DEBUG
 
-# include "zone.h"
+#  include "zone.h"
 
-# define OFF "\033[0m"
-# define RED "\033[0;31m"
-# define GREEN "\033[0;32m"
+#  define OFF "\033[0m"
+#  define RED "\033[0;31m"
+#  define GREEN "\033[0;32m"
 
-# define CHECK(cond) ({						\
-	t_bool res = false;						\
-	if (cond) {								\
-		res = true;							\
-	}										\
-	ft_putstr("[TEST] ");					\
-	ft_putstr(__func__);					\
-	ft_putstr(": ");						\
-	if (res) {								\
-		ft_putstr(GREEN);					\
-		ft_putstr("OK");					\
-	}										\
-	else {									\
-		ft_putstr(RED);						\
-		ft_putstr("KO");					\
-	}										\
-	ft_putendl(OFF);						\
+#  define CHECK(cond) ({									\
+	t_bool res = false;										\
+	if (cond) {												\
+		res = true;											\
+	}														\
+	ft_putstr("[TEST] ");									\
+	ft_putstr(__func__);									\
+	ft_putstr(": ");										\
+	if (res) {												\
+		ft_putstr(GREEN);									\
+		ft_putstr("OK");									\
+	}														\
+	else {													\
+		ft_putstr(RED);										\
+		ft_putstr("KO");									\
+	}														\
+	ft_putendl(OFF);										\
 })
 
-# define TEAR_DOWN() ({\
-	CHECK(get_first_zone() == NULL); \
-	struct s_zone_meta *zone;\
-	while ((zone = get_first_zone()))\
-	{\
-		struct s_block_meta *block = ZONE_TO_BLOCK(zone);\
-		while (block)\
-		{\
-			if (!block->available)\
-			{\
-				free(META_TO_DATA(block));\
-				break ;\
-			}\
-			block = block->next;\
-		}\
-	}\
+#  define TEAR_DOWN() ({									\
+	CHECK(get_first_zone() == NULL);						\
+	struct s_zone_meta *zone;								\
+	while ((zone = get_first_zone()))						\
+	{														\
+		struct s_block_meta *block = ZONE_TO_BLOCK(zone);	\
+		while (block)										\
+		{													\
+			if (!block->available)							\
+			{												\
+				free(META_TO_DATA(block));					\
+				break ;										\
+			}												\
+			block = block->next;							\
+		}													\
+	}														\
 })
 
 int getZonesNumber(void)
@@ -123,11 +123,14 @@ t_bool cmpContent(void *content, const char *data)
 
 # else
 
-# define CHECK(cond) ({						\
-	show_alloc_mem();						\
+#  include "libft.h"
+
+#  define CHECK(cond) ({									\
+	show_alloc_mem();										\
+	ft_putchar('\n');										\
 })
 
-# define TEAR_DOWN() ({})
+#  define TEAR_DOWN() ({})
 
 # endif
 

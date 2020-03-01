@@ -48,7 +48,7 @@ static void		print_zone_info(struct s_zone_meta *zone)
 	ft_putchar('\n');
 }
 
-void 			print_decimal_value(char *str, int value)
+void			print_decimal_value(char *str, int value)
 {
 	if (DEBUG)
 	{

@@ -22,7 +22,6 @@ INC =			-I ./includes \
 				-I ./libft/includes
 CC_FLAGS =		-Wall -Wextra -Werror
 SH_LIB_FLAGS =	-fvisibility=hidden -fPIC $(CC_FLAGS)
-
 SRC_LIST =		malloc \
 				get_suitable_block \
 				mmap \
@@ -38,10 +37,9 @@ TESTS =			test0 \
 				test3 \
 				test4 \
 				test5 \
-				test6 \
-				test7 \
+				test_zones \
+				test_realloc \
 				test_thread
-				# TODO: bonuses test
 
 OFF=\033[0m
 PURPLE=\033[0;38;2;102;102;255m

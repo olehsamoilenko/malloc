@@ -15,9 +15,7 @@
 struct s_zone_meta	*g_first_zone = NULL;
 pthread_mutex_t		g_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
 
-struct s_block_meta		*get_suitable_block(size_t size);
-
-enum e_zone_type		define_zone_type(size_t size)
+enum e_zone_type	define_zone_type(size_t size)
 {
 	enum e_zone_type type;
 
@@ -42,7 +40,8 @@ enum e_zone_type		define_zone_type(size_t size)
 	return (type);
 }
 
-static void				drop_info(struct s_block_meta *nb, struct s_block_meta *rb)
+static void			drop_info(struct s_block_meta *nb,
+					struct s_block_meta *rb)
 {
 	if (DEBUG)
 	{
@@ -58,7 +57,7 @@ static void				drop_info(struct s_block_meta *nb, struct s_block_meta *rb)
 	}
 }
 
-void alloc_on_block(struct s_block_meta *new_blk, size_t size)
+void				alloc_on_block(struct s_block_meta *new_blk, size_t size)
 {
 	struct s_block_meta *reduced_blk;
 	struct s_block_meta *nextnext;
@@ -86,7 +85,7 @@ void alloc_on_block(struct s_block_meta *new_blk, size_t size)
 	}
 }
 
-EXPORT_VOID	*malloc(size_t size)
+EXPORT_VOID			*malloc(size_t size)
 {
 	void				*ret;
 	struct s_block_meta	*new_block;

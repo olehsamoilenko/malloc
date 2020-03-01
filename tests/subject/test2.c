@@ -12,9 +12,11 @@
 
 #include "../../includes/malloc.h"
 
-// less pages than test1
-// TDCHECK: pages = test0 + 3
-// diff: 1
+/*
+ * ./run.sh /usr/bin/time -l ./test2
+ * check diff between test1 and test2
+ * should be 3 pages
+ */
 
 int main()
 {

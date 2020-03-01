@@ -19,4 +19,7 @@
 #  define DEBUG 0
 # endif
 
+void print_decimal_value(char *str, int value);
+void print_hex_value(char *str, unsigned long value);
+
 #endif

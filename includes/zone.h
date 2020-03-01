@@ -42,14 +42,12 @@ struct					s_zone_meta
 struct s_zone_meta		*mmap_zone(size_t size);
 enum e_zone_type		define_zone_type(size_t size);
 struct s_zone_meta		*get_my_zone_meta(struct s_block_meta *block);
-
-void print_decimal_value(char *str, int value);
-void print_hex_value(char *str, unsigned long value);
-
+void					unmap(struct s_block_meta *block);
 
 # if DEBUG
 
 struct s_zone_meta		*get_first_zone(void);
+
 # endif
 
 #endif

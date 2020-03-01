@@ -9,4 +9,4 @@ libft_malloc*.so
 *.dSYM
 text
 test.c
-test_thread
+test_*

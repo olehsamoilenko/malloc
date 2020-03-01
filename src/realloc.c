@@ -12,10 +12,8 @@
 
 #include "zone.h"
 
-void		alloc_on_block(struct s_block_meta *new_block, size_t size);
-
 static void	*malloc_and_cpy(struct s_block_meta *block,
-	size_t size, size_t old_size, void *ptr)
+			size_t size, size_t old_size, void *ptr)
 {
 	void	*ret;
 	size_t	cpy_size;
@@ -29,7 +27,7 @@ static void	*malloc_and_cpy(struct s_block_meta *block,
 }
 
 static void	dump_info(struct s_block_meta *block,
-	size_t size, enum e_zone_type new_type)
+			size_t size, enum e_zone_type new_type)
 {
 	if (DEBUG)
 	{

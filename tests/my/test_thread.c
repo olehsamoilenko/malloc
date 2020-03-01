@@ -11,8 +11,6 @@
 /* ************************************************************************** */
 
 #include "malloc.h"
-#include "test.h"
-#include <stdio.h>
 #include <pthread.h>
 
 void *thread_func()
