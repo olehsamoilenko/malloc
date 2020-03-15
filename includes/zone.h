@@ -22,34 +22,34 @@
 # include <pthread.h>
 # include "block.h"
 
-extern pthread_mutex_t		g_mutex;
-extern struct s_zone_meta	*g_first_zone;
+extern pthread_mutex_t      g_mutex;
+extern struct s_zone_meta   *g_first_zone;
 
-enum					e_zone_type
+enum                    e_zone_type
 {
-	TINY,
-	SMALL,
-	LARGE
+    TINY,
+    SMALL,
+    LARGE
 };
 
-struct					s_zone_meta
+struct                  s_zone_meta
 {
-	enum e_zone_type	type;
-	size_t				size;
-	struct s_zone_meta	*next;
+    enum e_zone_type    type;
+    size_t              size;
+    struct s_zone_meta  *next;
 };
 
-# define ZONE_TO_BLOCK(zone)	((void *)zone + sizeof(struct s_zone_meta))
-# define BLOCK_TO_ZONE(block)	((void *)block - sizeof(struct s_zone_meta))
+# define ZONE_TO_BLOCK(zone)    ((void *)zone + sizeof(struct s_zone_meta))
+# define BLOCK_TO_ZONE(block)   ((void *)block - sizeof(struct s_zone_meta))
 
-struct s_zone_meta		*mmap_zone(size_t size);
-enum e_zone_type		define_zone_type(size_t size);
-struct s_zone_meta		*get_my_zone_meta(struct s_block_meta *block);
-void					unmap(struct s_block_meta *block);
+struct s_zone_meta      *mmap_zone(size_t size);
+enum e_zone_type        define_zone_type(size_t size);
+struct s_zone_meta      *get_my_zone_meta(struct s_block_meta *block);
+void                    unmap(struct s_block_meta *block);
 
 # if DEBUG
 
-struct s_zone_meta		*get_first_zone(void);
+struct s_zone_meta      *get_first_zone(void);
 
 # endif
 

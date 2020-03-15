@@ -12,12 +12,12 @@
 
 int main()
 {
-	int i;
+    int i;
 
-	i = 0;
-	while (i < 1024)
-	{
-		i++;
-	}
-	return (0);
+    i = 0;
+    while (i < 1024)
+    {
+        i++;
+    }
+    return (0);
 }

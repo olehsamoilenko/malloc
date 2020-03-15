@@ -11,35 +11,35 @@
 # **************************************************************************** #
 
 ifeq ($(HOSTTYPE),)
-	HOSTTYPE := $(shell uname -m)_$(shell uname -s)
+    HOSTTYPE := $(shell uname -m)_$(shell uname -s)
 endif
 
-NAME =			libft_malloc_$(HOSTTYPE).so
-LINK_NAME =		libft_malloc.so
-HEADER =		./includes/malloc.h \
-				./includes/block.h
-INC =			-I ./includes \
-				-I ./libft/includes
-CC_FLAGS =		-Wall -Wextra -Werror
-SH_LIB_FLAGS =	-fvisibility=hidden -fPIC $(CC_FLAGS)
-SRC_LIST =		malloc \
-				get_suitable_block \
-				mmap \
-				unmap \
-				free \
-				realloc \
-				show_alloc_mem \
-				show_alloc_mem_ex
-OBJ =			$(addprefix obj/, $(addsuffix .o, $(SRC_LIST)))
-TESTS =			test0 \
-				test1 \
-				test2 \
-				test3 \
-				test4 \
-				test5 \
-				test_zones \
-				test_realloc \
-				test_thread
+NAME =            libft_malloc_$(HOSTTYPE).so
+LINK_NAME =       libft_malloc.so
+HEADER =          ./includes/malloc.h \
+                  ./includes/block.h
+INC =             -I ./includes \
+                  -I ./libft/includes
+CC_FLAGS =        -Wall -Wextra -Werror
+SH_LIB_FLAGS =    -fvisibility=hidden -fPIC $(CC_FLAGS)
+SRC_LIST =        malloc \
+                  get_suitable_block \
+                  mmap \
+                  unmap \
+                  free \
+                  realloc \
+                  show_alloc_mem \
+                  show_alloc_mem_ex
+OBJ =             $(addprefix obj/, $(addsuffix .o, $(SRC_LIST)))
+TESTS =           test0 \
+                  test1 \
+                  test2 \
+                  test3 \
+                  test4 \
+                  test5 \
+                  test_zones \
+                  test_realloc \
+                  test_thread
 
 OFF=\033[0m
 PURPLE=\033[0;38;2;102;102;255m

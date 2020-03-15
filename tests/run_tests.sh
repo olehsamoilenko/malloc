@@ -15,12 +15,11 @@
 cd $(dirname $0)/..
 if [ $(uname -s) = Darwin ]
 then
-	./test5
-	./test_zones
-	./test_realloc
+    ./test5
+    ./test_zones
+    ./test_realloc
 else
-	echo 
-	sh run.sh ./test5
-	sh run.sh ./test_zones
-	sh run.sh ./test_realloc
+    sh run.sh ./test5
+    sh run.sh ./test_zones
+    sh run.sh ./test_realloc
 fi
