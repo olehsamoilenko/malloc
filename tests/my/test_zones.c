@@ -44,7 +44,7 @@ int main(void)
 	free(n);
 	free(n); /* double free */
 
-	void *c = malloc(INT32_MAX + 1); /* mmap failed */
+	void *c = malloc((size_t)INT32_MAX + 1); /* mmap failed */
 	free(c);
 
 	CHECK(

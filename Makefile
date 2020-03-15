@@ -72,12 +72,16 @@ obj/%.o: src/%.c $(HEADER)
 
 tests: $(LINK_NAME) $(TESTS)
 
+%: tests/subject/%.c
+	@gcc $(CC_FLAGS) $< -o $@
+	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
+
 %: tests/my/%.c
 	@gcc $(CC_FLAGS) $< -o $@ $(INC) -lft -L ./libft -lft_malloc -L .
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
-%: tests/subject/%.c
-	@gcc $(CC_FLAGS) $< -o $@
+test_thread: tests/my/test_thread.c
+	@gcc $(CC_FLAGS) $< -o $@ $(INC) -lft -L ./libft -lft_malloc -L . -lpthread
 	@echo "$(WHITEBOLD)$@$(PURPLE) ready$(OFF)"
 
 clean:

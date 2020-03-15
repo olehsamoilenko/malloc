@@ -13,7 +13,11 @@
 #include "zone.h"
 
 struct s_zone_meta	*g_first_zone = NULL;
+# ifdef __linux__
+pthread_mutex_t		g_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+# else
 pthread_mutex_t		g_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
+# endif
 
 enum e_zone_type	define_zone_type(size_t size)
 {

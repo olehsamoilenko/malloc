@@ -16,6 +16,9 @@
 # define BLOCKS_IN_ZONE 100
 
 # include <stdlib.h>
+# ifdef __linux__
+#  define __USE_GNU
+# endif
 # include <pthread.h>
 # include "block.h"
 

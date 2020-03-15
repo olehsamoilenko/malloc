@@ -34,5 +34,7 @@ int main()
 		&& getZoneTh(5)->type == LARGE
 		&& getBlocksNumber(getZoneTh(1)) == 1
 	);
+
+	(void)ptr;
 	return (0);
 }
